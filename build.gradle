@@ -1,17 +1,23 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'application'
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.8.0"
 }
 
 group = 'org.sol4k'
 version = '1.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    implementation 'org.bitcoinj:bitcoinj-core:0.16.2'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+    implementation 'com.iwebpp.crypto:tweetnacl-java:1.1.2-SNAPSHOT'
 }
 
 test {
@@ -19,7 +25,7 @@ test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
 }
 
 application {
