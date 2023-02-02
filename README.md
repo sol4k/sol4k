@@ -1,10 +1,11 @@
 # sol4k [![build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-Sol4k is a Kotlin client for Solana. It can be used with Java
-or any JVM language as well as in Android.
+Sol4k is a Kotlin client for Solana that can be used with
+Java or any other JVM language, as well as in Android.
 
-This project is in development. If you want to contribute,
-please check opened issues or submit a pull request.
+This project is under development. If you would like to
+contribute, please check the open issues or submit
+a pull request.
 
 ## How to use
 
