@@ -11,10 +11,5 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-      - name: Build tweetnacl-java from sources
-        run: |
-          git clone https://github.com/sol4k/tweetnacl.git
-          cd tweetnacl
-          mvn  install
       - name: Build
         run: ./gradlew build
