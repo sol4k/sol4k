@@ -1,6 +1,6 @@
 package org.sol4k
 
-import com.iwebpp.crypto.TweetNaclFast
+import org.sol4k.tweetnacl.TweetNaclFast
 
 class Keypair private constructor(
     private val keypair: TweetNaclFast.Signature.KeyPair,

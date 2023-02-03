@@ -13,8 +13,8 @@ jobs:
           distribution: 'temurin'
       - name: Build tweetnacl-java from sources
         run: |
-          git clone https://github.com/InstantWebP2P/tweetnacl-java.git
-          cd tweetnacl-java
+          git clone https://github.com/sol4k/tweetnacl.git
+          cd tweetnacl
           mvn  install
       - name: Build
         run: ./gradlew build
