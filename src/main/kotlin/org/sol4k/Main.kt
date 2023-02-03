@@ -3,7 +3,7 @@ package org.sol4k
 import org.bitcoinj.core.Base58
 
 
-fun main(args: Array<String>) {
+fun main() {
     val connection = Connection("https://api.devnet.solana.com")
     val latestBlockhash = connection.getLatestBlockhash()
     val sender = Keypair.fromSecretKey(
