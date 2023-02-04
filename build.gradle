@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.sol4k'
-version = '0.1.1'
+version = '0.1.2'
 
 repositories {
     mavenLocal()
@@ -33,7 +33,7 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates("org.sol4k", "sol4k", "0.1.1")
+    coordinates("org.sol4k", "sol4k", "0.1.2")
 
     pom {
         name = "sol4k"
