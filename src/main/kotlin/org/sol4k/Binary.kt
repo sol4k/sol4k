@@ -1,4 +1,4 @@
-package org.sol4k.bn
+package org.sol4k
 
 object Binary {
     @JvmStatic fun uint32(value: Long): ByteArray {

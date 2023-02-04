@@ -1,7 +1,5 @@
 package org.sol4k
 
-import org.sol4k.bn.Binary
-
 class TransferInstruction(
     private val from: PublicKey,
     private val to: PublicKey,
