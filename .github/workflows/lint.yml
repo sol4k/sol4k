@@ -1,4 +1,4 @@
-name: build
+name: Code Style
 on: [ push ]
 jobs:
   build:
@@ -11,5 +11,5 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-      - name: Build
-        run: ./gradlew build
+      - name: Check Code Style
+        run: ./gradlew ktlintCheck
