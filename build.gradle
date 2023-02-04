@@ -33,7 +33,7 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates("com.sol4k", "sol4k", "0.1.0")
+    coordinates("org.sol4k", "sol4k", "0.1.0")
 
     pom {
         name = "sol4k"
