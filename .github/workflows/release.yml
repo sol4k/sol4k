@@ -1,6 +1,8 @@
 name: Publish to Maven Central
 
-on: [ push ]
+on:
+  release:
+    types: [created]
 
 jobs:
   publish:
