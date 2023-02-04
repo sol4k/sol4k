@@ -13,9 +13,9 @@ class Keypair private constructor(
         get() = PublicKey(keypair.publicKey)
 
     companion object {
-        fun generate(): Keypair = Keypair(TweetNaclFast.Signature.keyPair())
+        @JvmStatic fun generate(): Keypair = Keypair(TweetNaclFast.Signature.keyPair())
 
-        fun fromSecretKey(secret: ByteArray): Keypair {
+        @JvmStatic fun fromSecretKey(secret: ByteArray): Keypair {
             return Keypair(TweetNaclFast.Signature.keyPair_fromSeed(secret))
         }
     }

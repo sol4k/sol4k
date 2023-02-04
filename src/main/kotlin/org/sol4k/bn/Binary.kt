@@ -1,7 +1,7 @@
 package org.sol4k.bn
 
 object Binary {
-    fun uint32(value: Long): ByteArray {
+    @JvmStatic fun uint32(value: Long): ByteArray {
         val byteArray = ByteArray(4)
         byteArray[0] = (0xFFL and value).toByte()
         byteArray[1] = (0xFFL and (value shr 8)).toByte()
@@ -10,7 +10,7 @@ object Binary {
         return byteArray
     }
 
-    fun int64(value: Long): ByteArray {
+    @JvmStatic fun int64(value: Long): ByteArray {
         val byteArray = ByteArray(8)
         byteArray[0] = (0xFFL and value).toByte()
         byteArray[1] = (0xFFL and (value shr 8)).toByte()
@@ -23,14 +23,14 @@ object Binary {
         return byteArray
     }
 
-    fun uint16(value: Int): ByteArray {
+    @JvmStatic fun uint16(value: Int): ByteArray {
         val byteArray = ByteArray(2)
         byteArray[0] = (0xFF and value).toByte()
         byteArray[1] = (0xFF and (value shr 8)).toByte()
         return byteArray
     }
 
-    fun encodeLength(len: Int): ByteArray {
+    @JvmStatic fun encodeLength(len: Int): ByteArray {
         val out = ByteArray(10)
         var remLen = len
         var cursor = 0
