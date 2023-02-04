@@ -1,4 +1,4 @@
-# sol4k [![build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://search.maven.org/artifact/org.sol4k/sol4k) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
+# sol4k [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://search.maven.org/artifact/org.sol4k/sol4k) [![Code Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
 Sol4k is a Kotlin client for Solana that can be used with
 Java or any other JVM language, as well as in Android.
@@ -12,7 +12,7 @@ a pull request.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.1.3'
+implementation 'org.sol4k:sol4k:0.1.4'
 ```
 
 Maven:
@@ -20,7 +20,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 </dependency>
 ```
 

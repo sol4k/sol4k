@@ -1,8 +1,8 @@
 package org.sol4k
 
-import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import org.bitcoinj.core.Base58
 import org.sol4k.bn.Binary
+import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import java.nio.ByteBuffer
 
 class Transaction(
@@ -33,18 +33,18 @@ class Transaction(
                 transactionAccountPublicKeys.indexOf(instruction.keys[it].publicKey).toByte()
             }
             byteArrayOf(transactionAccountPublicKeys.indexOf(instruction.programId).toByte()) +
-                    Binary.encodeLength(instruction.keys.size) +
-                    keyIndices +
-                    Binary.encodeLength(instruction.data.size) +
-                    instruction.data
+                Binary.encodeLength(instruction.keys.size) +
+                keyIndices +
+                Binary.encodeLength(instruction.data.size) +
+                instruction.data
         }
         val instructionsLength = Binary.encodeLength(instructions.size)
         val bufferSize = HEADER_LENGTH +
-                RECENT_BLOCK_HASH_LENGTH +
-                accountAddressesLength.size +
-                (accountKeys.size * PUBLIC_KEY_LENGTH) +
-                instructionsLength.size +
-                instructionBytes.sumOf { it.size }
+            RECENT_BLOCK_HASH_LENGTH +
+            accountAddressesLength.size +
+            (accountKeys.size * PUBLIC_KEY_LENGTH) +
+            instructionsLength.size +
+            instructionBytes.sumOf { it.size }
         val buffer = ByteBuffer.allocate(bufferSize)
         val numRequiredSignatures = accountKeys.count { it.signer }.toByte()
         val numReadonlySignedAccounts = accountKeys.count { it.signer && !it.writable }.toByte()

@@ -1,12 +1,13 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'org.jetbrains.dokka' version '1.7.20'
-    id "com.vanniktech.maven.publish" version '0.24.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.8.0"
+    id 'com.vanniktech.maven.publish' version '0.24.0'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.0'
+    id 'org.jlleitschuh.gradle.ktlint' version '11.1.0'
 }
 
 group = 'org.sol4k'
-version = '0.1.3'
+version = '0.1.4'
 
 repositories {
     mavenLocal()
@@ -15,9 +16,9 @@ repositories {
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'org.bitcoinj:bitcoinj-core:0.16.2'
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
     implementation 'org.sol4k:tweetnacl:0.1.5'
 }
 
@@ -33,31 +34,31 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates("org.sol4k", "sol4k", "0.1.3")
+    coordinates('org.sol4k', 'sol4k', '0.1.4')
 
     pom {
-        name = "sol4k"
-        description = "Kotlin, JVM, and Android client for Solana"
-        inceptionYear = "2023"
-        url = "https://github.com/sol4k/sol4k/"
+        name = 'sol4k'
+        description = 'Kotlin, JVM, and Android client for Solana'
+        inceptionYear = '2023'
+        url = 'https://github.com/sol4k/sol4k/'
         licenses {
             license {
-                name = "The Apache License, Version 2.0"
-                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                name = 'The Apache License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
             }
         }
         developers {
             developer {
-                id = "shpota"
-                name = "Sasha Shpota"
-                url = "https://github.com/shpota/"
+                id = 'shpota'
+                name = 'Sasha Shpota'
+                url = 'https://github.com/shpota/'
             }
         }
         scm {
-            url = "https://github.com/sol4k/sol4k/"
-            connection = "scm:git:git://github.com/sol4k/sol4k.git"
-            developerConnection = "scm:git:ssh://git@github.com/sol4k/sol4k.git"
+            url = 'https://github.com/sol4k/sol4k/'
+            connection = 'scm:git:git://github.com/sol4k/sol4k.git'
+            developerConnection = 'scm:git:ssh://git@github.com/sol4k/sol4k.git'
         }
     }
 }

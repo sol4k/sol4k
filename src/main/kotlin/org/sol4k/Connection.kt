@@ -9,7 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.sol4k.api.Blockhash
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.RpcResponse
-import java.util.*
+import java.util.Base64
 
 class Connection(private val rpcUrl: String) {
     private val client = OkHttpClient()
