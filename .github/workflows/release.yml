@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: 'temurin'
       - name: Build and publish artifacts
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
