@@ -1,7 +1,5 @@
 package org.sol4k
 
-import org.bitcoinj.core.Base58
-import org.sol4k.bn.Binary
 import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import java.nio.ByteBuffer
 

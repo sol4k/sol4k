@@ -1,7 +1,5 @@
 package org.sol4k
 
-import org.bitcoinj.core.Base58
-
 class PublicKey {
     private val bytes: ByteArray
 
