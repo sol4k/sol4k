@@ -12,7 +12,7 @@ a pull request.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.1.6'
+implementation 'org.sol4k:sol4k:0.1.7'
 ```
 
 Maven:
@@ -20,7 +20,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.1.6</version>
+    <version>0.1.7</version>
 </dependency>
 ```
 
