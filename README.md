@@ -30,7 +30,7 @@ Maven:
 ## How to use
 
 Create a connection, request the latest blockhash, and submit
-a SOL transfer transaction from one account to another:
+a SOL transfer transaction from one account to another
 ```kotlin
 val connection = Connection("https://api.devnet.solana.com")
 val latestBlockhash = connection.getLatestBlockhash()
@@ -50,7 +50,7 @@ of transferring SOL.
 
 ## Further development
 
-The following functionality will be added in the future
+The following functionality will be added in the future:
  - WebSocket APIs
  - More RPC functions
  - Account Management APIs
