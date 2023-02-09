@@ -1,13 +1,13 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.10'
     id 'org.jetbrains.dokka' version '1.7.20'
     id 'com.vanniktech.maven.publish' version '0.24.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.0'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10'
     id 'org.jlleitschuh.gradle.ktlint' version '11.1.0'
 }
 
 group = 'org.sol4k'
-version = '0.1.7'
+version = '0.1.8'
 
 repositories {
     mavenLocal()
@@ -34,7 +34,7 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates('org.sol4k', 'sol4k', '0.1.7')
+    coordinates('org.sol4k', 'sol4k', '0.1.8')
 
     pom {
         name = 'sol4k'
