@@ -1,13 +1,16 @@
 package org.sol4k
 
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.sol4k.api.Blockhash
 import org.sol4k.rpc.BlockhashResponse
+import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
 import java.util.Base64
 
@@ -19,14 +22,9 @@ class Connection(private val rpcUrl: String) {
         val request = Request.Builder()
             .url(rpcUrl)
             .post(
-                """
-                    {
-                        "jsonrpc": "2.0",
-                        "id": 1,
-                        "method": "getBalance",
-                        "params": [ "$walletAddress" ]
-                      }
-                """.toRequestBody(json)
+                Json.encodeToString(
+                    RpcRequest("getBalance", listOf(walletAddress)),
+                ).toRequestBody(json),
             )
             .build()
 
@@ -39,12 +37,12 @@ class Connection(private val rpcUrl: String) {
         val request = Request.Builder()
             .url(rpcUrl)
             .post(
-                """{
-                    "id":1,
-                    "jsonrpc":"2.0",
-                    "method":"getLatestBlockhash",
-                    "params":[ { "commitment":"finalized" } ]
-                }""".toRequestBody(json)
+                Json.encodeToString(
+                    RpcRequest(
+                        "getLatestBlockhash",
+                        listOf(mapOf("commitment" to "finalized")),
+                    ),
+                ).toRequestBody(json),
             )
             .build()
         val response = client.newCall(request).execute().use { response ->
@@ -59,16 +57,19 @@ class Connection(private val rpcUrl: String) {
     }
 
     fun sendTransaction(transaction: Transaction): String {
-        val base64Trx = Base64.getEncoder().encodeToString(transaction.serialize())
+        val encodedTransaction = Base64.getEncoder().encodeToString(transaction.serialize())
         val request = Request.Builder()
             .url(rpcUrl)
             .post(
-                """{
-                    "id":1,
-                    "jsonrpc":"2.0",
-                    "method":"sendTransaction",
-                    "params":["$base64Trx",{"encoding":"base64"}]
-                }""".toRequestBody(json)
+                Json.encodeToString(
+                    RpcRequest(
+                        "sendTransaction",
+                        listOf(
+                            Json.encodeToJsonElement(encodedTransaction),
+                            Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+                        ),
+                    ),
+                ).toRequestBody(json)
             )
             .build()
         val result = client.newCall(request).execute().use { response ->
