@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.sol4k'
-version = '0.1.8'
+version = '0.1.9'
 
 repositories {
     mavenLocal()
@@ -31,11 +31,37 @@ kotlin {
     jvmToolchain(11)
 }
 
+sourceSets {
+    integrationTest {
+        kotlin {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/kotlin')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = 'Runs the integration tests.'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    testLogging.showStandardStreams = true
+    mustRunAfter tasks.test
+}
+
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates('org.sol4k', 'sol4k', '0.1.8')
+    coordinates('org.sol4k', 'sol4k', '0.1.9')
 
     pom {
         name = 'sol4k'
