@@ -9,46 +9,29 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.sol4k.api.Blockhash
+import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
+import java.math.BigInteger
 import java.util.Base64
 
 class Connection(private val rpcUrl: String) {
     private val client = OkHttpClient()
-    private val json = "application/json".toMediaType()
+    private val contentType = "application/json".toMediaType()
+    private val jsonParser = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
-    fun getBalance(walletAddress: String): String {
-        val request = Request.Builder()
-            .url(rpcUrl)
-            .post(
-                Json.encodeToString(
-                    RpcRequest("getBalance", listOf(walletAddress)),
-                ).toRequestBody(json),
-            )
-            .build()
-
-        return client.newCall(request).execute().use { response ->
-            response.body!!.string()
-        }
+    fun getBalance(walletAddress: PublicKey): BigInteger {
+        val request = request("getBalance", listOf(walletAddress.toBase58()))
+        return rpcCall<Balance>(request).value
     }
 
     fun getLatestBlockhash(): Blockhash {
-        val request = Request.Builder()
-            .url(rpcUrl)
-            .post(
-                Json.encodeToString(
-                    RpcRequest(
-                        "getLatestBlockhash",
-                        listOf(mapOf("commitment" to "finalized")),
-                    ),
-                ).toRequestBody(json),
-            )
-            .build()
-        val response = client.newCall(request).execute().use { response ->
-            response.body!!.string()
-        }
-        val (_, result) = Json.decodeFromString<RpcResponse<BlockhashResponse>>(response)
+        val request = request("getLatestBlockhash", listOf(mapOf("commitment" to "finalized")))
+        val result = rpcCall<BlockhashResponse>(request)
         return Blockhash(
             blockhash = result.value.blockhash,
             slot = result.context.slot,
@@ -58,23 +41,29 @@ class Connection(private val rpcUrl: String) {
 
     fun sendTransaction(transaction: Transaction): String {
         val encodedTransaction = Base64.getEncoder().encodeToString(transaction.serialize())
-        val request = Request.Builder()
-            .url(rpcUrl)
-            .post(
-                Json.encodeToString(
-                    RpcRequest(
-                        "sendTransaction",
-                        listOf(
-                            Json.encodeToJsonElement(encodedTransaction),
-                            Json.encodeToJsonElement(mapOf("encoding" to "base64")),
-                        ),
-                    ),
-                ).toRequestBody(json)
+        val request = request(
+            "sendTransaction",
+            listOf(
+                Json.encodeToJsonElement(encodedTransaction),
+                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
             )
-            .build()
-        val result = client.newCall(request).execute().use { response ->
-            response.body!!.string()
-        }
-        return Json.decodeFromString<RpcResponse<String>>(result).result
+        )
+        return rpcCall(request)
     }
+
+    private inline fun <reified T> rpcCall(request: Request): T {
+        val response = client.newCall(request).execute().use { response ->
+            val body = response.body ?: throw IllegalArgumentException("Received empty response from the RPC node")
+            body.string()
+        }
+        val (_, result) = jsonParser.decodeFromString<RpcResponse<T>>(response)
+        return result
+    }
+
+    private inline fun <reified T : Any> request(method: String, params: List<T>): Request =
+        Request.Builder().url(rpcUrl).post(
+            Json.encodeToString(
+                RpcRequest(method, params)
+            ).toRequestBody(contentType),
+        ).build()
 }
