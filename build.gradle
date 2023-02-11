@@ -9,6 +9,9 @@ plugins {
 group = 'org.sol4k'
 version = '0.1.9'
 
+sourceCompatibility = 8
+targetCompatibility = 8
+
 repositories {
     mavenLocal()
     mavenCentral()
