@@ -67,7 +67,7 @@ mavenPublishing {
         name = 'sol4k'
         description = 'Kotlin, JVM, and Android client for Solana'
         inceptionYear = '2023'
-        url = 'https://github.com/sol4k/sol4k/'
+        url = 'https://sol4k.org'
         licenses {
             license {
                 name = 'The Apache License, Version 2.0'
