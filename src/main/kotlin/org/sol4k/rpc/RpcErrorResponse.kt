@@ -3,8 +3,8 @@ package org.sol4k.rpc
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class RpcResponse<T>(
-    val result: T,
+internal data class RpcErrorResponse(
+    val error: RpcError,
     val id: Long,
     val jsonrpc: String,
 )

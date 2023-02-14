@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.sol4k'
-version = '0.1.9'
+version = "$currentVersion"
 
 repositories {
     mavenLocal()
@@ -25,6 +25,10 @@ dependencies {
 test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 kotlin {
@@ -61,7 +65,7 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
     signAllPublications()
 
-    coordinates('org.sol4k', 'sol4k', '0.1.9')
+    coordinates('org.sol4k', 'sol4k', "$currentVersion")
 
     pom {
         name = 'sol4k'
