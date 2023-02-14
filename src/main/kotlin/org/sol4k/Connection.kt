@@ -1,5 +1,6 @@
 package org.sol4k
 
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -9,14 +10,22 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.sol4k.api.Blockhash
+import org.sol4k.api.Commitment
+import org.sol4k.api.Commitment.FINALIZED
+import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
+import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
+import java.lang.IllegalStateException
 import java.math.BigInteger
 import java.util.Base64
 
-class Connection(private val rpcUrl: String) {
+class Connection @JvmOverloads constructor(
+    private val rpcUrl: String,
+    private val commitment: Commitment = FINALIZED,
+) {
     private val client = OkHttpClient()
     private val contentType = "application/json".toMediaType()
     private val jsonParser = Json {
@@ -29,8 +38,9 @@ class Connection(private val rpcUrl: String) {
         return rpcCall<Balance>(request).value
     }
 
-    fun getLatestBlockhash(): Blockhash {
-        val request = request("getLatestBlockhash", listOf(mapOf("commitment" to "finalized")))
+    @JvmOverloads
+    fun getLatestBlockhash(commitment: Commitment = this.commitment): Blockhash {
+        val request = request("getLatestBlockhash", listOf(mapOf("commitment" to commitment)))
         val result = rpcCall<BlockhashResponse>(request)
         return Blockhash(
             blockhash = result.value.blockhash,
@@ -52,12 +62,17 @@ class Connection(private val rpcUrl: String) {
     }
 
     private inline fun <reified T> rpcCall(request: Request): T {
-        val response = client.newCall(request).execute().use { response ->
-            val body = response.body ?: throw IllegalArgumentException("Received empty response from the RPC node")
+        val responseBody = client.newCall(request).execute().use { response ->
+            val body = response.body ?: throw IllegalStateException("Received empty response from the RPC node")
             body.string()
         }
-        val (_, result) = jsonParser.decodeFromString<RpcResponse<T>>(response)
-        return result
+        try {
+            val (result) = jsonParser.decodeFromString<RpcResponse<T>>(responseBody)
+            return result
+        } catch (_: SerializationException) {
+            val (error) = jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
+            throw RpcException(error.code, error.message, responseBody)
+        }
     }
 
     private inline fun <reified T : Any> request(method: String, params: List<T>): Request =
