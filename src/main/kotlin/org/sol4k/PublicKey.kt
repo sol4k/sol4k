@@ -1,5 +1,12 @@
 package org.sol4k
 
+import org.bitcoinj.core.Sha256Hash
+import org.sol4k.Constants.ASSOCIATED_TOKEN_PROGRAM_ID
+import org.sol4k.Constants.TOKEN_PROGRAM_ID
+import org.sol4k.tweetnacl.TweetNaclFast
+import java.lang.RuntimeException
+import java.nio.ByteBuffer
+
 class PublicKey {
     private val bytes: ByteArray
 
@@ -30,5 +37,49 @@ class PublicKey {
 
     override fun hashCode(): Int {
         return bytes.contentHashCode()
+    }
+
+    companion object {
+        private fun createProgramAddress(seeds: List<ByteArray>, programId: PublicKey): PublicKey {
+            val programDerivedAddressLabel = "ProgramDerivedAddress".toByteArray()
+            val buffer = ByteBuffer.allocate(
+                seeds.sumOf { it.size } +
+                    programId.bytes.size +
+                    programDerivedAddressLabel.size
+            )
+            seeds.forEach { buffer.put(it) }
+            buffer.put(programId.bytes)
+            buffer.put(programDerivedAddressLabel)
+            val hash = Sha256Hash.hash(buffer.array())
+            if (!TweetNaclFast.isOnCurve(hash)) {
+                return PublicKey(hash)
+            } else {
+                throw IllegalArgumentException("Invalid seeds")
+            }
+        }
+
+        @JvmStatic
+        fun findProgramAddress(
+            seeds: List<PublicKey>,
+            programId: PublicKey,
+        ): ProgramDerivedAddress {
+            val seedsBinary = seeds.map { it.bytes }
+            for (nonce in 255 downTo 1) try {
+                val newSeeds = seedsBinary + byteArrayOf(nonce.toByte())
+                val address = createProgramAddress(newSeeds, programId)
+                return ProgramDerivedAddress(address, nonce)
+            } catch (e: Exception) { /* ignore */
+            }
+            throw RuntimeException("Unable to find program address")
+        }
+
+        @JvmStatic
+        fun findProgramDerivedAddress(
+            holderAddress: PublicKey,
+            tokenMintAddress: PublicKey,
+        ): ProgramDerivedAddress = findProgramAddress(
+            listOf(holderAddress, TOKEN_PROGRAM_ID, tokenMintAddress),
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+        )
     }
 }

@@ -1,7 +1,10 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
+import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger.ZERO
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class ConnectionTest {
@@ -46,5 +49,53 @@ internal class ConnectionTest {
         val signature = connection.sendTransaction(transaction)
 
         assertTrue("signature must not be blank") { signature.isNotBlank() }
+    }
+
+    @Test
+    fun shouldSendCreateAssociatedTokenTransaction() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+        val payer = Keypair.fromSecretKey(
+            Base58.decode("2WGcYYau2gLu2DUq68SxxXQmCgi77n8hFqqLNbNyg6Xfh2m3tvg8LF5Lgh69CFDux41LUKV1ak1ERHUqiBZnyshz")
+        )
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val owner = Keypair.generate().publicKey
+        val (associatedAccount) = PublicKey.findProgramDerivedAddress(owner, usdc)
+        val instruction = CreateAssociatedTokenAccountInstruction(
+            payer.publicKey,
+            associatedAccount,
+            owner,
+            usdc,
+        )
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            payer.publicKey,
+        )
+        transaction.sign(payer)
+
+        val signature = connection.sendTransaction(transaction)
+
+        assertTrue("signature must not be blank") { signature.isNotBlank() }
+    }
+
+    @Test
+    fun shouldGetAccountInfo() {
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val connection = Connection(rpcUrl)
+
+        val accountInfo = connection.getAccountInfo(usdc)
+
+        assertTrue("accountInfo must not be blank") { accountInfo!!.data.isNotEmpty() }
+    }
+
+    @Test
+    fun shouldGetAccountInfoWhenAccountDoesNotExist() {
+        val connection = Connection(rpcUrl)
+        val publicKey = Keypair.generate().publicKey
+
+        val accountInfo = connection.getAccountInfo(publicKey)
+
+        assertNull(accountInfo, "accountInfo must not null")
     }
 }

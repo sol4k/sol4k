@@ -19,7 +19,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'org.bitcoinj:bitcoinj-core:0.16.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
-    implementation 'org.sol4k:tweetnacl:0.1.5'
+    implementation 'org.sol4k:tweetnacl:0.1.6'
 }
 
 test {
@@ -32,7 +32,7 @@ compileKotlin {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(8)
 }
 
 sourceSets {

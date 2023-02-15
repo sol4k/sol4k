@@ -9,12 +9,14 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
 import org.sol4k.api.Commitment.FINALIZED
 import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
+import org.sol4k.rpc.GetAccountInfoResponse
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
@@ -47,6 +49,27 @@ class Connection @JvmOverloads constructor(
             slot = result.context.slot,
             lastValidBlockHeight = result.value.lastValidBlockHeight,
         )
+    }
+
+    fun getAccountInfo(accountAddress: PublicKey): AccountInfo? {
+        val request = request(
+            "getAccountInfo",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(mapOf("encoding" to "base58")),
+            )
+        )
+        val (value) = rpcCall<GetAccountInfoResponse>(request)
+        return value?.let {
+            AccountInfo(
+                data = Base58.decode(value.data[0]),
+                executable = value.executable,
+                lamports = value.lamports,
+                owner = PublicKey(value.owner),
+                rentEpoch = value.rentEpoch,
+                space = value.space,
+            )
+        }
     }
 
     fun sendTransaction(transaction: Transaction): String {
