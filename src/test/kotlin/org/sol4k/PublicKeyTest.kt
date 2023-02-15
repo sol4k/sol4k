@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 internal class PublicKeyTest {
 
     @Test
-    fun bytes() {
+    fun testBytes() {
         val input = byteArrayOf(
             -64,
             125,
@@ -50,7 +50,7 @@ internal class PublicKeyTest {
     }
 
     @Test
-    fun toBase58() {
+    fun testToBase58() {
         val input = byteArrayOf(
             -64,
             125,
@@ -133,5 +133,16 @@ internal class PublicKeyTest {
         val publicKeyString = publicKey.toString()
 
         assertEquals("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx", publicKeyString)
+    }
+
+    @Test
+    fun shouldFindProgramDerivedAddress() {
+        val holder = PublicKey("CYLdTZhP8d1GDGeeNapgPdUcPiux1U9B26315x38TtbQ")
+        val tokenAddress = PublicKey("CYLdTZhP8d1GDGeeNapgPdUcPiux1U9B26315x38TtbQ")
+
+        val (publicKey, nonce) = PublicKey.findProgramDerivedAddress(holder, tokenAddress)
+
+        assertEquals(nonce, 254)
+        assertEquals("3W9cYxjkWXUPAsfGJ1GNdFiZsGEwcoopwMz4S8eAkkXd", publicKey.toBase58())
     }
 }

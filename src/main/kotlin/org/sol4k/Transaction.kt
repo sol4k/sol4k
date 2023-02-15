@@ -1,5 +1,6 @@
 package org.sol4k
 
+import org.sol4k.instruction.Instruction
 import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import java.nio.ByteBuffer
 
@@ -73,13 +74,14 @@ class Transaction(
     }
 
     private fun buildAccountKeys(): List<AccountMeta> {
+        val programIds = instructions
+            .map { it.programId }.toSet()
         val baseAccountKeys = instructions
             .flatMap { it.keys }
             .filter { acc -> acc.publicKey != this.feePayer }
-        val programIdKeys = instructions
-            .map { it.programId }
+            .filter { acc -> acc.publicKey !in programIds }
+        val programIdKeys = programIds
             .map { AccountMeta(it, writable = false, signer = false) }
-            .toSet()
         val feePayerList = listOf(AccountMeta(feePayer, writable = true, signer = true))
         return feePayerList + baseAccountKeys + programIdKeys
     }

@@ -1,4 +1,7 @@
-package org.sol4k
+package org.sol4k.instruction
+
+import org.sol4k.AccountMeta
+import org.sol4k.PublicKey
 
 data class BaseInstruction(
     override val data: ByteArray,
