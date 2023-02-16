@@ -2,6 +2,7 @@ package org.sol4k
 
 import org.junit.jupiter.api.Test
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
+import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger.ZERO
 import kotlin.test.assertNull
@@ -97,5 +98,33 @@ internal class ConnectionTest {
         val accountInfo = connection.getAccountInfo(publicKey)
 
         assertNull(accountInfo, "accountInfo must not null")
+    }
+
+    @Test
+    fun shouldSendSpl() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+        val holder = Keypair.fromSecretKey(
+            Base58.decode("4hf2H4aigDTWNVitY2CT2vstfqs4brsSFw2nvoKAyZ9LjQ1JUGhB6kaToRh9WBVhVzknzQywjEDQfGp4pkrhMQJv")
+        )
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val receiverAssociatedAccount = PublicKey("8r2iVNBQgJi59YCdj2YXipguirWZhdysWpL4cEGorN1v")
+        val (holderAssociatedAccount) = PublicKey.findProgramDerivedAddress(holder.publicKey, usdc)
+        val splTransferInstruction = SplTransferInstruction(
+            holderAssociatedAccount,
+            receiverAssociatedAccount,
+            holder.publicKey,
+            100,
+        )
+        val transaction = Transaction(
+            blockhash,
+            splTransferInstruction,
+            holder.publicKey
+        )
+        transaction.sign(holder)
+
+        val signature = connection.sendTransaction(transaction)
+
+        assertTrue("signature must not be blank") { signature.isNotBlank() }
     }
 }

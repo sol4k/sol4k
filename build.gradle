@@ -15,11 +15,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'org.bitcoinj:bitcoinj-core:0.16.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
     implementation 'org.sol4k:tweetnacl:0.1.6'
+    implementation 'org.bitcoinj:bitcoinj-core:0.16.2'
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 test {
@@ -28,7 +28,11 @@ test {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions {
+        jvmTarget = '1.8'
+        languageVersion = '1.4'
+        apiVersion = '1.4'
+    }
 }
 
 kotlin {

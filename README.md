@@ -15,7 +15,7 @@ and performing byte operations.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.1.11'
+implementation 'org.sol4k:sol4k:0.1.12'
 ```
 
 Maven:
@@ -23,7 +23,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.1.11</version>
+    <version>0.1.12</version>
 </dependency>
 ```
 
