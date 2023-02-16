@@ -1,11 +1,10 @@
 package org.sol4k
 
-import org.bitcoinj.core.Sha256Hash
 import org.sol4k.Constants.ASSOCIATED_TOKEN_PROGRAM_ID
 import org.sol4k.Constants.TOKEN_PROGRAM_ID
 import org.sol4k.tweetnacl.TweetNaclFast
-import java.lang.RuntimeException
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 
 class PublicKey {
     private val bytes: ByteArray
@@ -50,7 +49,7 @@ class PublicKey {
             seeds.forEach { buffer.put(it) }
             buffer.put(programId.bytes)
             buffer.put(programDerivedAddressLabel)
-            val hash = Sha256Hash.hash(buffer.array())
+            val hash = MessageDigest.getInstance("SHA-256").digest(buffer.array())
             if (!TweetNaclFast.isOnCurve(hash)) {
                 return PublicKey(hash)
             } else {
