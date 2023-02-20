@@ -63,6 +63,8 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     testLogging.showStandardStreams = true
     mustRunAfter tasks.test
+    systemProperty "E2E_RPC_URL", System.env.E2E_RPC_URL
+    systemProperty "E2E_SECRET_KEY", System.env.E2E_SECRET_KEY
 }
 
 mavenPublishing {
