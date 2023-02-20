@@ -1,8 +1,8 @@
 name: Integration Test
 on:
   push:
-    branches:
-      - '!main'
+    branches-ignore:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,4 +15,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
       - name: Build
+        env:
+          E2E_RPC_URL: ${{ secrets.E2E_RPC_URL }}
+          E2E_SECRET_KEY: ${{ secrets.E2E_SECRET_KEY }}
         run: ./gradlew integrationTest

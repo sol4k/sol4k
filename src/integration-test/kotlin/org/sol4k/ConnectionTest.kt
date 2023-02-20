@@ -9,8 +9,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class ConnectionTest {
-
-    private val rpcUrl = "https://api.devnet.solana.com"
+    private val rpcUrl = System.getProperty("E2E_RPC_URL")
+    private val secretKey = System.getProperty("E2E_SECRET_KEY")
 
     @Test
     fun shouldGetBalance() {
@@ -35,9 +35,7 @@ internal class ConnectionTest {
     fun shouldSendTransaction() {
         val connection = Connection(rpcUrl)
         val (blockhash) = connection.getLatestBlockhash()
-        val sender = Keypair.fromSecretKey(
-            Base58.decode("2WGcYYau2gLu2DUq68SxxXQmCgi77n8hFqqLNbNyg6Xfh2m3tvg8LF5Lgh69CFDux41LUKV1ak1ERHUqiBZnyshz")
-        )
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
         val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
         val transaction = Transaction(
@@ -53,12 +51,34 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldSendTowInstructionsInOneTransaction() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(
+            Base58.decode(secretKey)
+        )
+        val firstReceiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val secondReceiver = PublicKey("Hb2zfRfn5RwBq2DNWhee2iTVprfGHgiuK7KsiDA4HfMW")
+        val transaction = Transaction(
+            blockhash,
+            listOf(
+                TransferInstruction(sender.publicKey, firstReceiver, 1000),
+                TransferInstruction(sender.publicKey, secondReceiver, 1000),
+            ),
+            sender.publicKey
+        )
+        transaction.sign(sender)
+
+        val signature = connection.sendTransaction(transaction)
+
+        assertTrue("signature must not be blank") { signature.isNotBlank() }
+    }
+
+    @Test
     fun shouldSendCreateAssociatedTokenTransaction() {
         val connection = Connection(rpcUrl)
         val (blockhash) = connection.getLatestBlockhash()
-        val payer = Keypair.fromSecretKey(
-            Base58.decode("2WGcYYau2gLu2DUq68SxxXQmCgi77n8hFqqLNbNyg6Xfh2m3tvg8LF5Lgh69CFDux41LUKV1ak1ERHUqiBZnyshz")
-        )
+        val payer = Keypair.fromSecretKey(Base58.decode(secretKey))
         val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
         val owner = Keypair.generate().publicKey
         val (associatedAccount) = PublicKey.findProgramDerivedAddress(owner, usdc)
@@ -104,9 +124,7 @@ internal class ConnectionTest {
     fun shouldSendSpl() {
         val connection = Connection(rpcUrl)
         val (blockhash) = connection.getLatestBlockhash()
-        val holder = Keypair.fromSecretKey(
-            Base58.decode("4hf2H4aigDTWNVitY2CT2vstfqs4brsSFw2nvoKAyZ9LjQ1JUGhB6kaToRh9WBVhVzknzQywjEDQfGp4pkrhMQJv")
-        )
+        val holder = Keypair.fromSecretKey(Base58.decode(secretKey))
         val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
         val receiverAssociatedAccount = PublicKey("8r2iVNBQgJi59YCdj2YXipguirWZhdysWpL4cEGorN1v")
         val (holderAssociatedAccount) = PublicKey.findProgramDerivedAddress(holder.publicKey, usdc)
