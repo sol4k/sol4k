@@ -10,6 +10,7 @@ import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
 import org.sol4k.api.Commitment.FINALIZED
+import org.sol4k.api.Health
 import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
@@ -49,6 +50,11 @@ class Connection @JvmOverloads constructor(
             slot = result.context.slot,
             lastValidBlockHeight = result.value.lastValidBlockHeight,
         )
+    }
+
+    fun getHealth(): Health {
+        val result: String = rpcCall("getHealth", listOf<String>())
+        return if (result == "ok") Health.OK else Health.ERROR
     }
 
     fun getAccountInfo(accountAddress: PublicKey): AccountInfo? {
