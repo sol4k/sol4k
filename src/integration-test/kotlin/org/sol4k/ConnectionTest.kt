@@ -1,10 +1,12 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.api.Health
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger.ZERO
+import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -144,5 +146,14 @@ internal class ConnectionTest {
         val signature = connection.sendTransaction(transaction)
 
         assertTrue("signature must not be blank") { signature.isNotBlank() }
+    }
+
+    @Test
+    fun shouldGetHealth() {
+        val connection = Connection(rpcUrl)
+
+        val health = connection.getHealth()
+
+        assertEquals(health, Health.OK)
     }
 }
