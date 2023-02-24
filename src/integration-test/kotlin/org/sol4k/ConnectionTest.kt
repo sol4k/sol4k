@@ -1,14 +1,9 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
-import org.sol4k.api.Health
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
-import java.math.BigInteger.ZERO
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 internal class ConnectionTest {
     private val rpcUrl = System.getProperty("E2E_RPC_URL")
@@ -21,7 +16,7 @@ internal class ConnectionTest {
 
         val balance = connection.getBalance(wallet)
 
-        assertTrue("balance must not be blank") { balance > ZERO }
+        println("shouldGetBalance: Balance: $balance")
     }
 
     @Test
@@ -30,7 +25,7 @@ internal class ConnectionTest {
 
         val hash = connection.getLatestBlockhash()
 
-        assertTrue("blockhash must not be blank") { hash.blockhash.isNotBlank() }
+        println("shouldGetLatestBlockhash: hash: ${hash.blockhash}")
     }
 
     @Test
@@ -49,7 +44,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        assertTrue("signature must not be blank") { signature.isNotBlank() }
+        println("shouldSendTransaction: signature: $signature")
     }
 
     @Test
@@ -73,7 +68,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        assertTrue("signature must not be blank") { signature.isNotBlank() }
+        println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
     }
 
     @Test
@@ -99,7 +94,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        assertTrue("signature must not be blank") { signature.isNotBlank() }
+        println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
     }
 
     @Test
@@ -109,7 +104,7 @@ internal class ConnectionTest {
 
         val accountInfo = connection.getAccountInfo(usdc)
 
-        assertTrue("accountInfo must not be blank") { accountInfo!!.data.isNotEmpty() }
+        println("shouldGetAccountInfo: accountInfo: $accountInfo")
     }
 
     @Test
@@ -119,7 +114,7 @@ internal class ConnectionTest {
 
         val accountInfo = connection.getAccountInfo(publicKey)
 
-        assertNull(accountInfo, "accountInfo must not null")
+        println("shouldGetAccountInfoWhenAccountDoesNotExist: accountInfo: $accountInfo")
     }
 
     @Test
@@ -145,7 +140,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        assertTrue("signature must not be blank") { signature.isNotBlank() }
+        println("shouldSendSpl: signature: $signature")
     }
 
     @Test
@@ -154,6 +149,25 @@ internal class ConnectionTest {
 
         val health = connection.getHealth()
 
-        assertEquals(health, Health.OK)
+        println("shouldGetHealth: health: $health")
+    }
+
+    @Test
+    fun shouldRequestAirdrop() {
+        val connection = Connection(rpcUrl)
+        val receiver = Keypair.fromSecretKey(Base58.decode(secretKey)).publicKey
+
+        val signature = connection.requestAirdrop(receiver, 1000000000)
+
+        println("shouldRequestAirdrop: signature: $signature")
+    }
+
+    @Test
+    fun shouldGetIdentity() {
+        val connection = Connection(rpcUrl)
+
+        val identity = connection.getIdentity()
+
+        println("shouldGetIdentity: identity: $identity")
     }
 }

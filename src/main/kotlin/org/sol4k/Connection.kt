@@ -15,6 +15,7 @@ import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.GetAccountInfoResponse
+import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
@@ -57,6 +58,11 @@ class Connection @JvmOverloads constructor(
         return if (result == "ok") Health.OK else Health.ERROR
     }
 
+    fun getIdentity(): PublicKey {
+        val (identity) = rpcCall<Identity, String>("getIdentity", listOf())
+        return PublicKey(identity)
+    }
+
     fun getAccountInfo(accountAddress: PublicKey): AccountInfo? {
         val (value) = rpcCall<GetAccountInfoResponse, JsonElement>(
             "getAccountInfo",
@@ -75,6 +81,16 @@ class Connection @JvmOverloads constructor(
                 space = value.space,
             )
         }
+    }
+
+    fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
+        return rpcCall(
+            "requestAirdrop",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(amount),
+            ),
+        )
     }
 
     fun sendTransaction(transaction: Transaction): String {
