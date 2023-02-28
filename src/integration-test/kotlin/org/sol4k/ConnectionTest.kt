@@ -1,9 +1,13 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.api.TransactionSimulationError
+import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class ConnectionTest {
     private val rpcUrl = System.getProperty("E2E_RPC_URL")
@@ -48,7 +52,49 @@ internal class ConnectionTest {
     }
 
     @Test
-    fun shouldSendTowInstructionsInOneTransaction() {
+    fun shouldSimulateTransaction() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            sender.publicKey
+        )
+        transaction.sign(sender)
+
+        val simulation = connection.simulateTransaction(transaction)
+
+        assertTrue("Simulation must produce an error") {
+            simulation is TransactionSimulationSuccess
+        }
+        assertEquals(2, (simulation as TransactionSimulationSuccess).logs.size)
+    }
+
+    @Test
+    fun shouldSimulateTransactionWithAnError() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+        val senderWithNoSol = Keypair.generate()
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(senderWithNoSol.publicKey, receiver, 1000)
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            senderWithNoSol.publicKey
+        )
+        transaction.sign(senderWithNoSol)
+
+        val simulation = connection.simulateTransaction(transaction)
+
+        assertTrue("Simulation must produce an error") { simulation is TransactionSimulationError }
+        assertEquals("AccountNotFound", (simulation as TransactionSimulationError).error)
+    }
+
+    @Test
+    fun shouldSendTwoInstructionsInOneTransaction() {
         val connection = Connection(rpcUrl)
         val (blockhash) = connection.getLatestBlockhash()
         val sender = Keypair.fromSecretKey(

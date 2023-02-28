@@ -5,12 +5,16 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.encodeToJsonElement
 import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
 import org.sol4k.api.Commitment.FINALIZED
 import org.sol4k.api.Health
+import org.sol4k.api.TransactionSimulation
+import org.sol4k.api.TransactionSimulationError
+import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
@@ -19,6 +23,7 @@ import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
+import org.sol4k.rpc.SimulateTransactionResponse
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.math.BigInteger
@@ -102,6 +107,27 @@ class Connection @JvmOverloads constructor(
                 Json.encodeToJsonElement(mapOf("encoding" to "base64")),
             )
         )
+    }
+
+    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
+        val encodedTransaction = Base64.getEncoder().encodeToString(transaction.serialize())
+        val result: SimulateTransactionResponse = rpcCall(
+            "simulateTransaction",
+            listOf(
+                Json.encodeToJsonElement(encodedTransaction),
+                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+            )
+        )
+        val (err, logs) = result.value
+        if (err != null) {
+            when (err) {
+                is JsonPrimitive -> return TransactionSimulationError(err.content)
+                else -> throw IllegalArgumentException("Failed to parse the error")
+            }
+        } else if (logs != null) {
+            return TransactionSimulationSuccess(logs)
+        }
+        throw IllegalArgumentException("Unable to parse simulation response")
     }
 
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
