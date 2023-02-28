@@ -1,11 +1,11 @@
 package org.sol4k
 
-import org.bitcoinj.core.Base58 as BitcoinjBase58
+import org.sol4k.utilities.Base58 as Base58Encoding
 
 object Base58 {
     @JvmStatic
-    fun encode(input: ByteArray): String = BitcoinjBase58.encode(input)
+    fun encode(input: ByteArray): String = Base58Encoding.encode(input)
 
     @JvmStatic
-    fun decode(input: String): ByteArray = BitcoinjBase58.decode(input)
+    fun decode(input: String): ByteArray = Base58Encoding.decode(input)
 }
