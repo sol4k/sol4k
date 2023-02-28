@@ -67,7 +67,7 @@ internal class ConnectionTest {
 
         val simulation = connection.simulateTransaction(transaction)
 
-        assertTrue("Simulation must produce an error") {
+        assertTrue("Simulation must be successful") {
             simulation is TransactionSimulationSuccess
         }
         assertEquals(2, (simulation as TransactionSimulationSuccess).logs.size)
