@@ -9,7 +9,7 @@ data class AccountInfo(
     val lamports: BigInteger,
     val owner: PublicKey,
     val rentEpoch: Long,
-    val space: Long?,
+    val space: Int,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

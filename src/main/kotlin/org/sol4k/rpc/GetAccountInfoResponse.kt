@@ -16,5 +16,5 @@ internal data class GetAccountInfoValue(
     val lamports: BigInteger,
     val owner: String,
     val rentEpoch: Long,
-    val space: Long? = null,
+    val space: Int? = null,
 )

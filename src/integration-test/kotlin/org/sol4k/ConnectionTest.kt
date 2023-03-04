@@ -6,7 +6,9 @@ import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
+import java.math.BigInteger
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 internal class ConnectionTest {
@@ -215,5 +217,37 @@ internal class ConnectionTest {
         val identity = connection.getIdentity()
 
         println("shouldGetIdentity: identity: $identity")
+    }
+
+    @Test
+    fun shouldGetTokenAccountBalance() {
+        val connection = Connection(rpcUrl)
+        val receiverAssociatedAccount = PublicKey("73d3sqQPLsiwKvdJt2XnnLEzNiEjfn2nreqLujM7zXiT")
+
+        val (amount, decimals, uiAmount) = connection.getTokenAccountBalance(receiverAssociatedAccount)
+
+        assertEquals(BigInteger("123"), amount)
+        assertEquals(6, decimals)
+        assertEquals("0.000123", uiAmount)
+    }
+
+    @Test
+    fun shouldVerifyIfBlockhashValid() {
+        val connection = Connection(rpcUrl)
+        val (blockhash) = connection.getLatestBlockhash()
+
+        val result = connection.isBlockhashValid(blockhash)
+
+        assertTrue("blockhash must be valid") { result }
+    }
+
+    @Test
+    fun shouldVerifyIfBlockhashValidGivenInvalidBlockhash() {
+        val connection = Connection(rpcUrl)
+        val anOutdatedBlockhash = "3dseDCjWBhwFxuukMuiRofHSZaNozXYQKAYFj9vDSoca"
+
+        val result = connection.isBlockhashValid(anOutdatedBlockhash)
+
+        assertFalse("blockhash must be invalid") { result }
     }
 }
