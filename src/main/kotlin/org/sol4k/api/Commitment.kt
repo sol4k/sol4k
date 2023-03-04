@@ -7,8 +7,14 @@ import kotlinx.serialization.Serializable
 enum class Commitment {
     @SerialName("finalized")
     FINALIZED,
+
     @SerialName("confirmed")
     CONFIRMED,
+
     @SerialName("processed")
-    PROCESSED,
+    PROCESSED;
+
+    override fun toString(): String {
+        return this.name.toLowerCase()
+    }
 }

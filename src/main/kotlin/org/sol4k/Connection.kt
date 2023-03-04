@@ -12,6 +12,8 @@ import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
 import org.sol4k.api.Commitment.FINALIZED
 import org.sol4k.api.Health
+import org.sol4k.api.IsBlockhashValidResult
+import org.sol4k.api.TokenAccountBalance
 import org.sol4k.api.TransactionSimulation
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
@@ -24,6 +26,7 @@ import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
 import org.sol4k.rpc.SimulateTransactionResponse
+import org.sol4k.rpc.TokenBalanceResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.math.BigInteger
@@ -46,6 +49,26 @@ class Connection @JvmOverloads constructor(
     }
 
     @JvmOverloads
+    fun getTokenAccountBalance(
+        accountAddress: PublicKey,
+        commitment: Commitment = this.commitment,
+    ): TokenAccountBalance {
+        val result: TokenBalanceResult = rpcCall(
+            "getTokenAccountBalance",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(mapOf("commitment" to commitment.toString())),
+            ),
+        )
+        val (amount, decimals, uiAmountString) = result.value
+        return TokenAccountBalance(
+            amount = BigInteger(amount),
+            decimals = decimals,
+            uiAmount = uiAmountString,
+        )
+    }
+
+    @JvmOverloads
     fun getLatestBlockhash(commitment: Commitment = this.commitment): Blockhash {
         val result: BlockhashResponse = rpcCall(
             "getLatestBlockhash",
@@ -56,6 +79,18 @@ class Connection @JvmOverloads constructor(
             slot = result.context.slot,
             lastValidBlockHeight = result.value.lastValidBlockHeight,
         )
+    }
+
+    @JvmOverloads
+    fun isBlockhashValid(blockhash: String, commitment: Commitment = this.commitment): Boolean {
+        val result: IsBlockhashValidResult = rpcCall(
+            "isBlockhashValid",
+            listOf(
+                Json.encodeToJsonElement(blockhash),
+                Json.encodeToJsonElement(mapOf("commitment" to commitment.toString())),
+            ),
+        )
+        return result.value
     }
 
     fun getHealth(): Health {
@@ -77,13 +112,14 @@ class Connection @JvmOverloads constructor(
             ),
         )
         return value?.let {
+            val data = Base64.getDecoder().decode(value.data[0])
             AccountInfo(
-                data = Base64.getDecoder().decode(value.data[0]),
+                data,
                 executable = value.executable,
                 lamports = value.lamports,
                 owner = PublicKey(value.owner),
                 rentEpoch = value.rentEpoch,
-                space = value.space,
+                space = value.space ?: data.size,
             )
         }
     }
