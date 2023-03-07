@@ -123,23 +123,22 @@ internal class ConnectionTest {
     fun shouldSendCreateAssociatedTokenTransaction() {
         val connection = Connection(rpcUrl)
         val (blockhash) = connection.getLatestBlockhash()
-        val payer = Keypair.fromSecretKey(Base58.decode(secretKey))
-        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
-        val owner = Keypair.generate().publicKey
-        val (associatedAccount) = PublicKey.findProgramDerivedAddress(owner, usdc)
+        val payerWallet = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val usdcMintAddress = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val destinationWallet = Keypair.generate().publicKey
+        val (associatedAccount) = PublicKey.findProgramDerivedAddress(destinationWallet, usdcMintAddress)
         val instruction = CreateAssociatedTokenAccountInstruction(
-            payer.publicKey,
-            associatedAccount,
-            owner,
-            usdc,
+            payer = payerWallet.publicKey,
+            associatedToken = associatedAccount,
+            owner = destinationWallet,
+            mint = usdcMintAddress,
         )
         val transaction = Transaction(
             blockhash,
             instruction,
-            payer.publicKey,
+            feePayer = payerWallet.publicKey,
         )
-        transaction.sign(payer)
-
+        transaction.sign(payerWallet)
         val signature = connection.sendTransaction(transaction)
 
         println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
@@ -249,5 +248,14 @@ internal class ConnectionTest {
         val result = connection.isBlockhashValid(anOutdatedBlockhash)
 
         assertFalse("blockhash must be invalid") { result }
+    }
+
+    @Test
+    fun shouldGetEpochInfo() {
+        val connection = Connection(rpcUrl)
+
+        val result = connection.getEpochInfo()
+
+        println("shouldGetEpochInfo: result: $result")
     }
 }

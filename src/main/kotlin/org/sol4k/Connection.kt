@@ -11,6 +11,7 @@ import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
 import org.sol4k.api.Commitment.FINALIZED
+import org.sol4k.api.EpochInfo
 import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
 import org.sol4k.api.TokenAccountBalance
@@ -20,6 +21,7 @@ import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
+import org.sol4k.rpc.EpochInfoResult
 import org.sol4k.rpc.GetAccountInfoResponse
 import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
@@ -96,6 +98,18 @@ class Connection @JvmOverloads constructor(
     fun getHealth(): Health {
         val result: String = rpcCall("getHealth", listOf<String>())
         return if (result == "ok") Health.OK else Health.ERROR
+    }
+
+    fun getEpochInfo(): EpochInfo {
+        val result: EpochInfoResult = rpcCall("getEpochInfo", listOf<String>())
+        return EpochInfo(
+            absoluteSlot = result.absoluteSlot,
+            blockHeight = result.blockHeight,
+            epoch = result.epoch,
+            slotIndex = result.slotIndex,
+            slotsInEpoch = result.slotsInEpoch,
+            transactionCount = result.transactionCount,
+        )
     }
 
     fun getIdentity(): PublicKey {
