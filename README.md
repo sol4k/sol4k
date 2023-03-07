@@ -162,7 +162,7 @@ interface Instruction {
     val programId: PublicKey
 }
 ```
-The `Instaruction`interface has several implementations such as `TransferInstruction`,
+The `Instaruction` interface has several implementations such as `TransferInstruction`,
 `SplTransferInstruction`, `CreateAssociatedTokenAccountInstruction`, and `BaseInstruction`
 (the one used for sending arbitrary transactions).
 
