@@ -1,20 +1,19 @@
 # sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://search.maven.org/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-Sol4k is a Kotlin client for Solana that can be used with
-Java or any other JVM language, as well as in Android.
-It allows you to communicate with an RPC node, query the information
-from the blockchain, create accounts and read data from them, create transactions
-for transferring SOL or SPL, or create arbitrary
-transactions and send them to the RPC node.
-Sol4k also lets you generate key pairs, public keys, encode and
-decode them in the Base 58 format. Besides, it exposes
-convenient APIs to make the developer experience smooth and straight forward.
+Sol4k is a Kotlin client for Solana that can be used with Java or any other
+JVM language, as well as on Android. It enables communication with an RPC node,
+allowing users to query information from the blockchain, create accounts, and
+read data from them. Sol4k also enables the creation of transactions to transfer
+SOL or SPL, as well as custom transactions that can be submitted to the RPC node.
+Additionally, sol4k lets you generate key pairs and public keys, and encode and
+decode them in the Base 58 format. The client also exposes convenient APIs to make
+the developer experience smooth and straightforward.
 
 ## How to import
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.2.1'
+implementation 'org.sol4k:sol4k:0.2.2'
 ```
 
 Maven:
@@ -22,7 +21,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 </dependency>
 ```
 
@@ -116,7 +115,7 @@ val connection = Connection("https://api.devnet.solana.com")
 ```
 
 RPC methods that require commitment will use the one specified during the connection
-creation or can be overridden passing commitment as an additional argument.
+creation or can be overridden by passing commitment as an additional argument.
 
 ```kotlin
 val connection = Connection("https://api.devnet.solana.com", Commitment.CONFIRMED)
@@ -129,6 +128,7 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 Supported APIs:
 - `getAccountInfo`
 - `getBalance`
+- `getEpochInfo`
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
@@ -140,9 +140,9 @@ Supported APIs:
 
 ### Transactions
 
-A sol4k Transaction is a class that can be used to building, signing, serializing, and sending
-Solana transactions. Transaction can be created specifying the latest blockhash, one or several
-instructions, and a fee payer.
+A sol4k Transaction is a class that can be used to build, sign, serialize,
+and send Solana transactions. A transaction can be created by specifying
+the latest blockhash, one or several instructions, and a fee payer.
 
 ```kotlin
 val transaction = Transaction(blockhash, instruction, feePayer)
@@ -167,12 +167,12 @@ The `Instaruction`interface has several implementations such as `TransferInstruc
 (the one used for sending arbitrary transactions).
 
 `AccountMeta` is a class that lets you specify metadata for the accounts used in an instruction.
-It requires a public key, and two boolean values: `signer` and `writable`.
+It requires a public key and two boolean values: `signer` and `writable`.
 
 ```kotlin
 val accountMeta = AccountMeta(publicKey, signer = false, writable = true)
 ```
-It also has three convenience functions to construct object with different combinations of
+It also has three convenience functions to construct objects with different combinations of
 properties.
 
 ```kotlin
@@ -181,8 +181,8 @@ val signer: AccountMeta = AccountMeta.signer(publicKey)
 val writable: AccountMeta = AccountMeta.writable(publicKey)
 ```
 
-Example of combining all together. Here a transactions is created that sends information
-to a game program. 
+Here's an example of combining everything together: creating a transaction that sends
+information to a game program.
 
 ```kotlin
 val instructionData = byteArrayOf(-3, -42, 48, -55, 100, -55, -29, -37) 
@@ -201,7 +201,8 @@ joinGameTransaction.sign(playerKeypair)
 val signature = connection.sendTransaction(joinGameTransaction)
 ```
 
-Another example. Here an associated token account is created for a users' wallet.
+Here's another example: creating an associated token account for a user's wallet.
+
 ```kotlin
 val (blockhash) = connection.getLatestBlockhash()
 val payerWallet = Keypair.fromSecretKey(secretKeyBytes)
@@ -233,5 +234,4 @@ a pull request.
 
 ## Contacts
 
-If you have any questions reach out to email `contact@sol4k.org`. 
-
+If you have any questions reach out to email `contact@sol4k.org`.
