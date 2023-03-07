@@ -74,7 +74,7 @@ Obtaining an associated token account address for an SPL token.
 ```kotlin
 val holderAddress: PublicKey = ...
 val tokenMintAddress: PublicKey = ...
-val keypairFromSecretKey = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
+val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
 Converting a public key to a string.
