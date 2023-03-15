@@ -117,6 +117,8 @@ class Connection @JvmOverloads constructor(
         return PublicKey(identity)
     }
 
+    fun getTransactionCount(): Long = rpcCall<Long, String>("getTransactionCount", listOf())
+
     fun getAccountInfo(accountAddress: PublicKey): AccountInfo? {
         val (value) = rpcCall<GetAccountInfoResponse, JsonElement>(
             "getAccountInfo",

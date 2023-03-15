@@ -1,19 +1,17 @@
-# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.2.2/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
+# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.2.3/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-Sol4k is a Kotlin client for Solana that can be used with Java or any other
-JVM language, as well as on Android. It enables communication with an RPC node,
-allowing users to query information from the blockchain, create accounts, and
-read data from them. Sol4k also enables the creation of transactions to transfer
-SOL or SPL, as well as custom transactions that can be submitted to the RPC node.
-Additionally, sol4k lets you generate key pairs and public keys, and encode and
-decode them in the Base 58 format. The client also exposes convenient APIs to make
-the developer experience smooth and straightforward.
+Sol4k is a Kotlin client for Solana that can be used with Java or any other JVM
+language, as well as on Android. It enables communication with an RPC node,
+allowing users to query information from the blockchain, create accounts, read
+data from them, send different types of transactions, and work with key pairs
+and public keys. The client also exposes convenient APIs to make the developer
+experience smooth and straightforward.
 
 ## How to import
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.2.2'
+implementation 'org.sol4k:sol4k:0.2.3'
 ```
 
 Maven:
@@ -21,7 +19,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
 </dependency>
 ```
 
@@ -133,6 +131,7 @@ Supported APIs:
 - `getIdentity`
 - `getLatestBlockhash`
 - `getTokenAccountBalance`
+- `getTransactionCount`
 - `isBlockhashValid`
 - `requestAirdrop`
 - `sendTransaction`
