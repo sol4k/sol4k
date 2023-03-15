@@ -258,4 +258,13 @@ internal class ConnectionTest {
 
         println("shouldGetEpochInfo: result: $result")
     }
+
+    @Test
+    fun shouldGetTransactionCount() {
+        val connection = Connection(rpcUrl)
+
+        val count = connection.getTransactionCount()
+
+        println("shouldGetTransactionCount: count: $count")
+    }
 }
