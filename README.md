@@ -37,9 +37,11 @@ val transaction = Transaction(blockhash, instruction, feePayer = sender.publicKe
 transaction.sign(sender)
 val signature = connection.sendTransaction(transaction)
 ```
-Check the [sol4k-demo](https://github.com/sol4k/sol4k-demo) to see other examples.
 
-## APIs and examples
+Check the [sol4k-examples](https://github.com/sol4k/sol4k-examples) repository to find
+ready-to-use Java examples of sol4k APIs.
+
+## APIs
 
 ### Working with key pairs and public keys.
 
