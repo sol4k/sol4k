@@ -29,7 +29,7 @@ Create a connection, request the latest blockhash, and submit
 a SOL transfer transaction from one account to another
 ```kotlin
 val connection = Connection("https://api.devnet.solana.com")
-val (blockhash) = connection.getLatestBlockhash()
+val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 val instruction = TransferInstruction(sender.publicKey, receiver, lamports = 1000)
@@ -192,7 +192,7 @@ val accounts = listOf(
     AccountMeta.signerAndWritable(playerPublicKey)
 )
 val joinGameInstruction = BaseInstruction(instructionData, accounts, programId)
-val (blockhash) = connection.getLatestBlockhash()
+val blockhash = connection.getLatestBlockhash()
 val joinGameTransaction = Transaction(
     blockhash,
     instruction = joinGameInstruction,
@@ -205,7 +205,7 @@ val signature = connection.sendTransaction(joinGameTransaction)
 Here's another example: creating an associated token account for a user's wallet.
 
 ```kotlin
-val (blockhash) = connection.getLatestBlockhash()
+val blockhash = connection.getLatestBlockhash()
 val payerWallet = Keypair.fromSecretKey(secretKeyBytes)
 val usdcMintAddress = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
 val destinationWallet = Keypair.generate().publicKey
