@@ -31,13 +31,22 @@ internal class ConnectionTest {
 
         val hash = connection.getLatestBlockhash()
 
-        println("shouldGetLatestBlockhash: hash: ${hash.blockhash}")
+        println("shouldGetLatestBlockhash: hash: $hash")
+    }
+
+    @Test
+    fun shouldGetLatestBlockhashExtended() {
+        val connection = Connection(rpcUrl)
+
+        val blockhash = connection.getLatestBlockhashExtended()
+
+        println("shouldGetLatestBlockhashExtended: hash: $blockhash")
     }
 
     @Test
     fun shouldSendTransaction() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
         val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
@@ -56,7 +65,7 @@ internal class ConnectionTest {
     @Test
     fun shouldSimulateTransaction() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
         val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
@@ -78,7 +87,7 @@ internal class ConnectionTest {
     @Test
     fun shouldSimulateTransactionWithAnError() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val senderWithNoSol = Keypair.generate()
         val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val instruction = TransferInstruction(senderWithNoSol.publicKey, receiver, 1000)
@@ -98,7 +107,7 @@ internal class ConnectionTest {
     @Test
     fun shouldSendTwoInstructionsInOneTransaction() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val sender = Keypair.fromSecretKey(
             Base58.decode(secretKey)
         )
@@ -122,7 +131,7 @@ internal class ConnectionTest {
     @Test
     fun shouldSendCreateAssociatedTokenTransaction() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val payerWallet = Keypair.fromSecretKey(Base58.decode(secretKey))
         val usdcMintAddress = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
         val destinationWallet = Keypair.generate().publicKey
@@ -167,7 +176,7 @@ internal class ConnectionTest {
     @Test
     fun shouldSendSpl() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
         val holder = Keypair.fromSecretKey(Base58.decode(secretKey))
         val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
         val receiverAssociatedAccount = PublicKey("8r2iVNBQgJi59YCdj2YXipguirWZhdysWpL4cEGorN1v")
@@ -233,7 +242,7 @@ internal class ConnectionTest {
     @Test
     fun shouldVerifyIfBlockhashValid() {
         val connection = Connection(rpcUrl)
-        val (blockhash) = connection.getLatestBlockhash()
+        val blockhash = connection.getLatestBlockhash()
 
         val result = connection.isBlockhashValid(blockhash)
 

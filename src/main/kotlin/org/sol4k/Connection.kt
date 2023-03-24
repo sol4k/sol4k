@@ -71,7 +71,11 @@ class Connection @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun getLatestBlockhash(commitment: Commitment = this.commitment): Blockhash {
+    fun getLatestBlockhash(commitment: Commitment = this.commitment): String =
+        this.getLatestBlockhashExtended(commitment).blockhash
+
+    @JvmOverloads
+    fun getLatestBlockhashExtended(commitment: Commitment = this.commitment): Blockhash {
         val result: BlockhashResponse = rpcCall(
             "getLatestBlockhash",
             listOf(mapOf("commitment" to commitment.toString())),
