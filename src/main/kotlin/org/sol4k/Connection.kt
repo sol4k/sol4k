@@ -40,6 +40,12 @@ class Connection @JvmOverloads constructor(
     private val rpcUrl: String,
     private val commitment: Commitment = FINALIZED,
 ) {
+    @JvmOverloads
+    constructor(
+        rpcUrl: RpcUrl,
+        commitment: Commitment = FINALIZED,
+    ) : this(rpcUrl.value, commitment)
+
     private val jsonParser = Json {
         ignoreUnknownKeys = true
         isLenient = true
