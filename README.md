@@ -1,4 +1,4 @@
-# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.3.0/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
+# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.3.1/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
 Sol4k is a Kotlin client for Solana that can be used with Java or any other JVM
 language, as well as on Android. It enables communication with an RPC node,
@@ -11,7 +11,7 @@ experience smooth and straightforward.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.3.0'
+implementation 'org.sol4k:sol4k:0.3.1'
 ```
 
 Maven:
@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ Maven:
 Create a connection, request the latest blockhash, and submit
 a SOL transfer transaction from one account to another
 ```kotlin
-val connection = Connection("https://api.devnet.solana.com")
+val connection = Connection(RpcUrl.DEVNET)
 val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
@@ -105,10 +105,16 @@ RPC calls are performed via a `Connection` class that exposes functions that mir
 with an HTTP URL of an RPC node and a commitment.
 
 ```kotlin
-val connection = Connection("https://api.devnet.solana.com", Commitment.PROCESSED)
+val connection = Connection(RpcUrl.DEVNET, Commitment.PROCESSED)
 ```
 
 If commitment is not specified, `FINALIZED` is used by default.
+
+```kotlin
+val connection = Connection(RpcUrl.DEVNET)
+```
+
+You can also pass RPC URL as a string.
 
 ```kotlin
 val connection = Connection("https://api.devnet.solana.com")
@@ -118,7 +124,7 @@ RPC methods that require commitment will use the one specified during the connec
 creation or can be overridden by passing commitment as an additional argument.
 
 ```kotlin
-val connection = Connection("https://api.devnet.solana.com", Commitment.CONFIRMED)
+val connection = Connection(RpcUrl.DEVNET, Commitment.CONFIRMED)
 // a blockhash with the 'confirmed' commitment
 val blockhash = connection.getLatestBlockhash() 
 // commitment is overridden by 'finalized'
