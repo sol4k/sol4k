@@ -3,6 +3,7 @@ package org.sol4k
 import org.sol4k.Constants.ASSOCIATED_TOKEN_PROGRAM_ID
 import org.sol4k.Constants.TOKEN_PROGRAM_ID
 import org.sol4k.tweetnacl.TweetNaclFast
+import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 
@@ -20,6 +21,9 @@ class PublicKey {
     fun bytes(): ByteArray = bytes.copyOf()
 
     fun toBase58(): String = Base58.encode(this.bytes)
+
+    fun verify(signature: ByteArray, message: ByteArray): Boolean =
+        Signature(bytes, ByteArray(0)).detached_verify(message, signature)
 
     override fun toString(): String = toBase58()
 
