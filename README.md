@@ -1,4 +1,4 @@
-# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.3.1/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
+# sol4k [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sol4k/sol4k/badge.svg)](https://central.sonatype.com/artifact/org.sol4k/sol4k/0.3.2/versions) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
 Sol4k is a Kotlin client for Solana that can be used with Java or any other JVM
 language, as well as on Android. It enables communication with an RPC node,
@@ -11,7 +11,7 @@ experience smooth and straightforward.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.3.1'
+implementation 'org.sol4k:sol4k:0.3.2'
 ```
 
 Maven:
@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
 </dependency>
 ```
 
@@ -52,7 +52,7 @@ val generatedKeypair = Keypair.generate()
 
 Creating a keypair from an existing secret.
 ```kotlin
-val secretKey: ByteArray = ...
+val secretKey: ByteArray = TODO()
 val keypairFromSecretKey = Keypair.fromSecretKey(secretKey)
 ```
 
@@ -65,15 +65,15 @@ val publicKey = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 Creating a public key from a byte array.
 
 ```kotlin
-val publicKeyBytes: ByteArray = ...
+val publicKeyBytes: ByteArray = TODO()
 val publicKey = PublicKey(publicKeyBytes)
 ```
 
 Obtaining an associated token account address for an SPL token.
 
 ```kotlin
-val holderAddress: PublicKey = ...
-val tokenMintAddress: PublicKey = ...
+val holderAddress: PublicKey = TODO()
+val tokenMintAddress: PublicKey = TODO()
 val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
@@ -97,6 +97,26 @@ Encoding data.
 ```kotlin
 val encodedData: String = Base58.encode(inputByteArray)
 ```
+
+### Working with signatures
+
+Signing a message.
+
+```kotlin
+val keypair: Keypair = TODO()
+val message: ByteArray = TODO()
+val signature: ByteArray = keypair.sign(message)
+```
+
+Verifying.
+
+```kotlin
+val message: ByteArray = TODO()
+val signature: ByteArray = TODO()
+val publicKey: PublicKey = TODO()
+val result: Boolean = publicKey.verify(signature, message)
+```
+
 
 ### RPC functions
 
@@ -157,7 +177,7 @@ val transaction = Transaction(blockhash, instruction, feePayer)
 
 A transaction with multiple instructions:
 ```kotlin
-val instructions: List<Instruction> = ...
+val instructions: List<Instruction> = TODO()
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
 

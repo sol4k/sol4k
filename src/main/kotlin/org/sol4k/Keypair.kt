@@ -12,6 +12,9 @@ class Keypair private constructor(
     val publicKey: PublicKey
         get() = PublicKey(keypair.publicKey)
 
+    fun sign(message: ByteArray): ByteArray =
+        TweetNaclFast.Signature(ByteArray(0), secret).detached(message)
+
     companion object {
         @JvmStatic
         fun generate(): Keypair = Keypair(TweetNaclFast.Signature.keyPair())

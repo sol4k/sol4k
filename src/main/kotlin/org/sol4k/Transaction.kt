@@ -1,7 +1,6 @@
 package org.sol4k
 
 import org.sol4k.instruction.Instruction
-import org.sol4k.tweetnacl.TweetNaclFast.Signature
 import java.nio.ByteBuffer
 
 class Transaction(
@@ -19,7 +18,7 @@ class Transaction(
 
     fun sign(keypair: Keypair) {
         val message = transactionMessage()
-        val signature = Signature(ByteArray(0), keypair.secret).detached(message)
+        val signature = keypair.sign(message)
         signatures.add(Base58.encode(signature))
     }
 
