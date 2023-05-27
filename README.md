@@ -52,8 +52,7 @@ val generatedKeypair = Keypair.generate()
 
 Creating a keypair from an existing secret.
 ```kotlin
-val secretKey: ByteArray = TODO()
-val keypairFromSecretKey = Keypair.fromSecretKey(secretKey)
+val keypairFromSecretKey = Keypair.fromSecretKey(secretKeyByteArray)
 ```
 
 Creating a public key from string.
@@ -65,15 +64,12 @@ val publicKey = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 Creating a public key from a byte array.
 
 ```kotlin
-val publicKeyBytes: ByteArray = TODO()
-val publicKey = PublicKey(publicKeyBytes)
+val publicKey = PublicKey(publicKeyByteArray)
 ```
 
 Obtaining an associated token account address for an SPL token.
 
 ```kotlin
-val holderAddress: PublicKey = TODO()
-val tokenMintAddress: PublicKey = TODO()
 val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
@@ -103,17 +99,12 @@ val encodedData: String = Base58.encode(inputByteArray)
 Signing a message.
 
 ```kotlin
-val keypair: Keypair = TODO()
-val message: ByteArray = TODO()
-val signature: ByteArray = keypair.sign(message)
+val signature: ByteArray = keypair.sign(messageByteArray)
 ```
 
 Verifying.
 
 ```kotlin
-val message: ByteArray = TODO()
-val signature: ByteArray = TODO()
-val publicKey: PublicKey = TODO()
 val result: Boolean = publicKey.verify(signature, message)
 ```
 
@@ -177,7 +168,6 @@ val transaction = Transaction(blockhash, instruction, feePayer)
 
 A transaction with multiple instructions:
 ```kotlin
-val instructions: List<Instruction> = TODO()
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
 
