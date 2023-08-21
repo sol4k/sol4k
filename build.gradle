@@ -1,7 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.21'
     id 'org.jetbrains.dokka' version '1.8.10'
-//    id 'com.vanniktech.maven.publish' version '0.25.2'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.21'
     id 'org.jlleitschuh.gradle.ktlint' version '11.1.0'
 }
@@ -66,36 +65,3 @@ task integrationTest(type: Test) {
     systemProperty "E2E_RPC_URL", System.env.E2E_RPC_URL
     systemProperty "E2E_SECRET_KEY", System.env.E2E_SECRET_KEY
 }
-
-//mavenPublishing {
-//    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
-//    signAllPublications()
-//
-//    coordinates('org.sol4k', 'sol4k', "$currentVersion")
-//
-//    pom {
-//        name = 'sol4k'
-//        description = 'Kotlin, JVM, and Android client for Solana'
-//        inceptionYear = '2023'
-//        url = 'https://sol4k.org'
-//        licenses {
-//            license {
-//                name = 'The Apache License, Version 2.0'
-//                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                distribution = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//            }
-//        }
-//        developers {
-//            developer {
-//                id = 'shpota'
-//                name = 'Sasha Shpota'
-//                url = 'https://github.com/shpota/'
-//            }
-//        }
-//        scm {
-//            url = 'https://github.com/sol4k/sol4k/'
-//            connection = 'scm:git:git://github.com/sol4k/sol4k.git'
-//            developerConnection = 'scm:git:ssh://git@github.com/sol4k/sol4k.git'
-//        }
-//    }
-//}

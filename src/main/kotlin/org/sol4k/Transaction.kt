@@ -1,8 +1,8 @@
 package org.sol4k
 
+import jdk.internal.org.jline.utils.Log
 import org.sol4k.instruction.BaseInstruction
 import org.sol4k.instruction.Instruction
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.util.*
 
@@ -101,7 +101,6 @@ class Transaction(
         fun from(encodedTransaction: String): Transaction? {
             return try {
                 var byteArray = Base64.getDecoder().decode(encodedTransaction)
-                val buffer = ByteBuffer.wrap(byteArray)
 
                 // 1. remove signatures
                 val signaturesCount = Binary.decodeLength(byteArray)
@@ -113,8 +112,10 @@ class Transaction(
                     signatures.add(Base58.encode(signature.toByteArray()))
                 }
 
-                // 2. decompile Message
+                Log.debug("signaturesCount: $signaturesCount")
+                Log.debug("signatures: $signatures")
 
+                // 2. decompile Message
                 val numRequiredSignatures = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
                 val numReadonlySignedAccounts = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
                 val numReadonlyUnsignedAccounts = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
@@ -175,10 +176,12 @@ class Transaction(
                     instructions = instructions,
                 ).apply {
                     signatures.forEach { signature ->
+                        Log.debug("signature: $signature")
                         this.addSignature(signature)
                     }
                 }
             } catch (e: Exception) {
+                Log.error("Exception: $e")
                 null
             }
         }
