@@ -97,7 +97,8 @@ class Transaction(
         private const val PUBLIC_KEY_LENGTH = 32
         private const val SIGNATURE_LENGTH = 64
 
-        fun from(encodedTransaction: String): Transaction? {
+        @JvmStatic
+        fun from(encodedTransaction: String): Transaction {
             return try {
                 var byteArray = Base64.getDecoder().decode(encodedTransaction)
 
@@ -164,7 +165,7 @@ class Transaction(
                 }
 
                 // 3. construct Transaction
-                if(numRequiredSignatures <= 0) return null
+                if(numRequiredSignatures <= 0) throw Exception("Feepayer does not exist")
 
                 Transaction(
                     feePayer = PublicKey(accountKeys[0]),
@@ -176,7 +177,7 @@ class Transaction(
                     }
                 }
             } catch (e: Exception) {
-                null
+                throw e
             }
         }
 
