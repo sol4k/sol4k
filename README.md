@@ -5,7 +5,7 @@ language, as well as on Android. It enables communication with an RPC node,
 allowing users to query information from the blockchain, create accounts, read
 data from them, send different types of transactions, and work with key pairs
 and public keys. The client also exposes convenient APIs to make the developer
-experience smooth and straightforward.
+experience smooth and straightforward
 
 ## How to import
 
