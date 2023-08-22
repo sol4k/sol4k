@@ -7,7 +7,7 @@ data from them, send different types of transactions, and work with key pairs
 and public keys. The client also exposes convenient APIs to make the developer
 experience smooth and straightforward
 
-## How to import
+## How to import.
 
 Gradle:
 ```groovy
