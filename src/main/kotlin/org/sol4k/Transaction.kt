@@ -158,13 +158,23 @@ class Transaction(
                             programId = PublicKey(programId),
                             data = dataSlice,
                             keys = accountIndices.map { accountIdx ->
-                                AccountMeta(
-                                    publicKey = PublicKey(accountKeys[accountIdx]),
-                                    signer = accountIdx < numRequiredSignatures,
-                                    writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
-                                            (accountIdx >= numRequiredSignatures &&
-                                                    accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
-                                )
+//                                AccountMeta(
+//                                    publicKey = PublicKey(accountKeys[accountIdx]),
+//                                    signer = accountIdx < numRequiredSignatures,
+//                                    writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
+//                                            (accountIdx >= numRequiredSignatures &&
+//                                                    accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
+//                                )
+                                when (accountIdx) {
+                                    in 0 until (numRequiredSignatures - numReadonlySignedAccounts) ->
+                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = true, writable = true)
+                                    in (numRequiredSignatures - numReadonlySignedAccounts) until numRequiredSignatures ->
+                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = true, writable = false)
+                                    in numRequiredSignatures until (accountKeys.count() - numReadonlyUnsignedAccounts) ->
+                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = false, writable = true)
+                                    else ->
+                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = false, writable = false)
+                                }
                             }
                         )
                     )
