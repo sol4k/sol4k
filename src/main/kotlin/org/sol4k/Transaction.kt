@@ -3,6 +3,7 @@ package org.sol4k
 import org.sol4k.instruction.BaseInstruction
 import org.sol4k.instruction.Instruction
 import java.nio.ByteBuffer
+import java.text.Collator
 import java.util.*
 
 class Transaction(
@@ -79,16 +80,84 @@ class Transaction(
     }
 
     private fun buildAccountKeys(): List<AccountMeta> {
-        val programIds = instructions
-            .map { it.programId }.toSet()
-        val baseAccountKeys = instructions
-            .flatMap { it.keys }
-            .filter { acc -> acc.publicKey != this.feePayer }
-            .filter { acc -> acc.publicKey !in programIds }
-        val programIdKeys = programIds
-            .map { AccountMeta(it, writable = false, signer = false) }
-        val feePayerList = listOf(AccountMeta(feePayer, writable = true, signer = true))
-        return feePayerList + baseAccountKeys + programIdKeys
+//        val programIds = instructions
+//            .map { it.programId }.toSet()
+//        val baseAccountKeys = instructions
+//            .flatMap { it.keys }
+//            .filter { acc -> acc.publicKey != this.feePayer }
+//            .filter { acc -> acc.publicKey !in programIds }
+//        val programIdKeys = programIds
+//            .map { AccountMeta(it, writable = false, signer = false) }
+//        val feePayerList = listOf(AccountMeta(feePayer, writable = true, signer = true))
+//        return feePayerList + baseAccountKeys + programIdKeys
+
+        val feePayer = feePayer
+
+        val programIds = mutableSetOf<PublicKey>()
+        val accountMetas = mutableListOf<AccountMeta>()
+        for (instruction in instructions) {
+            for (accountMeta in instruction.keys) {
+                accountMetas.add(accountMeta)
+            }
+            programIds.add(instruction.programId)
+        }
+
+        // append programId to accountMetas
+        for (programId in programIds) {
+            accountMetas.add(
+                AccountMeta(
+                    publicKey = programId,
+                    signer = false,
+                    writable = false
+                )
+            )
+        }
+
+        // dedupe accountMetas
+        val uniqueMetas = mutableListOf<AccountMeta>()
+        for (accountMeta in accountMetas) {
+            val pubkeyString = accountMeta.publicKey.toBase58()
+            val uniqueIndex = uniqueMetas.indexOfFirst { it.publicKey.toBase58() == pubkeyString }
+            if(uniqueIndex > -1) {
+                uniqueMetas[uniqueIndex].writable =
+                    uniqueMetas[uniqueIndex].writable || accountMeta.writable
+            } else {
+                uniqueMetas.add(accountMeta)
+            }
+        }
+
+        val collator = Collator.getInstance(Locale.ENGLISH)
+        // sort by signer & writable
+        uniqueMetas.sortWith { x, y ->
+            if(x.signer != y.signer) {
+                return@sortWith if (x.signer) -1 else 1
+            }
+            if(x.writable != y.writable) {
+                return@sortWith if (x.writable) -1 else 1
+            }
+            return@sortWith collator.compare(x.publicKey.toBase58(), y.publicKey.toBase58())
+
+        }
+
+        // feePayer to the front
+        val feePayerIndex = uniqueMetas.indexOfFirst { it.publicKey == feePayer }
+        if(feePayerIndex > -1) {
+            val payerMeta = uniqueMetas.removeAt(feePayerIndex)
+            payerMeta.signer = true
+            payerMeta.writable = true
+            uniqueMetas.add(0, payerMeta)
+        } else {
+            uniqueMetas.add(
+                index = 0,
+                element = AccountMeta(
+                    publicKey = feePayer,
+                    signer = true,
+                    writable = true
+                )
+            )
+        }
+
+        return uniqueMetas
     }
 
     companion object {
