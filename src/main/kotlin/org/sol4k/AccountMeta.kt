@@ -1,9 +1,9 @@
 package org.sol4k
 
 data class AccountMeta(
-    val publicKey: PublicKey,
-    val signer: Boolean = false,
-    val writable: Boolean = false,
+    var publicKey: PublicKey,
+    var signer: Boolean = false,
+    var writable: Boolean = false,
 ) {
     companion object {
         @JvmStatic

@@ -1,5 +1,7 @@
 package org.sol4k
 
+import java.nio.ByteBuffer
+
 object Binary {
     @JvmStatic
     fun uint32(value: Long): ByteArray {
@@ -57,5 +59,40 @@ object Binary {
         val bytes = ByteArray(cursor + 1)
         System.arraycopy(out, 0, bytes, 0, cursor + 1)
         return bytes
+    }
+
+//    @JvmStatic
+//    fun decodeLength(buffer: ByteBuffer): Int {
+//        var result = 0
+//        var shift = 0
+//        while (true) {
+//            // Ensure there's data to read
+//            if (!buffer.hasRemaining()) {
+//                throw IllegalArgumentException("Insufficient data while decoding length.")
+//            }
+//            val byte = buffer.get().toInt()
+//            result = result or ((byte and 0x7F) shl shift)
+//            if (byte and 0x80 == 0) {
+//                break
+//            }
+//            shift += 7
+//        }
+//        return result
+//    }
+
+    @JvmStatic
+    fun decodeLength(bytes: ByteArray): Pair<Int, ByteArray> {
+        var newBytes = bytes
+        var len = 0
+        var size = 0
+        while (true) {
+            val elem = newBytes.first().toInt().also { newBytes = newBytes.drop(1).toByteArray() }
+            len = len or (elem and 0x7f) shl (size * 7)
+            size += 1
+            if ((elem and 0x80) == 0) {
+                break
+            }
+        }
+        return len to newBytes
     }
 }
