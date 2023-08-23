@@ -178,7 +178,11 @@ class Transaction(
                 for (i in 0 until signaturesCount.first) {
                     val signature = byteArray.slice(0 until SIGNATURE_LENGTH)
                     byteArray = byteArray.drop(SIGNATURE_LENGTH).toByteArray()
-                    signatures.add(Base58.encode(signature.toByteArray()))
+                    val encodedSignature = Base58.encode(signature.toByteArray())
+                    val zeroSignature = Base58.encode(ByteArray(SIGNATURE_LENGTH))
+                    if(encodedSignature != zeroSignature) {
+                        signatures.add(encodedSignature)
+                    }
                 }
 
                 // 2. decompile Message
