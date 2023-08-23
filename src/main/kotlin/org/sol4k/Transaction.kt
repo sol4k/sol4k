@@ -109,13 +109,7 @@ class Transaction(
                 for (i in 0 until signaturesCount.first) {
                     val signature = byteArray.slice(0 until SIGNATURE_LENGTH)
                     byteArray = byteArray.drop(SIGNATURE_LENGTH).toByteArray()
-
-                    val encodedSignature = Base58.encode(signature.toByteArray())
-                    val zeroSignature = Base58.encode(ByteArray(SIGNATURE_LENGTH))
-
-                    if(encodedSignature != zeroSignature) {
-                        signatures.add(Base58.encode(signature.toByteArray()))
-                    }
+                    signatures.add(Base58.encode(signature.toByteArray()))
                 }
 
                 // 2. decompile Message
@@ -158,23 +152,13 @@ class Transaction(
                             programId = PublicKey(programId),
                             data = dataSlice,
                             keys = accountIndices.map { accountIdx ->
-//                                AccountMeta(
-//                                    publicKey = PublicKey(accountKeys[accountIdx]),
-//                                    signer = accountIdx < numRequiredSignatures,
-//                                    writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
-//                                            (accountIdx >= numRequiredSignatures &&
-//                                                    accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
-//                                )
-                                when (accountIdx) {
-                                    in 0 until (numRequiredSignatures - numReadonlySignedAccounts) ->
-                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = true, writable = true)
-                                    in (numRequiredSignatures - numReadonlySignedAccounts) until numRequiredSignatures ->
-                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = true, writable = false)
-                                    in numRequiredSignatures until (accountKeys.count() - numReadonlyUnsignedAccounts) ->
-                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = false, writable = true)
-                                    else ->
-                                        AccountMeta(publicKey = PublicKey(accountKeys[accountIdx]), signer = false, writable = false)
-                                }
+                                AccountMeta(
+                                    publicKey = PublicKey(accountKeys[accountIdx]),
+                                    signer = accountIdx < numRequiredSignatures,
+                                    writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
+                                            (accountIdx >= numRequiredSignatures &&
+                                                    accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
+                                )
                             }
                         )
                     )
