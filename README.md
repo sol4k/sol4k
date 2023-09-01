@@ -249,6 +249,48 @@ This project is actively developed. If you would like to
 contribute, please check the open issues or submit
 a pull request.
 
+## Development setup
+
+In order to build and run sol4k locally, perform the next steps:
+- Install JDK 11 or 17 as a default version of JDK (running `java --version` should print 11 or 17).
+- Install JDK 8, but do not select it as a default. If you're using macOS, you can check for Java 8 in the list by running `/usr/libexec/java_home -V`.
+- Execute `./gradlew publishToMavenLocal -x signMavenPublication`.
+
+This would install sol4k in your local Maven repository, and you would be able to import it in other projects (make sure
+`mavenLocal` is among [your Maven repositories](https://github.com/sol4k/sol4k-examples/blob/main/build.gradle#L11-L14)).
+Adjust `currentVersion` in `gradle.properties` to be sure you are importing the version that
+you have built.
+
+In order to run end-to-end tests, you need to set two environment variables: an RPC URL and a Base-58 encoded
+secret key of an account that you would be using for testing.
+
+```shell
+export E2E_RPC_URL="https://api.devnet.solana.com"
+export E2E_SECRET_KEY="base-58-encode-secret-key..."
+```
+
+Execute the tests:
+
+```shell
+./gradlew integrationTest
+```
+
+The account needs to have some Devnet SOL as well as Devnet USDC in order to run the tests.
+You can aridrop them both using [this faucet](https://spl-token-faucet.com/?token-name=USDC-Dev).
+
+If you want to generate a new account for testing, you can do it like this:
+
+```shell
+val keypair = Keypair.generate()
+val secret = Base58.encode(keypair.secret)
+println("Secret: $secret")
+println("Public Key: ${keypair.publicKey}")
+```
+
+If no environment variables are set, end-to-end tests would use `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`
+to interact with the blockchain. Its secret key is publicly available in the source code, that's why make sure
+it has Devnet USDC and SOL if you want to rely on it.
+
 ## Contacts
 
 If you have any questions reach out to email `contact@sol4k.org`.
