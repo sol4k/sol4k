@@ -12,8 +12,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 internal class ConnectionTest {
-    private val rpcUrl = System.getProperty("E2E_RPC_URL")
-    private val secretKey = System.getProperty("E2E_SECRET_KEY")
+    private val rpcUrl = getRpcUrl()
+    private val secretKey = getSecretKey()
 
     @Test
     fun shouldGetBalance() {
@@ -275,5 +275,21 @@ internal class ConnectionTest {
         val count = connection.getTransactionCount()
 
         println("shouldGetTransactionCount: count: $count")
+    }
+
+    private fun getRpcUrl(): String {
+        val rpcUrl = System.getProperty("E2E_RPC_URL")
+        return if (rpcUrl.isNullOrEmpty()) "https://api.devnet.solana.com" else rpcUrl
+    }
+
+    private fun getSecretKey(): String {
+        val secretKey = System.getProperty("E2E_SECRET_KEY")
+        return if (secretKey.isNullOrEmpty()) {
+            // Public Key: EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF
+            // Make sure it has Devnet SOL & Devnet USDC if you rely on it
+            "28bMpVHJQjuxo3fWw4cBa6Gz7QELgYkx4cjMxU87aPx9Hn6amZZQwH2J5UNCzSYM1jDjcj7TndiK4gpGSiYyLcPy"
+        } else {
+            secretKey
+        }
     }
 }
