@@ -294,3 +294,4 @@ it has Devnet USDC and SOL if you want to rely on it.
 ## Contacts
 
 If you have any questions reach out to email `contact@sol4k.org`.
+
