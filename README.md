@@ -11,7 +11,7 @@ experience smooth and straightforward.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.3.4'
+implementation 'org.sol4k:sol4k:0.4.0'
 ```
 
 Maven:
@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.3.4</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
@@ -252,7 +252,7 @@ a pull request.
 ## Development setup
 
 In order to build and run sol4k locally, perform the next steps:
-- Install JDK 11 or 17 as a default version of JDK (running `java --version` should print 11 or 17).
+- Install JDK 11 or newer as a default version of JDK (running `java --version` should print 11 or newer).
 - Install JDK 8, but do not select it as a default. If you're using macOS, you can check for Java 8 in the list by running `/usr/libexec/java_home -V`.
 - Execute `./gradlew publishToMavenLocal -x signMavenPublication`.
 
