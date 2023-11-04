@@ -8,7 +8,7 @@ data class AccountInfo(
     val executable: Boolean,
     val lamports: BigInteger,
     val owner: PublicKey,
-    val rentEpoch: Long,
+    val rentEpoch: BigInteger,
     val space: Int,
 ) {
     override fun equals(other: Any?): Boolean {

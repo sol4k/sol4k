@@ -15,6 +15,7 @@ internal data class GetAccountInfoValue(
     @Serializable(with = BigIntegerSerializer::class)
     val lamports: BigInteger,
     val owner: String,
-    val rentEpoch: Long,
+    @Serializable(with = BigIntegerSerializer::class)
+    val rentEpoch: BigInteger,
     val space: Int? = null,
 )
