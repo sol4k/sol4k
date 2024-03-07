@@ -287,6 +287,15 @@ internal class ConnectionTest {
         println("shouldGetMinimumBalanceForRentExemption: result: $result")
     }
 
+    @Test
+    fun shouldGetBlockHeight() {
+        val connection = Connection(rpcUrl)
+
+        val result = connection.getBlockHeight()
+
+        println("shouldGetBlockHeight: result: $result")
+    }
+
     private fun getRpcUrl(): String {
         val rpcUrl = System.getProperty("E2E_RPC_URL")
         return if (rpcUrl.isNullOrEmpty()) "https://api.devnet.solana.com" else rpcUrl

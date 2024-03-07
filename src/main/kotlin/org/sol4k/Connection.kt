@@ -158,6 +158,10 @@ class Connection @JvmOverloads constructor(
         )
     )
 
+    fun getBlockHeight(): Long = rpcCall<Long, JsonElement>(
+        "getBlockHeight", listOf()
+    )
+
     fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
         return rpcCall(
             "requestAirdrop",
