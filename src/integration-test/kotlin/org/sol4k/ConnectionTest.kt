@@ -278,6 +278,15 @@ internal class ConnectionTest {
         println("shouldGetTransactionCount: count: $count")
     }
 
+    @Test
+    fun shouldGetMinimumBalanceForRentExemption() {
+        val connection = Connection(RpcUrl.MAINNNET)
+
+        val result = connection.getMinimumBalanceForRentExemption(0)
+
+        println("shouldGetMinimumBalanceForRentExemption: result: $result")
+    }
+
     private fun getRpcUrl(): String {
         val rpcUrl = System.getProperty("E2E_RPC_URL")
         return if (rpcUrl.isNullOrEmpty()) "https://api.devnet.solana.com" else rpcUrl
