@@ -280,7 +280,7 @@ internal class ConnectionTest {
 
     @Test
     fun shouldGetMinimumBalanceForRentExemption() {
-        val connection = Connection(RpcUrl.MAINNNET)
+        val connection = Connection(rpcUrl)
 
         val result = connection.getMinimumBalanceForRentExemption(0)
 
