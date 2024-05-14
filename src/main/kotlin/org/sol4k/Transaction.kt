@@ -24,7 +24,7 @@ class Transaction(
         signatures.add(Base58.encode(signature))
     }
 
-    fun addSignature(signature: String) {
+    private fun addSignature(signature: String) {
         signatures.add(signature)
     }
 
@@ -103,90 +103,90 @@ class Transaction(
 
         @JvmStatic
         fun from(encodedTransaction: String): Transaction {
-            return try {
-                var byteArray = Base64.getDecoder().decode(encodedTransaction)
+            var byteArray = Base64.getDecoder().decode(encodedTransaction)
 
-                // 1. remove signatures
-                val signaturesCount = Binary.decodeLength(byteArray)
-                byteArray = signaturesCount.second
-                val signatures = mutableListOf<String>()
-                for (i in 0 until signaturesCount.first) {
-                    val signature = byteArray.slice(0 until SIGNATURE_LENGTH)
-                    byteArray = byteArray.drop(SIGNATURE_LENGTH).toByteArray()
-                    val encodedSignature = Base58.encode(signature.toByteArray())
-                    val zeroSignature = Base58.encode(ByteArray(SIGNATURE_LENGTH))
-                    if(encodedSignature != zeroSignature) {
-                        signatures.add(encodedSignature)
-                    }
+            // 1. remove signatures
+            val signaturesDecodedLength = Binary.decodeLength(byteArray)
+            byteArray = signaturesDecodedLength.bytes
+            val signatures = mutableListOf<String>()
+            for (i in 0 until signaturesDecodedLength.length) {
+                val signature = byteArray.slice(0 until SIGNATURE_LENGTH)
+                byteArray = byteArray.drop(SIGNATURE_LENGTH).toByteArray()
+                val encodedSignature = Base58.encode(signature.toByteArray())
+                val zeroSignature = Base58.encode(ByteArray(SIGNATURE_LENGTH))
+                if(encodedSignature != zeroSignature) {
+                    signatures.add(encodedSignature)
                 }
-
-                // 2. decompile Message
-                val numRequiredSignatures = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
-                val numReadonlySignedAccounts = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
-                val numReadonlyUnsignedAccounts = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
-
-                val accountCount = Binary.decodeLength(byteArray)
-                byteArray = accountCount.second
-                val accountKeys = mutableListOf<String>() // list of all accounts
-                for (i in 0 until accountCount.first) {
-                    val account = byteArray.slice(0 until PUBLIC_KEY_LENGTH)
-                    byteArray = byteArray.drop(PUBLIC_KEY_LENGTH).toByteArray()
-                    accountKeys.add(Base58.encode(account.toByteArray()))
-                }
-
-                val recentBlockhash = byteArray.slice(0 until PUBLIC_KEY_LENGTH).toByteArray()
-                byteArray = byteArray.drop(PUBLIC_KEY_LENGTH).toByteArray()
-
-                val instructionCount = Binary.decodeLength(byteArray)
-                byteArray = instructionCount.second
-                val instructions = mutableListOf<Instruction>()
-                for(i in 0 until instructionCount.first) {
-                    val programIdIndex = byteArray.first().toInt().also { byteArray = byteArray.drop(1).toByteArray() }
-                    val programId = accountKeys[programIdIndex]
-
-                    val accountCount = Binary.decodeLength(byteArray)
-                    byteArray = accountCount.second
-
-                    val accountIndices =
-                        byteArray.slice(0 until accountCount.first).toByteArray().toList().map(Byte::toInt)
-                    byteArray = byteArray.drop(accountCount.first).toByteArray()
-
-                    val dataLength = Binary.decodeLength(byteArray)
-                    byteArray = dataLength.second
-                    val dataSlice = byteArray.slice(0 until dataLength.first).toByteArray()
-                    byteArray = byteArray.drop(dataLength.first).toByteArray()
-                    instructions.add(
-                        BaseInstruction(
-                            programId = PublicKey(programId),
-                            data = dataSlice,
-                            keys = accountIndices.map { accountIdx ->
-                                AccountMeta(
-                                    publicKey = PublicKey(accountKeys[accountIdx]),
-                                    signer = accountIdx < numRequiredSignatures,
-                                    writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
-                                            (accountIdx >= numRequiredSignatures &&
-                                                    accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
-                                )
-                            }
-                        )
-                    )
-                }
-
-                // 3. construct Transaction
-                if(numRequiredSignatures <= 0) throw Exception("Feepayer does not exist")
-
-                Transaction(
-                    feePayer = PublicKey(accountKeys[0]),
-                    recentBlockhash = Base58.encode(recentBlockhash),
-                    instructions = instructions,
-                ).apply {
-                    signatures.forEach { signature ->
-                        this.addSignature(signature)
-                    }
-                }
-            } catch (e: Exception) {
-                throw e
             }
+
+            // 2. decompile Message
+            val numRequiredSignatures = byteArray.first().toInt()
+            byteArray = byteArray.drop(1).toByteArray()
+            val numReadonlySignedAccounts = byteArray.first().toInt()
+            byteArray = byteArray.drop(1).toByteArray()
+            val numReadonlyUnsignedAccounts = byteArray.first().toInt()
+            byteArray = byteArray.drop(1).toByteArray()
+
+            val accountDecodedLength = Binary.decodeLength(byteArray)
+            byteArray = accountDecodedLength.bytes
+            val accountKeys = mutableListOf<String>() // list of all accounts
+            for (i in 0 until accountDecodedLength.length) {
+                val account = byteArray.slice(0 until PUBLIC_KEY_LENGTH)
+                byteArray = byteArray.drop(PUBLIC_KEY_LENGTH).toByteArray()
+                accountKeys.add(Base58.encode(account.toByteArray()))
+            }
+
+            val recentBlockhash = byteArray.slice(0 until PUBLIC_KEY_LENGTH).toByteArray()
+            byteArray = byteArray.drop(PUBLIC_KEY_LENGTH).toByteArray()
+
+            val instructionDecodedLength = Binary.decodeLength(byteArray)
+            byteArray = instructionDecodedLength.bytes
+            val instructions = mutableListOf<Instruction>()
+            for(i in 0 until instructionDecodedLength.length) {
+                val programIdIndex = byteArray.first().toInt()
+                byteArray = byteArray.drop(1).toByteArray()
+                val programId = accountKeys[programIdIndex]
+
+                val instructionAccountDecodedLength = Binary.decodeLength(byteArray)
+                byteArray = instructionAccountDecodedLength.bytes
+
+                val accountIndices =
+                    byteArray.slice(0 until instructionAccountDecodedLength.length).toByteArray().toList().map(Byte::toInt)
+                byteArray = byteArray.drop(instructionAccountDecodedLength.length).toByteArray()
+
+                val dataDecodedLength = Binary.decodeLength(byteArray)
+                byteArray = dataDecodedLength.bytes
+                val dataSlice = byteArray.slice(0 until dataDecodedLength.length).toByteArray()
+                byteArray = byteArray.drop(dataDecodedLength.length).toByteArray()
+                instructions.add(
+                    BaseInstruction(
+                        programId = PublicKey(programId),
+                        data = dataSlice,
+                        keys = accountIndices.map { accountIdx ->
+                            AccountMeta(
+                                publicKey = PublicKey(accountKeys[accountIdx]),
+                                signer = accountIdx < numRequiredSignatures,
+                                writable = accountIdx < numRequiredSignatures - numReadonlySignedAccounts ||
+                                        (accountIdx >= numRequiredSignatures &&
+                                                accountIdx < accountKeys.count() - numReadonlyUnsignedAccounts)
+                            )
+                        }
+                    )
+                )
+            }
+
+            // 3. construct Transaction
+            if(numRequiredSignatures <= 0) throw Exception("FeePayer does not exist")
+
+            val tx = Transaction(
+                feePayer = PublicKey(accountKeys[0]),
+                recentBlockhash = Base58.encode(recentBlockhash),
+                instructions = instructions,
+            )
+            signatures.forEach { signature ->
+                tx.addSignature(signature)
+            }
+            return tx
         }
     }
 }

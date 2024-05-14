@@ -60,7 +60,7 @@ object Binary {
     }
 
     @JvmStatic
-    fun decodeLength(bytes: ByteArray): Pair<Int, ByteArray> {
+    fun decodeLength(bytes: ByteArray): DecodedLength {
         var newBytes = bytes
         var len = 0
         var size = 0
@@ -72,6 +72,29 @@ object Binary {
                 break
             }
         }
-        return len to newBytes
+        return DecodedLength(len, newBytes)
+    }
+
+    data class DecodedLength(
+        val length: Int,
+        val bytes: ByteArray,
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as DecodedLength
+
+            if (length != other.length) return false
+            if (!bytes.contentEquals(other.bytes)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = length
+            result = 31 * result + bytes.contentHashCode()
+            return result
+        }
     }
 }
