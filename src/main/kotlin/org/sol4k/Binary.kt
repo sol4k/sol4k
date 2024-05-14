@@ -58,4 +58,43 @@ object Binary {
         System.arraycopy(out, 0, bytes, 0, cursor + 1)
         return bytes
     }
+
+    @JvmStatic
+    fun decodeLength(bytes: ByteArray): DecodedLength {
+        var newBytes = bytes
+        var len = 0
+        var size = 0
+        while (true) {
+            val elem = newBytes.first().toInt().also { newBytes = newBytes.drop(1).toByteArray() }
+            len = len or (elem and 0x7f) shl (size * 7)
+            size += 1
+            if ((elem and 0x80) == 0) {
+                break
+            }
+        }
+        return DecodedLength(len, newBytes)
+    }
+
+    data class DecodedLength(
+        val length: Int,
+        val bytes: ByteArray,
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as DecodedLength
+
+            if (length != other.length) return false
+            if (!bytes.contentEquals(other.bytes)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = length
+            result = 31 * result + bytes.contentHashCode()
+            return result
+        }
+    }
 }
