@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import java.util.Base64
 import kotlin.test.assertEquals
 
-
 internal class TransactionTest {
 
     @Test
@@ -20,4 +19,3 @@ internal class TransactionTest {
         assertEquals(recoverSt, st)
     }
 }
-
