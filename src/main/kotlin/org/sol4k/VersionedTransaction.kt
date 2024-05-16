@@ -76,7 +76,7 @@ class VersionedTransaction(
 
             val message = Message.deserialize(byteArray)
 
-            if(signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
+            if (signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
                 throw Exception("numRequireSignatures is not equal to signatureCount")
             }
             return VersionedTransaction(message, signatures)

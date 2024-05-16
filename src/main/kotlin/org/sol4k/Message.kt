@@ -1,10 +1,8 @@
 package org.sol4k
 
 import okio.Buffer
-import okio.ByteString.Companion.toByteString
 import org.sol4k.VersionedTransaction.Companion.PUBLIC_KEY_LENGTH
 import org.sol4k.instruction.CompiledInstruction
-import kotlin.experimental.and
 
 data class Message(
     val version: MessageVersion,
@@ -102,7 +100,7 @@ data class Message(
             val instructionDecodedLength = Binary.decodeLength(data)
             data = instructionDecodedLength.bytes
             val instructions = mutableListOf<CompiledInstruction>()
-            for(i in 0 until instructionDecodedLength.length) {
+            for (i in 0 until instructionDecodedLength.length) {
                 val programIdIndex = data.first().toInt().also { data = data.drop(1).toByteArray() }
 
                 val accountDecodedLength = Binary.decodeLength(data)
