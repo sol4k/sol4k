@@ -57,7 +57,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendTransaction: signature: $signature")
     }
@@ -76,7 +76,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val simulation = connection.simulateTransaction(transaction)
+        val simulation = connection.simulateTransaction(transaction.serialize())
 
         assertTrue("Simulation must be successful") {
             simulation is TransactionSimulationSuccess
@@ -98,7 +98,7 @@ internal class ConnectionTest {
         )
         transaction.sign(senderWithNoSol)
 
-        val simulation = connection.simulateTransaction(transaction)
+        val simulation = connection.simulateTransaction(transaction.serialize())
 
         assertTrue("Simulation must produce an error") { simulation is TransactionSimulationError }
         assertEquals("AccountNotFound", (simulation as TransactionSimulationError).error)
@@ -123,7 +123,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
     }
@@ -148,7 +148,7 @@ internal class ConnectionTest {
             feePayer = payerWallet.publicKey,
         )
         transaction.sign(payerWallet)
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
     }
@@ -184,8 +184,11 @@ internal class ConnectionTest {
         val splTransferInstruction = SplTransferInstruction(
             holderAssociatedAccount,
             receiverAssociatedAccount,
+            usdc,
             holder.publicKey,
+            emptyList(),
             100,
+            6,
         )
         val transaction = Transaction(
             blockhash,
@@ -194,7 +197,7 @@ internal class ConnectionTest {
         )
         transaction.sign(holder)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendSpl: signature: $signature")
     }
