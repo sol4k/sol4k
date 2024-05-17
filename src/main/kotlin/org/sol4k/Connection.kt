@@ -155,7 +155,7 @@ class Connection @JvmOverloads constructor(
     fun getMinimumBalanceForRentExemption(space: Int): Long {
         return rpcCall(
             "getMinimumBalanceForRentExemption",
-            listOf(Json.encodeToJsonElement(space.toString()))
+            listOf(Json.encodeToJsonElement(space))
         )
     }
 
