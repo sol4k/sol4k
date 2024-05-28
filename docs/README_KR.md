@@ -1,5 +1,7 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
+<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> | 한국어
+
 Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용할 수 있는 Solana용 Kotlin 클라이언트입니다. 이 클라이언트를 사용하여 RPC 노드와 통신하고 블록체인에서 정보를 쿼리하며, 계정을 생성하고 데이터를 읽고, 다양한 유형의 트랜잭션을 전송하고, 키 쌍 및 공개 키와 작업할 수 있습니다. 또한 개발자가 매끄럽고 간편하게 작업할 수 있도록 편리한 API도 제공합니다.
 
 ## 가져오는 방법
