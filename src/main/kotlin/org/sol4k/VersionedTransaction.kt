@@ -1,6 +1,8 @@
 package org.sol4k
 
 import okio.Buffer
+import org.sol4k.Constants.SIGNATURE_LENGTH
+import org.sol4k.exception.SerializationException
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Base64
@@ -29,7 +31,7 @@ class VersionedTransaction(
 
     fun serialize(): ByteArray {
         if (signatures.isEmpty() || signatures.size != message.header.numRequireSignatures) {
-            throw Exception("Signature verification failed")
+            throw SerializationException("Signature verification failed")
         }
 
         val messageData = message.serialize()
@@ -46,20 +48,14 @@ class VersionedTransaction(
     fun calcFee(): BigDecimal {
         val sigFee = lamportToSol(BigDecimal(5000 * max(signatures.size, 1)))
         val accounts = message.accounts
-        val data = mutableListOf<ByteArray>()
-        for (i in message.instructions) {
-            if (accounts[i.programIdIndex] != Constants.COMPUTE_BUDGET__PROGRAM_ID) {
-                continue
-            }
-            data.add(i.data)
-        }
+        val data = message.instructions
+            .filter { accounts[it.programIdIndex] != Constants.COMPUTE_BUDGET_PROGRAM_ID }
+            .map { it.data }
         val msgFee = computeBudget(data)
         return sigFee.add(msgFee).setScale(9, RoundingMode.CEILING)
     }
 
     companion object {
-        const val PUBLIC_KEY_LENGTH = 32
-        private const val SIGNATURE_LENGTH = 64
 
         @JvmStatic
         fun from(encodedTransaction: String): VersionedTransaction {
@@ -77,7 +73,7 @@ class VersionedTransaction(
             val message = Message.deserialize(byteArray)
 
             if (signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
-                throw Exception("numRequireSignatures is not equal to signatureCount")
+                throw SerializationException("numRequireSignatures is not equal to signatureCount")
             }
             return VersionedTransaction(message, signatures)
         }

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class GetTokenApplyResponse(
-    val value: TokenAmount? = null,
+    val value: TokenAmount,
 )
 
 @Serializable

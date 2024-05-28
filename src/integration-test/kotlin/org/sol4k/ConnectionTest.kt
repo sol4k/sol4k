@@ -76,7 +76,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val simulation = connection.simulateTransaction(transaction.serialize())
+        val simulation = connection.simulateTransaction(transaction)
 
         assertTrue("Simulation must be successful") {
             simulation is TransactionSimulationSuccess

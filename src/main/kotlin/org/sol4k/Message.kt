@@ -1,7 +1,8 @@
 package org.sol4k
 
 import okio.Buffer
-import org.sol4k.VersionedTransaction.Companion.PUBLIC_KEY_LENGTH
+import org.sol4k.Constants.PUBLIC_KEY_LENGTH
+import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.CompiledInstruction
 
 data class Message(
@@ -22,10 +23,10 @@ data class Message(
         if (version != MessageVersion.Legacy) {
             val v = version.name.substring(1).toIntOrNull()
             if (v == null || v > 255) {
-                throw Exception("failed to parse message version")
+                throw SerializationException("failed to parse message version")
             }
             if (v > 128) {
-                throw Exception("unexpected message version")
+                throw SerializationException("unexpected message version")
             }
             b.writeByte(v.toByte() + 128.toByte())
         }

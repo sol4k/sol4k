@@ -11,10 +11,11 @@ object Constants {
     val ASSOCIATED_TOKEN_PROGRAM_ID = PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
 
     @JvmStatic
-    val COMPUTE_BUDGET__PROGRAM_ID = PublicKey("ComputeBudget111111111111111111111111111111")
+    val COMPUTE_BUDGET_PROGRAM_ID = PublicKey("ComputeBudget111111111111111111111111111111")
 
-    object SysPubkey {
-        @JvmStatic
-        val RENT_PUBKEY = PublicKey("SysvarRent111111111111111111111111111111111")
-    }
+    @JvmStatic
+    val SYSVAR_RENT_ADDRESS = PublicKey("SysvarRent111111111111111111111111111111111")
+
+    const val PUBLIC_KEY_LENGTH = 32
+    const val SIGNATURE_LENGTH = 64
 }

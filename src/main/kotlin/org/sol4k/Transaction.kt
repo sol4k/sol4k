@@ -1,5 +1,7 @@
 package org.sol4k
 
+import org.sol4k.Constants.PUBLIC_KEY_LENGTH
+import org.sol4k.Constants.SIGNATURE_LENGTH
 import org.sol4k.instruction.BaseInstruction
 import org.sol4k.instruction.Instruction
 import java.nio.ByteBuffer
@@ -105,8 +107,6 @@ class Transaction(
     companion object {
         private const val HEADER_LENGTH = 3
         private const val RECENT_BLOCK_HASH_LENGTH = 32
-        private const val PUBLIC_KEY_LENGTH = 32
-        private const val SIGNATURE_LENGTH = 64
 
         @JvmStatic
         fun from(encodedTransaction: String): Transaction {

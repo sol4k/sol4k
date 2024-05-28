@@ -184,6 +184,10 @@ class Connection @JvmOverloads constructor(
         )
     }
 
+    fun sendTransaction(transaction: Transaction): String {
+        return sendTransaction(transaction.serialize())
+    }
+
     fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         val result: SimulateTransactionResponse = rpcCall(
@@ -203,6 +207,10 @@ class Connection @JvmOverloads constructor(
             return TransactionSimulationSuccess(logs)
         }
         throw IllegalArgumentException("Unable to parse simulation response")
+    }
+
+    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
+        return simulateTransaction(transaction.serialize())
     }
 
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {

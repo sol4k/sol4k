@@ -23,7 +23,7 @@ class CreateAssociatedTokenAccountInstruction(
         AccountMeta(mint),
         AccountMeta(SYSTEM_PROGRAM),
         AccountMeta(TOKEN_PROGRAM_ID),
-        AccountMeta(Constants.SysPubkey.RENT_PUBKEY),
+        AccountMeta(Constants.SYSVAR_RENT_ADDRESS),
     )
 
     override val programId: PublicKey = ASSOCIATED_TOKEN_PROGRAM_ID
