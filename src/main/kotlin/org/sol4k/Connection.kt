@@ -159,7 +159,7 @@ class Connection @JvmOverloads constructor(
         )
     }
 
-    fun getTokenSupply(tokenPubkey: String): TokenAmount? {
+    fun getTokenSupply(tokenPubkey: String): TokenAmount {
         return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply", listOf(Json.encodeToJsonElement(tokenPubkey))).value
     }
 

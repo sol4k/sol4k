@@ -71,6 +71,8 @@ data class Message(
     }
 
     companion object {
+
+        @JvmStatic
         fun deserialize(d: ByteArray): Message {
             var data = d
             val v = data.first().toInt() and 0xFF

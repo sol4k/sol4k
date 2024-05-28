@@ -174,6 +174,26 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetMinimumBalanceForRentExemption() {
+        val connection = Connection(rpcUrl)
+        val space = 50
+
+        val minimumBalanceForRentExemption = connection.getMinimumBalanceForRentExemption(space)
+
+        println("shouldGetMinimumBalanceForRentExemption minimumBalanceForRentExemption $minimumBalanceForRentExemption")
+    }
+
+    @Test
+    fun shouldGetTokenSupply() {
+        val connection = Connection(rpcUrl)
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+
+        val tokenAmount = connection.getTokenSupply(usdc.toBase58())
+
+        println("shouldGetTokenSupply tokenAmount $tokenAmount")
+    }
+
+    @Test
     fun shouldSendSpl() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
