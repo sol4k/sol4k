@@ -35,8 +35,8 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
     if (unitLimit == 0 || unitPrice == 0L) {
         return BigDecimal.ZERO
     }
-    val feeInLamports = microToLamport(BigDecimal(unitLimit).multiply(BigDecimal(unitPrice)))
-    return lamportToSol(feeInLamports)
+    val feeInLamports = Convert.microToLamport(BigDecimal(unitLimit).multiply(BigDecimal(unitPrice)))
+    return Convert.lamportToSol(feeInLamports)
 }
 
 internal fun decodeComputeUnitLimit(data: ByteArray): Int {
