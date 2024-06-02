@@ -45,8 +45,8 @@ class VersionedTransaction(
         return b.readByteArray()
     }
 
-    fun calculateFee(): BigDecimal {
-        val sigFee = Convert.lamportToSol(BigDecimal(5000 * max(signatures.size, 1)))
+    fun calculateFee(lamportsPerSignature: Int): BigDecimal {
+        val sigFee = Convert.lamportToSol(BigDecimal(lamportsPerSignature * max(signatures.size, 1)))
         val accounts = message.accounts
         val data = message.instructions
             .filter { accounts[it.programIdIndex] != Constants.COMPUTE_BUDGET_PROGRAM_ID }
