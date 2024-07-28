@@ -1,9 +1,10 @@
 package org.sol4k.instruction
 
-import okio.Buffer
 import org.sol4k.AccountMeta
+import org.sol4k.Binary
 import org.sol4k.Constants.TOKEN_PROGRAM_ID
 import org.sol4k.PublicKey
+import java.io.ByteArrayOutputStream
 
 class SplTransferInstruction(
     from: PublicKey,
@@ -22,11 +23,12 @@ class SplTransferInstruction(
 
     override val data: ByteArray
         get() {
-            val buffer = Buffer()
-            buffer.writeByte(instructionTransferChecked)
-                .writeLongLe(amount)
-                .writeByte(decimals)
-            return buffer.readByteArray()
+            ByteArrayOutputStream().use { buffer ->
+                buffer.write(instructionTransferChecked)
+                buffer.write(Binary.int64(amount))
+                buffer.write(decimals)
+                return buffer.toByteArray()
+            }
         }
 
     override val keys: List<AccountMeta> = listOf(

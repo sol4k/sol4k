@@ -2,8 +2,9 @@
 
 package org.sol4k
 
-import okio.Buffer
 import java.math.BigDecimal
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 private const val InstructionRequestUnits = 0
 private const val InstructionRequestHeapFrame = 1
@@ -16,16 +17,20 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
     var unitLimit = 0
     var unitPrice = 0L
     data.map {
-        val d = Buffer()
-        d.write(it)
-        val instruction = d.readByte().toInt()
+        var d = it
+        val instruction = d.first().toInt()
+        d = d.drop(1).toByteArray()
         when (instruction) {
             InstructionSetComputeUnitLimit -> {
-                unitLimit = d.readIntLe()
+                val buffer = ByteBuffer.wrap(d.take(4).toByteArray())
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                unitLimit = buffer.asIntBuffer().get()
             }
             InstructionSetComputeUnitPrice -> {
                 // micro-lamports
-                unitPrice = d.readLongLe()
+                val buffer = ByteBuffer.wrap(d.take(8).toByteArray())
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                unitPrice = buffer.asLongBuffer().get()
             }
             else -> {
                 return BigDecimal.ZERO
@@ -40,22 +45,26 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
 }
 
 internal fun decodeComputeUnitLimit(data: ByteArray): Int {
-    val d = Buffer()
-    d.write(data)
-    val instruction = d.readByte().toInt()
+    var d = data
+    val instruction = d.first().toInt()
     if (instruction != InstructionSetComputeUnitLimit) {
         return 0
     }
-    return d.readIntLe()
+    d = d.drop(1).toByteArray()
+    val buffer = ByteBuffer.wrap(d.take(4).toByteArray())
+        .order(ByteOrder.LITTLE_ENDIAN)
+    return buffer.asIntBuffer().get()
 }
 
 // compute unit price in "micro-lamports"
 internal fun decodeComputeUnitPrice(data: ByteArray): Long {
-    val d = Buffer()
-    d.write(data)
-    val instruction = d.readByte().toInt()
+    var d = data
+    val instruction = d.first().toInt()
     if (instruction != InstructionSetComputeUnitPrice) {
-        return 0L
+        return 0
     }
-    return d.readLongLe()
+    d = d.drop(1).toByteArray()
+    val buffer = ByteBuffer.wrap(d.take(8).toByteArray())
+        .order(ByteOrder.LITTLE_ENDIAN)
+    return buffer.asLongBuffer().get()
 }

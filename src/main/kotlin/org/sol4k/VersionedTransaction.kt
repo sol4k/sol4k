@@ -1,8 +1,8 @@
 package org.sol4k
 
-import okio.Buffer
 import org.sol4k.Constants.SIGNATURE_LENGTH
 import org.sol4k.exception.SerializationException
+import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Base64
@@ -36,13 +36,13 @@ class VersionedTransaction(
 
         val messageData = message.serialize()
 
-        val b = Buffer()
+        val b = ByteArrayOutputStream()
         b.write(Binary.encodeLength(signatures.size))
         for (s in signatures) {
             b.write(Base58.decode(s))
         }
         b.write(messageData)
-        return b.readByteArray()
+        return b.toByteArray()
     }
 
     fun calculateFee(lamportsPerSignature: Int): BigDecimal {

@@ -1,9 +1,9 @@
 package org.sol4k
 
-import okio.Buffer
 import org.sol4k.Constants.PUBLIC_KEY_LENGTH
 import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.CompiledInstruction
+import java.io.ByteArrayOutputStream
 
 data class Message(
     val version: MessageVersion,
@@ -19,55 +19,57 @@ data class Message(
     }
 
     fun serialize(): ByteArray {
-        val b = Buffer()
-        if (version != MessageVersion.Legacy) {
-            val v = version.name.substring(1).toIntOrNull()
-            if (v == null || v > 255) {
-                throw SerializationException("failed to parse message version")
+        ByteArrayOutputStream().use { b ->
+            if (version != MessageVersion.Legacy) {
+                val v = version.name.substring(1).toIntOrNull()
+                if (v == null || v > 255) {
+                    throw SerializationException("failed to parse message version")
+                }
+                if (v > 128) {
+                    throw SerializationException("unexpected message version")
+                }
+                b.write(v.toByte() + 128.toByte())
             }
-            if (v > 128) {
-                throw SerializationException("unexpected message version")
-            }
-            b.writeByte(v.toByte() + 128.toByte())
-        }
 
-        b.writeByte(header.numRequireSignatures)
-            .writeByte(header.numReadonlySignedAccounts)
-            .writeByte(header.numReadonlyUnsignedAccounts)
-            .write(Binary.encodeLength(accounts.size))
-        for (a in accounts) {
-            b.write(a.bytes())
-        }
-        b.write(Base58.decode(recentBlockhash))
-            .write(Binary.encodeLength(instructions.size))
-        for (i in instructions) {
-            b.writeByte(i.programIdIndex)
-                .write(Binary.encodeLength(i.accounts.size))
-            for (a in i.accounts) {
-                b.writeByte(a)
+            b.write(header.numRequireSignatures)
+            b.write(header.numReadonlySignedAccounts)
+            b.write(header.numReadonlyUnsignedAccounts)
+            b.write(Binary.encodeLength(accounts.size))
+            for (a in accounts) {
+                b.write(a.bytes())
             }
-            b.write(Binary.encodeLength(i.data.size))
-                .write(i.data)
-        }
+            b.write(Base58.decode(recentBlockhash))
+            b.write(Binary.encodeLength(instructions.size))
+            for (i in instructions) {
+                b.write(i.programIdIndex)
+                b.write(Binary.encodeLength(i.accounts.size))
+                for (a in i.accounts) {
+                    b.write(a)
+                }
+                b.write(Binary.encodeLength(i.data.size))
+                b.write(i.data)
+            }
 
-        if (version != MessageVersion.Legacy) {
-            var validAddressLookupCount = 0
-            val accountLookupTableSerializedData = Buffer()
-            for (a in addressLookupTables) {
-                if (a.writableIndexes.isNotEmpty() || a.readonlyIndexes.isNotEmpty()) {
-                    accountLookupTableSerializedData.write(a.publicKey.bytes())
-                        .write(Binary.encodeLength(a.writableIndexes.size))
-                        .write(a.writableIndexes)
-                        .write(Binary.encodeLength(a.readonlyIndexes.size))
-                        .write(a.readonlyIndexes)
-                    validAddressLookupCount++
+            if (version != MessageVersion.Legacy) {
+                var validAddressLookupCount = 0
+                ByteArrayOutputStream().use { accountLookupTableSerializedData ->
+                    for (a in addressLookupTables) {
+                        if (a.writableIndexes.isNotEmpty() || a.readonlyIndexes.isNotEmpty()) {
+                            accountLookupTableSerializedData.write(a.publicKey.bytes())
+                            accountLookupTableSerializedData.write(Binary.encodeLength(a.writableIndexes.size))
+                            accountLookupTableSerializedData.write(a.writableIndexes)
+                            accountLookupTableSerializedData.write(Binary.encodeLength(a.readonlyIndexes.size))
+                            accountLookupTableSerializedData.write(a.readonlyIndexes)
+                            validAddressLookupCount++
+                        }
+                    }
+
+                    b.write(Binary.encodeLength(validAddressLookupCount))
+                    b.write(accountLookupTableSerializedData.toByteArray())
                 }
             }
-
-            b.write(Binary.encodeLength(validAddressLookupCount))
-            b.write(accountLookupTableSerializedData.readByteString())
+            return b.toByteArray()
         }
-        return b.readByteArray()
     }
 
     companion object {

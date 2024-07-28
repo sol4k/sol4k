@@ -18,7 +18,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3'
     implementation 'org.sol4k:tweetnacl:0.1.6'
     implementation 'org.sol4k:utilities:0.1.0'
-    implementation 'com.squareup.okio:okio:3.9.0'
 
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
