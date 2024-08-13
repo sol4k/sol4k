@@ -9,7 +9,7 @@ import java.util.Base64
 import kotlin.math.max
 
 class VersionedTransaction(
-    val message: Message,
+    val message: TransactionMessage,
     val signatures: MutableList<String>,
 ) {
 
@@ -70,7 +70,7 @@ class VersionedTransaction(
                 signatures.add(encodedSignature)
             }
 
-            val message = Message.deserialize(byteArray)
+            val message = TransactionMessage.deserialize(byteArray)
 
             if (signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
                 throw SerializationException("numRequireSignatures is not equal to signatureCount")

@@ -5,7 +5,7 @@ import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.CompiledInstruction
 import java.io.ByteArrayOutputStream
 
-data class Message(
+data class TransactionMessage(
     val version: MessageVersion,
     val header: MessageHeader,
     val accounts: List<PublicKey>,
@@ -75,7 +75,7 @@ data class Message(
     companion object {
 
         @JvmStatic
-        fun deserialize(d: ByteArray): Message {
+        fun deserialize(d: ByteArray): TransactionMessage {
             var data = d
             val v = data.first().toInt() and 0xFF
             val version = if (v > 127) {
@@ -155,7 +155,7 @@ data class Message(
                     )
                 }
             }
-            return Message(
+            return TransactionMessage(
                 version = version,
                 header = MessageHeader(
                     numRequireSignatures = numRequiredSignatures,
