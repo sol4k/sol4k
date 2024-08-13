@@ -1,7 +1,6 @@
 package org.sol4k
 
 import org.sol4k.Constants.PUBLIC_KEY_LENGTH
-import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.CompiledInstruction
 import java.io.ByteArrayOutputStream
 
@@ -20,15 +19,8 @@ data class TransactionMessage(
 
     fun serialize(): ByteArray {
         ByteArrayOutputStream().use { b ->
-            if (version != MessageVersion.Legacy) {
-                val v = version.name.substring(1).toIntOrNull()
-                if (v == null || v > 255) {
-                    throw SerializationException("failed to parse message version")
-                }
-                if (v > 128) {
-                    throw SerializationException("unexpected message version")
-                }
-                b.write(v.toByte() + 128.toByte())
+            if (version == MessageVersion.V0) {
+                b.write(ByteArray(1) { 128.toByte() })
             }
 
             b.write(header.numRequireSignatures)
