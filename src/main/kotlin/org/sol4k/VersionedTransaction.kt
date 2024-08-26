@@ -13,6 +13,10 @@ class VersionedTransaction(
     val signatures: MutableList<String>,
 ) {
 
+    constructor(
+        message: TransactionMessage
+    ) : this(message, mutableListOf())
+
     fun sign(keypair: Keypair) {
         val data = message.serialize()
         val signature = keypair.sign(data)

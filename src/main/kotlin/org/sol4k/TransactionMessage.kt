@@ -2,6 +2,7 @@ package org.sol4k
 
 import org.sol4k.Constants.PUBLIC_KEY_LENGTH
 import org.sol4k.instruction.CompiledInstruction
+import org.sol4k.instruction.Instruction
 import java.io.ByteArrayOutputStream
 
 data class TransactionMessage(
@@ -160,6 +161,187 @@ data class TransactionMessage(
                 addressLookupTables = addressLookupTables,
             )
         }
+
+        @JvmStatic
+        fun newMessage(
+            feePayer: PublicKey,
+            recentBlockhash: String,
+            instructions: List<Instruction>,
+            addressLookupTableAccounts: List<AddressLookupTableAccount>, // v0 transaction
+        ): TransactionMessage {
+            val addressLookupTableMaps = mutableListOf<Map<PublicKey, Int>>()
+            addressLookupTableAccounts.forEach { addressLookupTableAccount ->
+                val m = mutableMapOf<PublicKey, Int>()
+                addressLookupTableAccount.addresses.forEachIndexed { i, publicKey ->
+                    m[publicKey] = i
+                }
+                addressLookupTableMaps.add(m)
+            }
+
+            val compileKeys = newCompileKeys(feePayer, instructions)
+            val allKeys = compileKeys.keyMetaMap.keys.sortedWith { p1, p2 ->
+                val a = p1.bytes()
+                val b = p2.bytes()
+                for (i in 0 until minOf(a.size, b.size)) {
+                    val comparison = a[i].compareTo(b[i])
+                    if (comparison != 0) {
+                        return@sortedWith comparison
+                    }
+                }
+                return@sortedWith a.size.compareTo(b.size)
+            }
+
+            val writableSignedAccount = mutableListOf<PublicKey>()
+            val readOnlySignedAccount = mutableListOf<PublicKey>()
+            val writableUnsignedAccount = mutableListOf<PublicKey>()
+            val readOnlyUnsignedAccount = mutableListOf<PublicKey>()
+            val addressLookupTableAccountCount = addressLookupTableAccounts.size
+            val addressLookupTableWritable = List(addressLookupTableAccountCount) { mutableListOf<PublicKey>() }
+            val addressLookupTableWritableIdx = List(addressLookupTableAccountCount) { mutableListOf<Byte>() }
+            val addressLookupTableReadonly = List(addressLookupTableAccountCount) { mutableListOf<PublicKey>() }
+            val addressLookupTableReadonlyIdx = List(addressLookupTableAccountCount) { mutableListOf<Byte>() }
+
+            next@ for (key in allKeys) {
+                if (key == feePayer) {
+                    continue@next
+                }
+                val meta = requireNotNull(compileKeys.keyMetaMap[key])
+                if (meta.signer) {
+                    if (meta.writable) {
+                        writableSignedAccount.add(key)
+                    } else {
+                        readOnlySignedAccount.add(key)
+                    }
+                } else {
+                    if (meta.writable) {
+                        for (n in 0 until addressLookupTableMaps.size) {
+                            val addressLookupTableMap = addressLookupTableMaps[n]
+                            val idx = addressLookupTableMap[key]
+                            if (idx != null && !meta.invoked) {
+                                addressLookupTableWritable[n].add(key)
+                                addressLookupTableWritableIdx[n].add(idx.toByte())
+                                continue@next
+                            }
+                        }
+                        // if not found in address lookup table
+                        writableUnsignedAccount.add(key)
+                    } else {
+                        for (n in 0 until addressLookupTableMaps.size) {
+                            val addressLookupTableMap = addressLookupTableMaps[n]
+                            val idx = addressLookupTableMap[key]
+                            if (idx != null && !meta.invoked) {
+                                addressLookupTableReadonly[n].add(key)
+                                addressLookupTableReadonlyIdx[n].add(idx.toByte())
+                                continue@next
+                            }
+                        }
+                        // if not found in address lookup table
+                        readOnlyUnsignedAccount.add(key)
+                    }
+                }
+            }
+
+            writableSignedAccount.add(0, feePayer)
+
+            val publicKeys = mutableListOf<PublicKey>().apply {
+                addAll(writableSignedAccount)
+                addAll(readOnlySignedAccount)
+                addAll(writableUnsignedAccount)
+                addAll(readOnlyUnsignedAccount)
+            }
+            val compiledAddressLookupTables = mutableListOf<CompiledAddressLookupTable>()
+            var lookupAddressCount = 0
+            for (i in 0 until addressLookupTableAccountCount) {
+                publicKeys.addAll(addressLookupTableWritable[i])
+                lookupAddressCount += addressLookupTableWritable[i].size
+            }
+            for (i in 0 until addressLookupTableAccountCount) {
+                publicKeys.addAll(addressLookupTableReadonly[i])
+                lookupAddressCount += addressLookupTableReadonly[i].size
+
+                if (addressLookupTableWritable[i].size > 0 || addressLookupTableReadonly[i].size > 0) {
+                    compiledAddressLookupTables.add(
+                        CompiledAddressLookupTable(
+                            addressLookupTableAccounts[i].key,
+                            addressLookupTableWritableIdx[i].toByteArray(),
+                            addressLookupTableReadonlyIdx[i].toByteArray(),
+                        )
+                    )
+                }
+            }
+
+            val version = if (addressLookupTableAccounts.isNotEmpty()) {
+                MessageVersion.V0
+            } else {
+                MessageVersion.Legacy
+            }
+            val publicKeyToIdx = mutableMapOf<PublicKey, Int>()
+            publicKeys.forEachIndexed { i, publicKey ->
+                publicKeyToIdx[publicKey] = i
+            }
+            val compiledInstructions = mutableListOf<CompiledInstruction>()
+            instructions.forEach { instruction ->
+                val accountIndex = mutableListOf<Int>()
+                instruction.keys.forEach { account ->
+                    accountIndex.add(requireNotNull(publicKeyToIdx[account.publicKey]))
+                }
+                compiledInstructions.add(
+                    CompiledInstruction(
+                        data = instruction.data,
+                        accounts = accountIndex.toList(),
+                        programIdIndex = requireNotNull(publicKeyToIdx[instruction.programId]),
+                    )
+                )
+            }
+
+            return TransactionMessage(
+                version = version,
+                header = MessageHeader(
+                    numRequireSignatures = writableSignedAccount.size + readOnlySignedAccount.size,
+                    numReadonlySignedAccounts = readOnlySignedAccount.size,
+                    numReadonlyUnsignedAccounts = readOnlyUnsignedAccount.size,
+                ),
+                accounts = publicKeys.subList(0, publicKeys.size - lookupAddressCount),
+                recentBlockhash = recentBlockhash,
+                instructions = compiledInstructions,
+                addressLookupTables = compiledAddressLookupTables,
+            )
+        }
+
+        @JvmStatic
+        fun newCompileKeys(
+            feePayer: PublicKey,
+            instructions: List<Instruction>,
+        ): CompileKeys {
+            val m = mutableMapOf<PublicKey, CompileKeyMeta>()
+            instructions.forEach { instruction ->
+                // compile program
+                var v = m[instruction.programId]
+                if (v == null) {
+                    v = CompileKeyMeta(signer = false, writable = false, invoked = false)
+                }
+                v.invoked = true
+                m[instruction.programId] = v
+
+                // compile accounts
+                instruction.keys.forEachIndexed { i, account ->
+                    var a = m[account.publicKey]
+                    if (a == null) {
+                        a = CompileKeyMeta(signer = false, writable = false, invoked = false)
+                    }
+                    a.signer = a.signer || account.signer
+                    a.writable = a.writable || account.writable
+                    m[account.publicKey] = a
+                }
+            }
+
+            val p = requireNotNull(m[feePayer])
+            p.signer = true
+            p.writable = true
+            m[feePayer] = p
+
+            return CompileKeys(feePayer, m)
+        }
     }
 }
 
@@ -167,4 +349,20 @@ data class MessageHeader(
     val numRequireSignatures: Int,
     val numReadonlySignedAccounts: Int,
     val numReadonlyUnsignedAccounts: Int,
+)
+
+data class AddressLookupTableAccount(
+    val key: PublicKey,
+    val addresses: List<PublicKey>,
+)
+
+data class CompileKeys(
+    val payer: PublicKey,
+    val keyMetaMap: Map<PublicKey, CompileKeyMeta>,
+)
+
+data class CompileKeyMeta(
+    var signer: Boolean,
+    var writable: Boolean,
+    var invoked: Boolean,
 )

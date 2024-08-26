@@ -63,6 +63,27 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldSendVersionedTransaction() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val message = TransactionMessage.newMessage(
+            sender.publicKey,
+            blockhash,
+            listOf(instruction),
+            emptyList(),
+        )
+        val transaction = VersionedTransaction(message)
+        transaction.sign(sender)
+
+        val signature = connection.sendTransaction(transaction.serialize())
+
+        println("shouldSendVersionedTransaction: signature: $signature")
+    }
+
+    @Test
     fun shouldSimulateTransaction() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
