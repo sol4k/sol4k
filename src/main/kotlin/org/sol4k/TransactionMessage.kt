@@ -5,16 +5,16 @@ import org.sol4k.instruction.CompiledInstruction
 import org.sol4k.instruction.Instruction
 import java.io.ByteArrayOutputStream
 
-data class TransactionMessage(
-    val version: MessageVersion,
-    val header: MessageHeader,
-    val accounts: List<PublicKey>,
+data class TransactionMessage internal constructor(
+    internal val version: MessageVersion,
+    internal val header: MessageHeader,
+    internal val accounts: List<PublicKey>,
     var recentBlockhash: String,
-    val instructions: List<CompiledInstruction>,
-    val addressLookupTables: List<CompiledAddressLookupTable>,
+    internal val instructions: List<CompiledInstruction>,
+    internal val addressLookupTables: List<CompiledAddressLookupTable>,
 ) {
 
-    enum class MessageVersion {
+    internal enum class MessageVersion {
         Legacy, V0
     }
 
@@ -167,7 +167,7 @@ data class TransactionMessage(
             feePayer: PublicKey,
             recentBlockhash: String,
             instructions: List<Instruction>,
-            addressLookupTableAccounts: List<AddressLookupTableAccount>, // v0 transaction
+            addressLookupTableAccounts: List<AddressLookupTableAccount> = emptyList(), // v0 transaction
         ): TransactionMessage {
             val addressLookupTableMaps = mutableListOf<Map<PublicKey, Int>>()
             addressLookupTableAccounts.forEach { addressLookupTableAccount ->
@@ -309,7 +309,7 @@ data class TransactionMessage(
         }
 
         @JvmStatic
-        fun newCompileKeys(
+        private fun newCompileKeys(
             feePayer: PublicKey,
             instructions: List<Instruction>,
         ): CompileKeys {
@@ -324,7 +324,7 @@ data class TransactionMessage(
                 m[instruction.programId] = v
 
                 // compile accounts
-                instruction.keys.forEachIndexed { i, account ->
+                instruction.keys.forEachIndexed { _, account ->
                     var a = m[account.publicKey]
                     if (a == null) {
                         a = CompileKeyMeta(signer = false, writable = false, invoked = false)
@@ -345,7 +345,7 @@ data class TransactionMessage(
     }
 }
 
-data class MessageHeader(
+internal data class MessageHeader(
     val numRequireSignatures: Int,
     val numReadonlySignedAccounts: Int,
     val numReadonlyUnsignedAccounts: Int,
@@ -356,12 +356,12 @@ data class AddressLookupTableAccount(
     val addresses: List<PublicKey>,
 )
 
-data class CompileKeys(
+private data class CompileKeys(
     val payer: PublicKey,
     val keyMetaMap: Map<PublicKey, CompileKeyMeta>,
 )
 
-data class CompileKeyMeta(
+private data class CompileKeyMeta(
     var signer: Boolean,
     var writable: Boolean,
     var invoked: Boolean,

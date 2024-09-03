@@ -73,7 +73,6 @@ internal class ConnectionTest {
             sender.publicKey,
             blockhash,
             listOf(instruction),
-            emptyList(),
         )
         val transaction = VersionedTransaction(message)
         transaction.sign(sender)
