@@ -145,4 +145,48 @@ class TransactionMessageTest {
         )
         assertEquals(message, target)
     }
+
+    @Test
+    fun testWithNewBlockhash() {
+        val data = listOf(2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0).map { it.toByte() }.toByteArray()
+        var message = TransactionMessage.newMessage(
+            feePayer = PublicKey("EvN4kgKmCmYzdbd5kL8Q8YgkUW5RoqMTpBczrfLExtx7"),
+            recentBlockhash = "FwRYtTPRk5N4wUeP87rTw9kQVSwigB6kbikGzzeCMrW5",
+            instructions = listOf(
+                BaseInstruction(
+                    programId = SYSTEM_PROGRAM,
+                    keys = listOf(
+                        AccountMeta.signerAndWritable(PublicKey("EvN4kgKmCmYzdbd5kL8Q8YgkUW5RoqMTpBczrfLExtx7")),
+                        AccountMeta.writable(PublicKey("A4iUVr5KjmsLymUcv4eSKPedUtoaBceiPeGipKMYc69b")),
+                    ),
+                    data = data,
+                ),
+            ),
+            addressLookupTableAccounts = emptyList(),
+        )
+        message = message.withNewBlockhash("EwRYtTPRk5N4wUeP87rTw9kQVSwigB6kbikGzzeCMrW4")
+        val target = TransactionMessage(
+            version = TransactionMessage.MessageVersion.Legacy,
+            header = MessageHeader(
+                numRequireSignatures = 1,
+                numReadonlySignedAccounts = 0,
+                numReadonlyUnsignedAccounts = 1,
+            ),
+            accounts = listOf(
+                PublicKey("EvN4kgKmCmYzdbd5kL8Q8YgkUW5RoqMTpBczrfLExtx7"),
+                PublicKey("A4iUVr5KjmsLymUcv4eSKPedUtoaBceiPeGipKMYc69b"),
+                SYSTEM_PROGRAM,
+            ),
+            recentBlockhash = "EwRYtTPRk5N4wUeP87rTw9kQVSwigB6kbikGzzeCMrW4",
+            instructions = listOf(
+                CompiledInstruction(
+                    programIdIndex = 2,
+                    accounts = listOf(0, 1),
+                    data = data,
+                )
+            ),
+            addressLookupTables = emptyList(),
+        )
+        assertEquals(message, target)
+    }
 }

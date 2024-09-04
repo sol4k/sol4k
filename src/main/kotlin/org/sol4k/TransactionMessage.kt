@@ -9,13 +9,17 @@ data class TransactionMessage internal constructor(
     internal val version: MessageVersion,
     internal val header: MessageHeader,
     internal val accounts: List<PublicKey>,
-    var recentBlockhash: String,
+    internal val recentBlockhash: String,
     internal val instructions: List<CompiledInstruction>,
     internal val addressLookupTables: List<CompiledAddressLookupTable>,
 ) {
 
     internal enum class MessageVersion {
         Legacy, V0
+    }
+
+    fun withNewBlockhash(blockhash: String): TransactionMessage {
+        return TransactionMessage(version, header, accounts, blockhash, instructions, addressLookupTables)
     }
 
     fun serialize(): ByteArray {
