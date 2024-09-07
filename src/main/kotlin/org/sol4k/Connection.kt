@@ -1,7 +1,6 @@
 package org.sol4k
 
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -160,7 +159,10 @@ class Connection @JvmOverloads constructor(
     }
 
     fun getTokenSupply(tokenPubkey: String): TokenAmount {
-        return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply", listOf(Json.encodeToJsonElement(tokenPubkey))).value
+        return rpcCall<GetTokenApplyResponse, JsonElement>(
+            "getTokenSupply",
+            listOf(Json.encodeToJsonElement(tokenPubkey))
+        ).value
     }
 
     fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
@@ -188,6 +190,10 @@ class Connection @JvmOverloads constructor(
         return sendTransaction(transaction.serialize())
     }
 
+    fun sendTransaction(transaction: VersionedTransaction): String {
+        return sendTransaction(transaction.serialize())
+    }
+
     fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         val result: SimulateTransactionResponse = rpcCall(
@@ -210,6 +216,10 @@ class Connection @JvmOverloads constructor(
     }
 
     fun simulateTransaction(transaction: Transaction): TransactionSimulation {
+        return simulateTransaction(transaction.serialize())
+    }
+
+    fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation {
         return simulateTransaction(transaction.serialize())
     }
 
