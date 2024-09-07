@@ -57,7 +57,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendTransaction: signature: $signature")
     }
@@ -77,7 +77,7 @@ internal class ConnectionTest {
         val transaction = VersionedTransaction(message)
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendVersionedTransaction: signature: $signature")
     }
@@ -143,7 +143,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
     }
@@ -168,7 +168,7 @@ internal class ConnectionTest {
             feePayer = payerWallet.publicKey,
         )
         transaction.sign(payerWallet)
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
     }
@@ -206,9 +206,9 @@ internal class ConnectionTest {
     @Test
     fun shouldGetTokenSupply() {
         val connection = Connection(rpcUrl)
-        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val usdc = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
 
-        val tokenAmount = connection.getTokenSupply(usdc.toBase58())
+        val tokenAmount = connection.getTokenSupply(usdc)
 
         println("shouldGetTokenSupply tokenAmount $tokenAmount")
     }
@@ -237,7 +237,7 @@ internal class ConnectionTest {
         )
         transaction.sign(holder)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendSpl: signature: $signature")
     }

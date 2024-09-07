@@ -8,9 +8,9 @@ import java.math.RoundingMode
 import java.util.Base64
 import kotlin.math.max
 
-class VersionedTransaction(
+class VersionedTransaction private constructor(
     val message: TransactionMessage,
-    val signatures: MutableList<String>,
+    private val signatures: MutableList<String>,
 ) {
 
     constructor(

@@ -274,11 +274,6 @@ data class TransactionMessage internal constructor(
                 }
             }
 
-            val version = if (addressLookupTableAccounts.isNotEmpty()) {
-                MessageVersion.V0
-            } else {
-                MessageVersion.Legacy
-            }
             val publicKeyToIdx = mutableMapOf<PublicKey, Int>()
             publicKeys.forEachIndexed { i, publicKey ->
                 publicKeyToIdx[publicKey] = i
@@ -299,7 +294,7 @@ data class TransactionMessage internal constructor(
             }
 
             return TransactionMessage(
-                version = version,
+                version = MessageVersion.V0,
                 header = MessageHeader(
                     numRequireSignatures = writableSignedAccount.size + readOnlySignedAccount.size,
                     numReadonlySignedAccounts = readOnlySignedAccount.size,
@@ -312,7 +307,6 @@ data class TransactionMessage internal constructor(
             )
         }
 
-        @JvmStatic
         private fun newCompileKeys(
             feePayer: PublicKey,
             instructions: List<Instruction>,
