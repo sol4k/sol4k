@@ -57,9 +57,29 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendTransaction: signature: $signature")
+    }
+
+    @Test
+    fun shouldSendVersionedTransaction() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val message = TransactionMessage.newMessage(
+            sender.publicKey,
+            blockhash,
+            listOf(instruction),
+        )
+        val transaction = VersionedTransaction(message)
+        transaction.sign(sender)
+
+        val signature = connection.sendTransaction(transaction.serialize())
+
+        println("shouldSendVersionedTransaction: signature: $signature")
     }
 
     @Test
@@ -98,7 +118,7 @@ internal class ConnectionTest {
         )
         transaction.sign(senderWithNoSol)
 
-        val simulation = connection.simulateTransaction(transaction)
+        val simulation = connection.simulateTransaction(transaction.serialize())
 
         assertTrue("Simulation must produce an error") { simulation is TransactionSimulationError }
         assertEquals("AccountNotFound", (simulation as TransactionSimulationError).error)
@@ -123,7 +143,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
     }
@@ -148,7 +168,7 @@ internal class ConnectionTest {
             feePayer = payerWallet.publicKey,
         )
         transaction.sign(payerWallet)
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
     }
@@ -174,6 +194,26 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetMinimumBalanceForRentExemption() {
+        val connection = Connection(rpcUrl)
+        val space = 50
+
+        val minimumBalanceForRentExemption = connection.getMinimumBalanceForRentExemption(space)
+
+        println("shouldGetMinimumBalanceForRentExemption minimumBalanceForRentExemption $minimumBalanceForRentExemption")
+    }
+
+    @Test
+    fun shouldGetTokenSupply() {
+        val connection = Connection(rpcUrl)
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+
+        val tokenAmount = connection.getTokenSupply(usdc.toBase58())
+
+        println("shouldGetTokenSupply tokenAmount $tokenAmount")
+    }
+
+    @Test
     fun shouldSendSpl() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
@@ -184,8 +224,11 @@ internal class ConnectionTest {
         val splTransferInstruction = SplTransferInstruction(
             holderAssociatedAccount,
             receiverAssociatedAccount,
+            usdc,
             holder.publicKey,
+            emptyList(),
             100,
+            6,
         )
         val transaction = Transaction(
             blockhash,
@@ -194,7 +237,7 @@ internal class ConnectionTest {
         )
         transaction.sign(holder)
 
-        val signature = connection.sendTransaction(transaction)
+        val signature = connection.sendTransaction(transaction.serialize())
 
         println("shouldSendSpl: signature: $signature")
     }

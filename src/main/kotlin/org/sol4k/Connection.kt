@@ -23,11 +23,13 @@ import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
 import org.sol4k.rpc.GetAccountInfoResponse
+import org.sol4k.rpc.GetTokenApplyResponse
 import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
 import org.sol4k.rpc.SimulateTransactionResponse
+import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -150,6 +152,17 @@ class Connection @JvmOverloads constructor(
         }
     }
 
+    fun getMinimumBalanceForRentExemption(space: Int): Long {
+        return rpcCall(
+            "getMinimumBalanceForRentExemption",
+            listOf(Json.encodeToJsonElement(space))
+        )
+    }
+
+    fun getTokenSupply(tokenPubkey: String): TokenAmount {
+        return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply", listOf(Json.encodeToJsonElement(tokenPubkey))).value
+    }
+
     fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
         return rpcCall(
             "requestAirdrop",
@@ -160,8 +173,8 @@ class Connection @JvmOverloads constructor(
         )
     }
 
-    fun sendTransaction(transaction: Transaction): String {
-        val encodedTransaction = Base64.getEncoder().encodeToString(transaction.serialize())
+    fun sendTransaction(transactionBytes: ByteArray): String {
+        val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         return rpcCall(
             "sendTransaction",
             listOf(
@@ -171,8 +184,12 @@ class Connection @JvmOverloads constructor(
         )
     }
 
-    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
-        val encodedTransaction = Base64.getEncoder().encodeToString(transaction.serialize())
+    fun sendTransaction(transaction: Transaction): String {
+        return sendTransaction(transaction.serialize())
+    }
+
+    fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
+        val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         val result: SimulateTransactionResponse = rpcCall(
             "simulateTransaction",
             listOf(
@@ -190,6 +207,10 @@ class Connection @JvmOverloads constructor(
             return TransactionSimulationSuccess(logs)
         }
         throw IllegalArgumentException("Unable to parse simulation response")
+    }
+
+    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
+        return simulateTransaction(transaction.serialize())
     }
 
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
