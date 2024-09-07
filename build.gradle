@@ -69,7 +69,9 @@ task integrationTest(type: Test) {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
-    signAllPublications()
+    if (!project.gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }) {
+        signAllPublications()
+    }
 
     coordinates('org.sol4k', 'sol4k', "$currentVersion")
 

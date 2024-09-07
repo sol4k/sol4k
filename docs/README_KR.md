@@ -242,7 +242,7 @@ val signature = connection.sendTransaction(transaction)
 sol4k를 로컬에서 빌드하고 실행하려면 다음 단계를 수행하십시오:
 - 기본 JDK 버전으로 JDK 11 이상을 설치합니다(`java --version`을 실행하여 11 이상이 출력되는지 확인).
 -  JDK 8을 설치하지만 기본값으로 선택하지 않습니다. macOS를 사용하는 경우 `/usr/libexec/java_home -V`를 실행하여 Java 8이 목록에 있는지 확인할 수 있습니다.
--  `./gradlew publishToMavenLocal -x signMavenPublication`을 실행합니다.
+-  `./gradlew publishToMavenLocal`을 실행합니다.
 
 이렇게 하면 sol4k가 로컬 Maven 저장소에 설치되며 다른 프로젝트에서 가져올 수 있습니다
 ([당신의 Maven 저장소에](https://github.com/sol4k/sol4k-examples/blob/main/build.gradle#L11-L14)`mavenLocal`이 포함되어 있는지 확인하십시오).
