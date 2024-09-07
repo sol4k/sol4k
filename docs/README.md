@@ -256,7 +256,7 @@ a pull request.
 In order to build and run sol4k locally, perform the next steps:
 - Install JDK 11 or newer as a default version of JDK (running `java --version` should print 11 or newer).
 - Install JDK 8, but do not select it as a default. If you're using macOS, you can check for Java 8 in the list by running `/usr/libexec/java_home -V`.
-- Execute `./gradlew publishToMavenLocal -x signMavenPublication`.
+- Execute `./gradlew publishToMavenLocal`.
 
 This would install sol4k in your local Maven repository, and you would be able to import it in other projects (make sure
 `mavenLocal` is among [your Maven repositories](https://github.com/sol4k/sol4k-examples/blob/main/build.gradle#L11-L14)).
