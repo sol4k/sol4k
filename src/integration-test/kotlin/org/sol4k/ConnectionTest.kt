@@ -470,7 +470,7 @@ internal class ConnectionTest {
 
     private fun getRpcUrl(): String {
         val rpcUrl = System.getProperty("E2E_RPC_URL")
-        return if (rpcUrl.isNullOrEmpty()) "https://mainnet.helius-rpc.com/?api-key=a544287b-5ebc-45f9-8d41-4307f088bcfd" else rpcUrl
+        return if (rpcUrl.isNullOrEmpty()) "https://api.devnet.solana.com" else rpcUrl
     }
 
     private fun getSecretKey(): String {

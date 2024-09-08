@@ -84,7 +84,6 @@ class Connection @JvmOverloads constructor(
                 Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
-       // val (amount, decimals, uiAmountString) = result.value
         return result
     }
 
@@ -183,21 +182,23 @@ class Connection @JvmOverloads constructor(
         }
     }
 
-    fun getMinimumBalanceForRentExemption(space: Int, optional: Map<String, Any> = mapOf()): Long {
+    fun getMinimumBalanceForRentExemption(space: Int, optional: Map<String, Any>? = null): Long {
         return rpcCall(
             "getMinimumBalanceForRentExemption",
-            listOf(
+            listOfNotNull(
                 Json.encodeToJsonElement(space),
-                Json.encodeToJsonElement(mapToJsonElement(optional)))
+                optional?.let { Json.encodeToJsonElement(mapToJsonElement(it)) }
+            )
         )
     }
 
-    fun getTokenSupply(tokenPubkey: String, optional: Map<String, Any> = mapOf()): TokenAmount {
+    fun getTokenSupply(tokenPubkey: String, optional: Map<String, Any>? = null): TokenAmount {
         return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply",
-            listOf(
+            listOfNotNull(
                 Json.encodeToJsonElement(tokenPubkey),
-                Json.encodeToJsonElement(mapToJsonElement(optional))
-            )).value
+                optional?.let { Json.encodeToJsonElement(mapToJsonElement(it)) }
+            )
+        ).value
     }
 
     fun requestAirdrop(accountAddress: PublicKey, amount: Long, optional: Map<String, Any> = mapOf()): String {
