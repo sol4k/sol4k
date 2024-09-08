@@ -6,14 +6,14 @@ import org.sol4k.Constants.TOKEN_PROGRAM_ID
 import org.sol4k.PublicKey
 import java.io.ByteArrayOutputStream
 
-class SplTransferInstruction(
-    from: PublicKey,
-    to: PublicKey,
-    mint: PublicKey,
-    owner: PublicKey,
-    signers: List<PublicKey>,
-    private val amount: Long,
-    private val decimals: Int,
+class SplTransferInstruction @JvmOverloads constructor(
+    val from: PublicKey,
+    val to: PublicKey,
+    val mint: PublicKey,
+    val owner: PublicKey,
+    val amount: Long,
+    val decimals: Int,
+    val signers: List<PublicKey> = emptyList(),
 ) : Instruction {
     companion object {
         @Suppress("unused")

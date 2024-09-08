@@ -101,7 +101,6 @@ class Connection @JvmOverloads constructor(
                 Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
-        // val (amount, decimals, uiAmountString) = result.value
         return result
     }
 
@@ -263,11 +262,12 @@ class Connection @JvmOverloads constructor(
                         @Suppress("UNCHECKED_CAST")
                         put(key, mapToJsonElement(value as Map<String, Any>))
                     }
-                    else -> put(key, Json.encodeToJsonElement(value)) // Универсальная обработка любого объекта
+                    else -> put(key, Json.encodeToJsonElement(value))
                 }
             }
         }
     }
+    
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
         val connection = URL(rpcUrl).openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
@@ -294,3 +294,4 @@ class Connection @JvmOverloads constructor(
         }
     }
 }
+

@@ -1,6 +1,6 @@
 package org.sol4k
 
-data class CompiledAddressLookupTable(
+internal data class CompiledAddressLookupTable(
     val publicKey: PublicKey,
     val writableIndexes: ByteArray,
     val readonlyIndexes: ByteArray,

@@ -167,6 +167,16 @@ data class TransactionMessage internal constructor(
         }
 
         @JvmStatic
+        @JvmOverloads
+        fun newMessage(
+            feePayer: PublicKey,
+            recentBlockhash: String,
+            instruction: Instruction,
+            addressLookupTableAccounts: List<AddressLookupTableAccount> = emptyList(),
+        ): TransactionMessage = newMessage(feePayer, recentBlockhash, listOf(instruction), addressLookupTableAccounts)
+
+        @JvmStatic
+        @JvmOverloads
         fun newMessage(
             feePayer: PublicKey,
             recentBlockhash: String,
@@ -274,11 +284,6 @@ data class TransactionMessage internal constructor(
                 }
             }
 
-            val version = if (addressLookupTableAccounts.isNotEmpty()) {
-                MessageVersion.V0
-            } else {
-                MessageVersion.Legacy
-            }
             val publicKeyToIdx = mutableMapOf<PublicKey, Int>()
             publicKeys.forEachIndexed { i, publicKey ->
                 publicKeyToIdx[publicKey] = i
@@ -299,7 +304,7 @@ data class TransactionMessage internal constructor(
             }
 
             return TransactionMessage(
-                version = version,
+                version = MessageVersion.V0,
                 header = MessageHeader(
                     numRequireSignatures = writableSignedAccount.size + readOnlySignedAccount.size,
                     numReadonlySignedAccounts = readOnlySignedAccount.size,
@@ -312,7 +317,6 @@ data class TransactionMessage internal constructor(
             )
         }
 
-        @JvmStatic
         private fun newCompileKeys(
             feePayer: PublicKey,
             instructions: List<Instruction>,

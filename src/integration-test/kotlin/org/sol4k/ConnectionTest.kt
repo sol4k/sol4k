@@ -21,7 +21,7 @@ internal class ConnectionTest {
 
         val balance = connection.getBalance(wallet)
 
-        println("shouldGetBalance: Balance: $balance")
+        Logger.info("Balance: $balance")
     }
 
     @Test
@@ -42,7 +42,7 @@ internal class ConnectionTest {
 
         val hash = connection.getLatestBlockhash()
 
-        println("shouldGetLatestBlockhash: hash: $hash")
+        Logger.info("hash: $hash")
     }
 
     @Test
@@ -62,7 +62,7 @@ internal class ConnectionTest {
 
         val blockhash = connection.getLatestBlockhashExtended()
 
-        println("shouldGetLatestBlockhashExtended: hash: $blockhash")
+        Logger.info("hash: $blockhash")
     }
 
     @Test
@@ -92,7 +92,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        println("shouldSendTransaction: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -133,9 +133,9 @@ internal class ConnectionTest {
         val transaction = VersionedTransaction(message)
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
-        println("shouldSendVersionedTransaction: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -226,7 +226,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -251,7 +251,7 @@ internal class ConnectionTest {
         transaction.sign(payerWallet)
         val signature = connection.sendTransaction(transaction)
 
-        println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -261,7 +261,7 @@ internal class ConnectionTest {
 
         val accountInfo = connection.getAccountInfo(usdc)
 
-        println("shouldGetAccountInfo: accountInfo: $accountInfo")
+        Logger.info("accountInfo: $accountInfo")
     }
 
     @Test
@@ -283,7 +283,7 @@ internal class ConnectionTest {
 
         val accountInfo = connection.getAccountInfo(publicKey)
 
-        println("shouldGetAccountInfoWhenAccountDoesNotExist: accountInfo: $accountInfo")
+        Logger.info("accountInfo: $accountInfo")
     }
 
     @Test
@@ -293,17 +293,17 @@ internal class ConnectionTest {
 
         val minimumBalanceForRentExemption = connection.getMinimumBalanceForRentExemption(space)
 
-        println("shouldGetMinimumBalanceForRentExemption minimumBalanceForRentExemption $minimumBalanceForRentExemption")
+        Logger.info("minimumBalanceForRentExemption $minimumBalanceForRentExemption")
     }
 
     @Test
     fun shouldGetTokenSupply() {
         val connection = Connection(rpcUrl)
-        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val usdc = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
 
-        val tokenAmount = connection.getTokenSupply(usdc.toBase58())
+        val tokenAmount = connection.getTokenSupply(usdc)
 
-        println("shouldGetTokenSupply tokenAmount $tokenAmount")
+        Logger.info("tokenAmount $tokenAmount")
     }
 
     @Test
@@ -319,7 +319,6 @@ internal class ConnectionTest {
             receiverAssociatedAccount,
             usdc,
             holder.publicKey,
-            emptyList(),
             100,
             6,
         )
@@ -332,7 +331,7 @@ internal class ConnectionTest {
 
         val signature = connection.sendTransaction(transaction)
 
-        println("shouldSendSpl: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -341,7 +340,7 @@ internal class ConnectionTest {
 
         val health = connection.getHealth()
 
-        println("shouldGetHealth: health: $health")
+        Logger.info("health: $health")
     }
 
     // TODO: find a way to fight rate limiting issue for airdrops
@@ -352,7 +351,7 @@ internal class ConnectionTest {
 
         val signature = connection.requestAirdrop(receiver, 1000000000)
 
-        println("shouldRequestAirdrop: signature: $signature")
+        Logger.info("signature: $signature")
     }
 
     @Test
@@ -361,7 +360,7 @@ internal class ConnectionTest {
 
         val identity = connection.getIdentity()
 
-        println("shouldGetIdentity: identity: $identity")
+        Logger.info("identity: $identity")
     }
 
     @Test
@@ -438,7 +437,7 @@ internal class ConnectionTest {
 
         val result = connection.getEpochInfo()
 
-        println("shouldGetEpochInfo: result: $result")
+        Logger.info("result: $result")
     }
 
     @Test
@@ -456,7 +455,7 @@ internal class ConnectionTest {
 
         val count = connection.getTransactionCount()
 
-        println("shouldGetTransactionCount: count: $count")
+        Logger.info("count: $count")
     }
 
     @Test
