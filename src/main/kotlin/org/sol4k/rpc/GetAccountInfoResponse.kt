@@ -9,7 +9,7 @@ internal data class GetAccountInfoResponse(
 )
 
 @Serializable
-internal data class GetAccountInfoValue(
+data class GetAccountInfoValue(
     val data: List<String>,
     val executable: Boolean,
     @Serializable(with = BigIntegerSerializer::class)

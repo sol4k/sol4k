@@ -3,18 +3,11 @@ package org.sol4k
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
-import org.sol4k.api.AccountInfo
-import org.sol4k.api.Blockhash
-import org.sol4k.api.Commitment
+import org.sol4k.api.*
 import org.sol4k.api.Commitment.FINALIZED
-import org.sol4k.api.EpochInfo
-import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
-import org.sol4k.api.TokenAccountBalance
-import org.sol4k.api.TransactionSimulation
-import org.sol4k.api.TransactionSimulationError
-import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.exception.RpcException
+import org.sol4k.rpc.*
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
@@ -25,7 +18,6 @@ import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
 import org.sol4k.rpc.SimulateTransactionResponse
-import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -77,6 +69,43 @@ class Connection @JvmOverloads constructor(
             uiAmount = uiAmountString,
         )
     }
+
+    @JvmOverloads
+    fun getTokenAccountsByOwner(
+        accountAddress: PublicKey,
+        tAParams:  Map<TokenAccountsByOwnerParams, String>,
+        optional: Map<String, Any>  = mapOf("encoding" to "base64"),
+    ): RpcResponseAndContext<GetProgramAccountsResponse<GetAccountInfoValue>> {
+        val result: RpcResponseAndContext<GetProgramAccountsResponse<GetAccountInfoValue>> = rpcCall(
+            "getTokenAccountsByOwner",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(tAParams),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
+            ),
+        )
+       // val (amount, decimals, uiAmountString) = result.value
+        return result
+    }
+
+    @JvmOverloads
+    fun getParsedTokenAccountsByOwner(
+        accountAddress: PublicKey,
+        tAParams:  Map<TokenAccountsByOwnerParams, String>,
+        optional: Map<String, Any>  = mapOf("encoding" to "jsonParsed"),
+    ): RpcResponseAndContext<GetProgramAccountsResponse<AccountInfo<ParsedAccountData>>> {
+        val result: RpcResponseAndContext<GetProgramAccountsResponse<AccountInfo<ParsedAccountData>>> = rpcCall(
+            "getTokenAccountsByOwner",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(tAParams),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
+            ),
+        )
+        // val (amount, decimals, uiAmountString) = result.value
+        return result
+    }
+
 
     @JvmOverloads
     fun getLatestBlockhash(optional: Map<String, Any>  = mapOf("commitment" to commitment.toString())): String =
@@ -133,7 +162,7 @@ class Connection @JvmOverloads constructor(
         listOf(Json.encodeToJsonElement(mapToJsonElement(optional)))
     )
 
-    fun getAccountInfo(accountAddress: PublicKey, optional: Map<String, Any>  = mapOf("encoding" to "base64")): AccountInfo? {
+    fun getAccountInfo(accountAddress: PublicKey, optional: Map<String, Any>  = mapOf("encoding" to "base64")): AccountInfo<ByteArray>? {
         val (value) = rpcCall<GetAccountInfoResponse, JsonElement>(
             "getAccountInfo",
             listOf(

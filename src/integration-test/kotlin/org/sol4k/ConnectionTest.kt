@@ -1,9 +1,7 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
-import org.sol4k.api.Commitment
-import org.sol4k.api.TransactionSimulationError
-import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.api.*
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
@@ -379,6 +377,30 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetParsedTokenAccountsByOwner() {
+        val connection = Connection(rpcUrl)
+        val accountAddress = PublicKey("4sZmtJHNuT7v1Dy1BpjdutqdJap4Jqt1Ekp6jYKsLbhu")
+
+        val tokenAccountsByOwner = connection.getParsedTokenAccountsByOwner(accountAddress,
+            mapOf(TokenAccountsByOwnerParams.PROGRAM_ID to Constants.TOKEN_PROGRAM_ID.toString())
+
+        )
+        println("shouldGetTokenAccountsByOwner: tokenAccountsByOwner: $tokenAccountsByOwner")
+    }
+
+    @Test
+    fun shouldGetTokenAccountsByOwner() {
+        val connection = Connection(rpcUrl)
+        val accountAddress = PublicKey("4sZmtJHNuT7v1Dy1BpjdutqdJap4Jqt1Ekp6jYKsLbhu")
+
+        val tokenAccountsByOwner = connection.getTokenAccountsByOwner(accountAddress,
+            mapOf(TokenAccountsByOwnerParams.PROGRAM_ID to Constants.TOKEN_PROGRAM_ID.toString())
+
+        )
+        println("shouldGetTokenAccountsByOwner: tokenAccountsByOwner: $tokenAccountsByOwner")
+    }
+
+    @Test
     fun shouldVerifyIfBlockhashValid() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
@@ -448,7 +470,7 @@ internal class ConnectionTest {
 
     private fun getRpcUrl(): String {
         val rpcUrl = System.getProperty("E2E_RPC_URL")
-        return if (rpcUrl.isNullOrEmpty()) "https://api.devnet.solana.com" else rpcUrl
+        return if (rpcUrl.isNullOrEmpty()) "https://mainnet.helius-rpc.com/?api-key=a544287b-5ebc-45f9-8d41-4307f088bcfd" else rpcUrl
     }
 
     private fun getSecretKey(): String {
