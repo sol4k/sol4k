@@ -1,6 +1,7 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.api.Commitment
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
@@ -26,6 +27,18 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetBalanceOptional() {
+        val connection = Connection(rpcUrl)
+        val wallet = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+
+        val balance = connection.getBalance(wallet, mapOf(
+            "commitment" to Commitment.FINALIZED.toString(),
+            "minContextSlot" to 3))
+
+        println("shouldGetBalance with optional: Balance: $balance")
+    }
+
+    @Test
     fun shouldGetLatestBlockhash() {
         val connection = Connection(rpcUrl)
 
@@ -35,12 +48,34 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetLatestBlockhashOptional() {
+        val connection = Connection(rpcUrl)
+
+        val hash = connection.getLatestBlockhash(mapOf(
+            "commitment" to Commitment.FINALIZED.toString(),
+            "minContextSlot" to 3))
+
+        println("shouldGetLatestBlockhash with optional: hash: $hash")
+    }
+
+    @Test
     fun shouldGetLatestBlockhashExtended() {
         val connection = Connection(rpcUrl)
 
         val blockhash = connection.getLatestBlockhashExtended()
 
         println("shouldGetLatestBlockhashExtended: hash: $blockhash")
+    }
+
+    @Test
+    fun shouldGetLatestBlockhashExtendedOptional() {
+        val connection = Connection(rpcUrl)
+
+        val blockhash = connection.getLatestBlockhash(mapOf(
+            "commitment" to Commitment.FINALIZED.toString(),
+            "minContextSlot" to 3))
+
+        println("shouldGetLatestBlockhashExtended with optional: hash: $blockhash")
     }
 
     @Test
@@ -57,9 +92,32 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendTransaction: signature: $signature")
+    }
+
+    @Test
+    fun shouldSendTransactionOptional() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            sender.publicKey
+        )
+        transaction.sign(sender)
+
+       val signature = connection.sendTransaction(transaction, mapOf(
+            "skipPreflight " to true,
+            "encoding" to "base64",
+            "maxRetries" to 2
+        ))
+
+        println("shouldSendTransaction with optional: signature: $signature")
     }
 
     @Test
@@ -105,6 +163,31 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldSimulateTransactionOptional() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            sender.publicKey
+        )
+        transaction.sign(sender)
+
+        val simulation = connection.simulateTransaction(transaction, mapOf(
+            "replaceRecentBlockhash" to true,
+            "encoding" to "base64",
+            "innerInstructions" to true
+        ))
+        assertTrue("Simulation with optional must be successful") {
+            simulation is TransactionSimulationSuccess
+        }
+        assertEquals(2, (simulation as TransactionSimulationSuccess).logs.size)
+    }
+
+    @Test
     fun shouldSimulateTransactionWithAnError() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
@@ -118,7 +201,7 @@ internal class ConnectionTest {
         )
         transaction.sign(senderWithNoSol)
 
-        val simulation = connection.simulateTransaction(transaction.serialize())
+        val simulation = connection.simulateTransaction(transaction)
 
         assertTrue("Simulation must produce an error") { simulation is TransactionSimulationError }
         assertEquals("AccountNotFound", (simulation as TransactionSimulationError).error)
@@ -143,7 +226,7 @@ internal class ConnectionTest {
         )
         transaction.sign(sender)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendTowInstructionsInOneTransaction: signature: $signature")
     }
@@ -168,7 +251,7 @@ internal class ConnectionTest {
             feePayer = payerWallet.publicKey,
         )
         transaction.sign(payerWallet)
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendCreateAssociatedTokenTransaction: signature: $signature")
     }
@@ -181,6 +264,18 @@ internal class ConnectionTest {
         val accountInfo = connection.getAccountInfo(usdc)
 
         println("shouldGetAccountInfo: accountInfo: $accountInfo")
+    }
+
+    @Test
+    fun shouldGetAccountInfoOptional() {
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val connection = Connection(rpcUrl)
+
+        val accountInfo = connection.getAccountInfo(usdc, mapOf(
+            "encoding" to "base64",
+            "minContextSlot" to 3))
+
+        println("shouldGetAccountInfo with optional: accountInfo: $accountInfo")
     }
 
     @Test
@@ -237,7 +332,7 @@ internal class ConnectionTest {
         )
         transaction.sign(holder)
 
-        val signature = connection.sendTransaction(transaction.serialize())
+        val signature = connection.sendTransaction(transaction)
 
         println("shouldSendSpl: signature: $signature")
     }
@@ -294,6 +389,18 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldVerifyIfBlockhashValidOptional() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+
+        val result = connection.isBlockhashValid(blockhash,  mapOf(
+            "commitment" to Commitment.FINALIZED.toString(),
+            "minContextSlot" to 3))
+
+        assertTrue("blockhash with optional must be valid") { result }
+    }
+
+    @Test
     fun shouldVerifyIfBlockhashValidGivenInvalidBlockhash() {
         val connection = Connection(rpcUrl)
         val anOutdatedBlockhash = "3dseDCjWBhwFxuukMuiRofHSZaNozXYQKAYFj9vDSoca"
@@ -313,12 +420,30 @@ internal class ConnectionTest {
     }
 
     @Test
+    fun shouldGetEpochInfoOptional() {
+        val connection = Connection(rpcUrl)
+
+        val result = connection.getEpochInfo(mapOf("minContextSlot" to 3 ))
+
+        println("shouldGetEpochInfo with optional: result: $result")
+    }
+
+    @Test
     fun shouldGetTransactionCount() {
         val connection = Connection(rpcUrl)
 
         val count = connection.getTransactionCount()
 
         println("shouldGetTransactionCount: count: $count")
+    }
+
+    @Test
+    fun shouldGetTransactionCountOptional() {
+        val connection = Connection(rpcUrl)
+
+        val count = connection.getTransactionCount(mapOf("minContextSlot" to 3 ))
+
+        println("shouldGetTransactionCount with optional: count: $count")
     }
 
     private fun getRpcUrl(): String {
