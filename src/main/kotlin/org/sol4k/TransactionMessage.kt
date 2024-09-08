@@ -167,6 +167,16 @@ data class TransactionMessage internal constructor(
         }
 
         @JvmStatic
+        @JvmOverloads
+        fun newMessage(
+            feePayer: PublicKey,
+            recentBlockhash: String,
+            instruction: Instruction,
+            addressLookupTableAccounts: List<AddressLookupTableAccount> = emptyList(),
+        ): TransactionMessage = newMessage(feePayer, recentBlockhash, listOf(instruction), addressLookupTableAccounts)
+
+        @JvmStatic
+        @JvmOverloads
         fun newMessage(
             feePayer: PublicKey,
             recentBlockhash: String,
