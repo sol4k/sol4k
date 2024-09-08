@@ -13,7 +13,7 @@ experience smooth and straightforward.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.4.2'
+implementation 'org.sol4k:sol4k:0.5.0'
 ```
 
 Maven:
@@ -21,7 +21,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -35,7 +35,8 @@ val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 val instruction = TransferInstruction(sender.publicKey, receiver, lamports = 1000)
-val transaction = Transaction(blockhash, instruction, feePayer = sender.publicKey)
+val message = TransactionMessage.newMessage(sender.publicKey, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 transaction.sign(sender)
 val signature = connection.sendTransaction(transaction)
 ```
@@ -151,7 +152,9 @@ Supported APIs:
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
+- `getMinimumBalanceForRentExemption`
 - `getTokenAccountBalance`
+- `getTokenSupply`
 - `getTransactionCount`
 - `isBlockhashValid`
 - `requestAirdrop`
@@ -160,15 +163,27 @@ Supported APIs:
 
 ### Transactions
 
-A sol4k Transaction is a class that can be used to build, sign, serialize,
-and send Solana transactions. A transaction can be created by specifying
-the latest blockhash, one or several instructions, and a fee payer.
+Sol4k supports versioned transactions and legacy transactions with
+the `VersionedTransaction` and `Transaction` classes correspondingly.
+Both classes support similar APIs and can be used to build, sign,
+serialize, deserialize and send Solana transactions. It is recommended
+to use `VersionedTransaction` in the new code. A transaction can be
+created by specifying the latest blockhash, one or several instructions,
+and a fee payer.
 
 ```kotlin
-val transaction = Transaction(blockhash, instruction, feePayer)
+val message = TransactionMessage.newMessage(feePayer, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 ```
 
-A transaction with multiple instructions:
+A versioned transaction with multiple instructions:
+
+```kotlin
+val message = TransactionMessage.newMessage(feePayer, blockhash, instructions)
+val transaction = VersionedTransaction(message)
+```
+
+Legacy transaction:
 ```kotlin
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
@@ -211,11 +226,8 @@ val accounts = listOf(
 )
 val joinGameInstruction = BaseInstruction(instructionData, accounts, programId)
 val blockhash = connection.getLatestBlockhash()
-val joinGameTransaction = Transaction(
-    blockhash,
-    instruction = joinGameInstruction,
-    feePayer = playerPublicKey,
-)
+val joinGameMessage = TransactionMessage.newMessage(playerPublicKey, blockhash, joinGameInstruction)
+val joinGameTransaction = VersionedTransaction(joinGameMessage)
 joinGameTransaction.sign(playerKeypair)
 val signature = connection.sendTransaction(joinGameTransaction)
 ```
@@ -234,11 +246,8 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     owner = destinationWallet,
     mint = usdcMintAddress,
 )
-val transaction = Transaction(
-    blockhash,
-    instruction,
-    feePayer = payerWallet.publicKey,
-)
+val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
+val transaction = Transaction(message)
 transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```
