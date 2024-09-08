@@ -226,7 +226,6 @@ internal class ConnectionTest {
             receiverAssociatedAccount,
             usdc,
             holder.publicKey,
-            emptyList(),
             100,
             6,
         )

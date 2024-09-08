@@ -8,12 +8,10 @@ object Logger {
 
     fun info(message: String) {
         try {
-            val stackTrace = Thread.currentThread().stackTrace
-            val caller = stackTrace[2]
-            val simpleClassName = caller.className.substring(caller.className.lastIndexOf('.') + 1)
-            val methodName = caller.methodName
+            val caller = Thread.currentThread().stackTrace[2]
+            val className = caller.className.substring(caller.className.lastIndexOf('.') + 1)
             val timestamp = LocalDateTime.now().format(formatter)
-            System.out.printf("[%s] %s.%s: %s%n", timestamp, simpleClassName, methodName, message)
+            System.out.printf("[%s] %s.%s: %s%n", timestamp, className, caller.methodName, message)
         } catch (_: Exception) {}
     }
 }
