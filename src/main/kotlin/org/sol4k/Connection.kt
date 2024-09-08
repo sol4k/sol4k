@@ -154,23 +154,30 @@ class Connection @JvmOverloads constructor(
         }
     }
 
-    fun getMinimumBalanceForRentExemption(space: Int): Long {
+    fun getMinimumBalanceForRentExemption(space: Int, optional: Map<String, Any> = mapOf()): Long {
         return rpcCall(
             "getMinimumBalanceForRentExemption",
-            listOf(Json.encodeToJsonElement(space))
+            listOf(
+                Json.encodeToJsonElement(space),
+                Json.encodeToJsonElement(mapToJsonElement(optional)))
         )
     }
 
-    fun getTokenSupply(tokenPubkey: String): TokenAmount {
-        return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply", listOf(Json.encodeToJsonElement(tokenPubkey))).value
+    fun getTokenSupply(tokenPubkey: String, optional: Map<String, Any> = mapOf()): TokenAmount {
+        return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply",
+            listOf(
+                Json.encodeToJsonElement(tokenPubkey),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
+            )).value
     }
 
-    fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
+    fun requestAirdrop(accountAddress: PublicKey, amount: Long, optional: Map<String, Any> = mapOf()): String {
         return rpcCall(
             "requestAirdrop",
             listOf(
                 Json.encodeToJsonElement(accountAddress.toBase58()),
-                Json.encodeToJsonElement(amount)
+                Json.encodeToJsonElement(amount),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
     }
