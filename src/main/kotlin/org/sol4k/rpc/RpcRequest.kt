@@ -13,6 +13,6 @@ internal data class RpcRequest<T : Any>(
         method,
         params,
         jsonrpc = "2.0",
-        id = System.currentTimeMillis()
+        id = System.currentTimeMillis(),
     )
 }

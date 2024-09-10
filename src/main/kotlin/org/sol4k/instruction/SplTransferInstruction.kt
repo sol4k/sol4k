@@ -17,14 +17,14 @@ class SplTransferInstruction @JvmOverloads constructor(
 ) : Instruction {
     companion object {
         @Suppress("unused")
-        private const val instructionTransfer = 3
-        private const val instructionTransferChecked = 12
+        private const val INSTRUCTION_TRANSFER = 3
+        private const val INSTRUCTION_TRANSFER_CHECKED = 12
     }
 
     override val data: ByteArray
         get() {
             ByteArrayOutputStream().use { buffer ->
-                buffer.write(instructionTransferChecked)
+                buffer.write(INSTRUCTION_TRANSFER_CHECKED)
                 buffer.write(Binary.int64(amount))
                 buffer.write(decimals)
                 return buffer.toByteArray()
@@ -36,7 +36,7 @@ class SplTransferInstruction @JvmOverloads constructor(
         AccountMeta(mint),
         AccountMeta.writable(to),
         if (signers.isEmpty()) AccountMeta.signer(owner) else AccountMeta(owner),
-        *signers.map { s -> AccountMeta.signer(s) }.toTypedArray()
+        *signers.map { s -> AccountMeta.signer(s) }.toTypedArray(),
     )
 
     override val programId: PublicKey = TOKEN_PROGRAM_ID

@@ -48,7 +48,7 @@ class PublicKey {
             val buffer = ByteBuffer.allocate(
                 seeds.sumOf { it.size } +
                     programId.bytes.size +
-                    programDerivedAddressLabel.size
+                    programDerivedAddressLabel.size,
             )
             seeds.forEach { buffer.put(it) }
             buffer.put(programId.bytes)
@@ -71,7 +71,8 @@ class PublicKey {
                 val newSeeds = seedsBinary + byteArrayOf(nonce.toByte())
                 val address = createProgramAddress(newSeeds, programId)
                 return ProgramDerivedAddress(address, nonce)
-            } catch (e: Exception) { /* ignore */
+            } catch (e: Exception) {
+                /* ignore */
             }
             throw RuntimeException("Unable to find program address")
         }

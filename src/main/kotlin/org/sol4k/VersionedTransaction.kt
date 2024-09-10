@@ -14,7 +14,7 @@ class VersionedTransaction private constructor(
 ) {
 
     constructor(
-        message: TransactionMessage
+        message: TransactionMessage,
     ) : this(message, mutableListOf())
 
     fun sign(keypair: Keypair) {

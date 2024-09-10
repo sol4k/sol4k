@@ -53,7 +53,7 @@ internal class ConnectionTest {
         val transaction = Transaction(
             blockhash,
             instruction,
-            sender.publicKey
+            sender.publicKey,
         )
         transaction.sign(sender)
 
@@ -92,7 +92,7 @@ internal class ConnectionTest {
         val transaction = Transaction(
             blockhash,
             instruction,
-            sender.publicKey
+            sender.publicKey,
         )
         transaction.sign(sender)
 
@@ -114,7 +114,7 @@ internal class ConnectionTest {
         val transaction = Transaction(
             blockhash,
             instruction,
-            senderWithNoSol.publicKey
+            senderWithNoSol.publicKey,
         )
         transaction.sign(senderWithNoSol)
 
@@ -129,7 +129,7 @@ internal class ConnectionTest {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
         val sender = Keypair.fromSecretKey(
-            Base58.decode(secretKey)
+            Base58.decode(secretKey),
         )
         val firstReceiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val secondReceiver = PublicKey("Hb2zfRfn5RwBq2DNWhee2iTVprfGHgiuK7KsiDA4HfMW")
@@ -139,7 +139,7 @@ internal class ConnectionTest {
                 TransferInstruction(sender.publicKey, firstReceiver, 1000),
                 TransferInstruction(sender.publicKey, secondReceiver, 1000),
             ),
-            sender.publicKey
+            sender.publicKey,
         )
         transaction.sign(sender)
 
@@ -232,7 +232,7 @@ internal class ConnectionTest {
         val transaction = Transaction(
             blockhash,
             splTransferInstruction,
-            holder.publicKey
+            holder.publicKey,
         )
         transaction.sign(holder)
 
