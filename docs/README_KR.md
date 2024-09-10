@@ -8,7 +8,7 @@ Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용�
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.4.2'
+implementation 'org.sol4k:sol4k:0.5.0'
 ```
 
 Maven:
@@ -16,12 +16,11 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
 ## 사용 방법
-
 
 연결을 생성하고 최신 블록 해시를 요청한 후, 한 계정에서 다른 계정으로 SOL 전송 트랜잭션을 제출합니다.
 ```kotlin
@@ -30,7 +29,8 @@ val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 val instruction = TransferInstruction(sender.publicKey, receiver, lamports = 1000)
-val transaction = Transaction(blockhash, instruction, feePayer = sender.publicKey)
+val message = TransactionMessage.newMessage(sender.publicKey, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 transaction.sign(sender)
 val signature = connection.sendTransaction(transaction)
 ```
@@ -144,7 +144,9 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
+- `getMinimumBalanceForRentExemption`
 - `getTokenAccountBalance`
+- `getTokenSupply`
 - `getTransactionCount`
 - `isBlockhashValid`
 - `requestAirdrop`
@@ -153,14 +155,21 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 
 ### 트랜잭션
 
-sol4k 트랜잭션은 Solana 트랜잭션을 빌드, 서명, 직렬화 및 전송하는 데 사용할 수 있는 클래스입니다. 최신 블록 해시, 하나 이상의 명령어 및 수수료 지불자를 지정하여 트랜잭션을 생성할 수 있습니다.
+Sol4k는 `VersionedTransaction` 및 `Transaction` 클래스를 통해 버전화된 트랜잭션과 레거시 트랜잭션을 지원합니다. 두 클래스는 유사한 API를 지원하며 Solana 트랜잭션을 생성, 서명, 직렬화, 역직렬화 및 전송하는 데 사용할 수 있습니다. 새로운 코드에서는 `VersionedTransaction` 을 사용하는 것이 권장됩니다. 트랜잭션은 최신 블록해시, 하나 이상의 명령어 및 수수료 지불자를 지정하여 생성할 수 있습니다.
 
 ```kotlin
-val transaction = Transaction(blockhash, instruction, feePayer)
+val message = TransactionMessage.newMessage(feePayer, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 ```
 
-여러 명령어가 있는 트랜잭션:
+다중 명령어 버전화된 트랜잭션:
 
+```kotlin
+val message = TransactionMessage.newMessage(feePayer, blockhash, instructions)
+val transaction = VersionedTransaction(message)
+```
+
+레거시 트랜잭션:
 ```kotlin
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
@@ -198,11 +207,8 @@ val accounts = listOf(
 )
 val joinGameInstruction = BaseInstruction(instructionData, accounts, programId)
 val blockhash = connection.getLatestBlockhash()
-val joinGameTransaction = Transaction(
-    blockhash,
-    instruction = joinGameInstruction,
-    feePayer = playerPublicKey,
-)
+val joinGameMessage = TransactionMessage.newMessage(playerPublicKey, blockhash, joinGameInstruction)
+val joinGameTransaction = VersionedTransaction(joinGameMessage)
 joinGameTransaction.sign(playerKeypair)
 val signature = connection.sendTransaction(joinGameTransaction)
 ```
@@ -221,17 +227,12 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     owner = destinationWallet,
     mint = usdcMintAddress,
 )
-val transaction = Transaction(
-    blockhash,
-    instruction,
-    feePayer = payerWallet.publicKey,
-)
-transaction.sign(payerWallet)
+val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
+val transaction = Transaction(message)
 val signature = connection.sendTransaction(transaction)
 ```
 
 [프로젝트 테스트](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)에서 더 많은 예제를 찾을 수 있습니다.
-
 
 ## 참고 사항
 
@@ -256,7 +257,6 @@ export E2E_SECRET_KEY="base-58-encode-secret-key..."
 ```
 
 테스트를 실행합니다:
-
 
 ```shell
 ./gradlew integrationTest
