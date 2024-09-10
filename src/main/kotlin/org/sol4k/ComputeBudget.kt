@@ -6,10 +6,10 @@ import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-private const val InstructionRequestUnits = 0
-private const val InstructionRequestHeapFrame = 1
-private const val InstructionSetComputeUnitLimit = 2
-private const val InstructionSetComputeUnitPrice = 3
+private const val INSTRUCTION_REQUEST_UNITS = 0
+private const val INSTRUCTION_REQUEST_HEAP_FRAME = 1
+private const val INSTRUCTION_SET_COMPUTE_UNIT_LIMIT = 2
+private const val INSTRUCTION_SET_COMPUTE_UNIT_PRICE = 3
 
 internal fun computeBudget(data: List<ByteArray>): BigDecimal {
     if (data.size != 2) return BigDecimal.ZERO
@@ -21,12 +21,12 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
         val instruction = d.first().toInt()
         d = d.drop(1).toByteArray()
         when (instruction) {
-            InstructionSetComputeUnitLimit -> {
+            INSTRUCTION_SET_COMPUTE_UNIT_LIMIT -> {
                 val buffer = ByteBuffer.wrap(d.take(4).toByteArray())
                     .order(ByteOrder.LITTLE_ENDIAN)
                 unitLimit = buffer.asIntBuffer().get()
             }
-            InstructionSetComputeUnitPrice -> {
+            INSTRUCTION_SET_COMPUTE_UNIT_PRICE -> {
                 // micro-lamports
                 val buffer = ByteBuffer.wrap(d.take(8).toByteArray())
                     .order(ByteOrder.LITTLE_ENDIAN)
@@ -47,7 +47,7 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
 internal fun decodeComputeUnitLimit(data: ByteArray): Int {
     var d = data
     val instruction = d.first().toInt()
-    if (instruction != InstructionSetComputeUnitLimit) {
+    if (instruction != INSTRUCTION_SET_COMPUTE_UNIT_LIMIT) {
         return 0
     }
     d = d.drop(1).toByteArray()
@@ -60,7 +60,7 @@ internal fun decodeComputeUnitLimit(data: ByteArray): Int {
 internal fun decodeComputeUnitPrice(data: ByteArray): Long {
     var d = data
     val instruction = d.first().toInt()
-    if (instruction != InstructionSetComputeUnitPrice) {
+    if (instruction != INSTRUCTION_SET_COMPUTE_UNIT_PRICE) {
         return 0
     }
     d = d.drop(1).toByteArray()

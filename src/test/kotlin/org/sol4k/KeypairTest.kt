@@ -9,7 +9,7 @@ internal class KeypairTest {
     @Test
     fun shouldSign() {
         val secret = Base58.decode(
-            "2h75aTMuyTXRrhLRkr8go9fYE7GEj1X3aX3zit91mBVTEkE8KKGNR69BU41zSyyVGBZSJAmHm5XUd4UAKDLD23WG"
+            "2h75aTMuyTXRrhLRkr8go9fYE7GEj1X3aX3zit91mBVTEkE8KKGNR69BU41zSyyVGBZSJAmHm5XUd4UAKDLD23WG",
         )
         val keypair = Keypair.fromSecretKey(secret)
         val publicKeyBytes = keypair.publicKey.bytes()

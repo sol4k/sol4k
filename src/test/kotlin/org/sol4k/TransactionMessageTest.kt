@@ -75,7 +75,7 @@ class TransactionMessageTest {
                 AddressLookupTableAccount(
                     key = PublicKey("HEhDGuxaxGr9LuNtBdvbX2uggyAKoxYgHFaAiqxVu8UY"),
                     addresses = emptyList(),
-                )
+                ),
             ),
         )
 
@@ -97,15 +97,15 @@ class TransactionMessageTest {
                     programIdIndex = 1,
                     accounts = listOf(0, 2),
                     data = data(),
-                )
+                ),
             ),
             addressLookupTables = listOf(
                 CompiledAddressLookupTable(
                     publicKey = PublicKey("HEhDGuxaxGr9LuNtBdvbX2uggyAKoxYgHFaAiqxVu8UY"),
                     writableIndexes = byteArrayOf(1.toByte()),
                     readonlyIndexes = byteArrayOf(),
-                )
-            )
+                ),
+            ),
         )
 
         val message = TransactionMessage.newMessage(
@@ -128,7 +128,7 @@ class TransactionMessageTest {
                         PublicKey("9aE476sH92Vz7DMPyq5WLPkrKWivxeuTKEFKd2sZZcde"),
                         PublicKey("2xNweLHLqrbx4zo1waDvgWJHgsUpPj8Y8icbAFeR4a8i"),
                     ),
-                )
+                ),
             ),
         )
 
@@ -177,7 +177,7 @@ class TransactionMessageTest {
             programIdIndex = 2,
             accounts = listOf(0, 1),
             data = data(),
-        )
+        ),
     )
 
     private fun data(): ByteArray = listOf(2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0).map { it.toByte() }.toByteArray()

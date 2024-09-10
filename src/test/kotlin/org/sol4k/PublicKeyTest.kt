@@ -216,7 +216,7 @@ internal class PublicKeyTest {
             6,
             105,
             0,
-            3
+            3,
         )
 
         val result = publicKey.verify(signature, message)
@@ -292,7 +292,7 @@ internal class PublicKeyTest {
             6,
             105,
             0,
-            3
+            3,
         )
 
         val result = publicKey.verify(signature, message)

@@ -154,14 +154,14 @@ class Connection @JvmOverloads constructor(
     fun getMinimumBalanceForRentExemption(space: Int): Long {
         return rpcCall(
             "getMinimumBalanceForRentExemption",
-            listOf(Json.encodeToJsonElement(space))
+            listOf(Json.encodeToJsonElement(space)),
         )
     }
 
     fun getTokenSupply(tokenPubkey: String): TokenAmount {
         return rpcCall<GetTokenApplyResponse, JsonElement>(
             "getTokenSupply",
-            listOf(Json.encodeToJsonElement(tokenPubkey))
+            listOf(Json.encodeToJsonElement(tokenPubkey)),
         ).value
     }
 
@@ -182,7 +182,7 @@ class Connection @JvmOverloads constructor(
             listOf(
                 Json.encodeToJsonElement(encodedTransaction),
                 Json.encodeToJsonElement(mapOf("encoding" to "base64")),
-            )
+            ),
         )
     }
 
@@ -201,7 +201,7 @@ class Connection @JvmOverloads constructor(
             listOf(
                 Json.encodeToJsonElement(encodedTransaction),
                 Json.encodeToJsonElement(mapOf("encoding" to "base64")),
-            )
+            ),
         )
         val (err, logs) = result.value
         if (err != null) {
@@ -230,7 +230,7 @@ class Connection @JvmOverloads constructor(
         connection.doOutput = true
         connection.outputStream.use {
             val body = Json.encodeToString(
-                RpcRequest(method, params)
+                RpcRequest(method, params),
             )
             it.write(body.toByteArray())
         }
