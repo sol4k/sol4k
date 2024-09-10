@@ -1,13 +1,20 @@
 package org.sol4k.api
 
+import kotlinx.serialization.Serializable
 import org.sol4k.PublicKey
+import org.sol4k.rpc.BigIntegerSerializer
+import org.sol4k.rpc.PublicKeySerializer
 import java.math.BigInteger
 
-data class AccountInfo(
-    val data: ByteArray,
+@Serializable
+data class AccountInfo<T>(
+    val data: T,
     val executable: Boolean,
+    @Serializable(with = BigIntegerSerializer::class)
     val lamports: BigInteger,
+    @Serializable(with = PublicKeySerializer::class)
     val owner: PublicKey,
+    @Serializable(with = BigIntegerSerializer::class)
     val rentEpoch: BigInteger,
     val space: Int,
 ) {
@@ -15,9 +22,13 @@ data class AccountInfo(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as AccountInfo
+        other as AccountInfo<*>
 
-        if (!data.contentEquals(other.data)) return false
+        if(data is ByteArray) {
+            if (!data.contentEquals(other.data as ByteArray?)) return false
+        } else {
+            if (!data?.equals(other.data)!!) return false
+        }
         if (executable != other.executable) return false
         if (lamports != other.lamports) return false
         if (owner != other.owner) return false
@@ -28,7 +39,12 @@ data class AccountInfo(
     }
 
     override fun hashCode(): Int {
-        var result = data.contentHashCode()
+        var result = 0
+        if(data is ByteArray) {
+            result = data.contentHashCode()
+        } else {
+            result = result.hashCode()
+        }
         result = 31 * result + executable.hashCode()
         result = 31 * result + lamports.hashCode()
         result = 31 * result + owner.hashCode()

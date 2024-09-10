@@ -2,22 +2,12 @@ package org.sol4k
 
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.encodeToJsonElement
-import org.sol4k.api.AccountInfo
-import org.sol4k.api.Blockhash
-import org.sol4k.api.Commitment
+import kotlinx.serialization.json.*
+import org.sol4k.api.*
 import org.sol4k.api.Commitment.FINALIZED
-import org.sol4k.api.EpochInfo
-import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
-import org.sol4k.api.TokenAccountBalance
-import org.sol4k.api.TransactionSimulation
-import org.sol4k.api.TransactionSimulationError
-import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.exception.RpcException
+import org.sol4k.rpc.*
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
@@ -28,7 +18,6 @@ import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
 import org.sol4k.rpc.SimulateTransactionResponse
-import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -52,21 +41,25 @@ class Connection @JvmOverloads constructor(
         isLenient = true
     }
 
-    fun getBalance(walletAddress: PublicKey): BigInteger {
-        val balance: Balance = rpcCall("getBalance", listOf(walletAddress.toBase58()))
+    fun getBalance(walletAddress: PublicKey, optional: Map<String, Any>  = mapOf()): BigInteger {
+        val balance: Balance = rpcCall("getBalance",
+            listOf(
+                Json.encodeToJsonElement(walletAddress.toBase58()),
+                Json.encodeToJsonElement(mapToJsonElement(optional)))
+            )
         return balance.value
     }
 
     @JvmOverloads
     fun getTokenAccountBalance(
         accountAddress: PublicKey,
-        commitment: Commitment = this.commitment,
+        optional: Map<String, Any>  = mapOf("commitment" to commitment.toString()),
     ): TokenAccountBalance {
         val result: TokenBalanceResult = rpcCall(
             "getTokenAccountBalance",
             listOf(
                 Json.encodeToJsonElement(accountAddress.toBase58()),
-                Json.encodeToJsonElement(mapOf("commitment" to commitment.toString())),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
         val (amount, decimals, uiAmountString) = result.value
@@ -78,14 +71,49 @@ class Connection @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun getLatestBlockhash(commitment: Commitment = this.commitment): String =
-        this.getLatestBlockhashExtended(commitment).blockhash
+    fun getTokenAccountsByOwner(
+        accountAddress: PublicKey,
+        tAParams:  Map<TokenAccountsByOwnerParams, String>,
+        optional: Map<String, Any>  = mapOf("encoding" to "base64"),
+    ): RpcResponseAndContext<GetProgramAccountsResponse<GetAccountInfoValue>> {
+        val result: RpcResponseAndContext<GetProgramAccountsResponse<GetAccountInfoValue>> = rpcCall(
+            "getTokenAccountsByOwner",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(tAParams),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
+            ),
+        )
+        return result
+    }
 
     @JvmOverloads
-    fun getLatestBlockhashExtended(commitment: Commitment = this.commitment): Blockhash {
+    fun getParsedTokenAccountsByOwner(
+        accountAddress: PublicKey,
+        tAParams:  Map<TokenAccountsByOwnerParams, String>,
+        optional: Map<String, Any>  = mapOf("encoding" to "jsonParsed"),
+    ): RpcResponseAndContext<GetProgramAccountsResponse<AccountInfo<ParsedAccountData>>> {
+        val result: RpcResponseAndContext<GetProgramAccountsResponse<AccountInfo<ParsedAccountData>>> = rpcCall(
+            "getTokenAccountsByOwner",
+            listOf(
+                Json.encodeToJsonElement(accountAddress.toBase58()),
+                Json.encodeToJsonElement(tAParams),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
+            ),
+        )
+        return result
+    }
+
+
+    @JvmOverloads
+    fun getLatestBlockhash(optional: Map<String, Any>  = mapOf("commitment" to commitment.toString())): String =
+        this.getLatestBlockhashExtended(optional).blockhash
+
+    @JvmOverloads
+    fun getLatestBlockhashExtended(optional: Map<String, Any>  = mapOf("commitment" to commitment.toString())): Blockhash {
         val result: BlockhashResponse = rpcCall(
             "getLatestBlockhash",
-            listOf(mapOf("commitment" to commitment.toString())),
+            listOf(Json.encodeToJsonElement(mapToJsonElement(optional)))
         )
         return Blockhash(
             blockhash = result.value.blockhash,
@@ -95,12 +123,12 @@ class Connection @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun isBlockhashValid(blockhash: String, commitment: Commitment = this.commitment): Boolean {
+    fun isBlockhashValid(blockhash: String, optional: Map<String, Any>  = mapOf("commitment" to commitment.toString())): Boolean {
         val result: IsBlockhashValidResult = rpcCall(
             "isBlockhashValid",
             listOf(
                 Json.encodeToJsonElement(blockhash),
-                Json.encodeToJsonElement(mapOf("commitment" to commitment.toString())),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
         return result.value
@@ -111,8 +139,8 @@ class Connection @JvmOverloads constructor(
         return if (result == "ok") Health.OK else Health.ERROR
     }
 
-    fun getEpochInfo(): EpochInfo {
-        val result: EpochInfoResult = rpcCall("getEpochInfo", listOf<String>())
+    fun getEpochInfo(optional: Map<String, Any>  = mapOf()): EpochInfo {
+        val result: EpochInfoResult = rpcCall("getEpochInfo", listOf(Json.encodeToJsonElement(mapToJsonElement(optional))))
         return EpochInfo(
             absoluteSlot = result.absoluteSlot,
             blockHeight = result.blockHeight,
@@ -128,14 +156,16 @@ class Connection @JvmOverloads constructor(
         return PublicKey(identity)
     }
 
-    fun getTransactionCount(): Long = rpcCall<Long, String>("getTransactionCount", listOf())
+    fun getTransactionCount(optional: Map<String, Any>  = mapOf()): Long = rpcCall<Long, JsonElement>("getTransactionCount",
+        listOf(Json.encodeToJsonElement(mapToJsonElement(optional)))
+    )
 
-    fun getAccountInfo(accountAddress: PublicKey): AccountInfo? {
+    fun getAccountInfo(accountAddress: PublicKey, optional: Map<String, Any>  = mapOf("encoding" to "base64")): AccountInfo<ByteArray>? {
         val (value) = rpcCall<GetAccountInfoResponse, JsonElement>(
             "getAccountInfo",
             listOf(
                 Json.encodeToJsonElement(accountAddress.toBase58()),
-                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+                Json.encodeToJsonElement(mapToJsonElement(optional)),
             ),
         )
         return value?.let {
@@ -151,56 +181,58 @@ class Connection @JvmOverloads constructor(
         }
     }
 
-    fun getMinimumBalanceForRentExemption(space: Int): Long {
+    fun getMinimumBalanceForRentExemption(space: Int, optional: Map<String, Any>? = null): Long {
         return rpcCall(
             "getMinimumBalanceForRentExemption",
-            listOf(Json.encodeToJsonElement(space))
+            listOfNotNull(
+                Json.encodeToJsonElement(space),
+                optional?.let { Json.encodeToJsonElement(mapToJsonElement(it)) }
+            )
         )
     }
 
-    fun getTokenSupply(tokenPubkey: String): TokenAmount {
-        return rpcCall<GetTokenApplyResponse, JsonElement>(
-            "getTokenSupply",
-            listOf(Json.encodeToJsonElement(tokenPubkey))
+    fun getTokenSupply(tokenPubkey: String, optional: Map<String, Any>? = null): TokenAmount {
+        return rpcCall<GetTokenApplyResponse, JsonElement>("getTokenSupply",
+            listOfNotNull(
+                Json.encodeToJsonElement(tokenPubkey),
+                optional?.let { Json.encodeToJsonElement(mapToJsonElement(it)) }
+            )
         ).value
     }
 
-    fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
+    fun requestAirdrop(accountAddress: PublicKey, amount: Long, optional: Map<String, Any> = mapOf()): String {
         return rpcCall(
             "requestAirdrop",
             listOf(
                 Json.encodeToJsonElement(accountAddress.toBase58()),
                 Json.encodeToJsonElement(amount),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             ),
         )
     }
 
-    fun sendTransaction(transactionBytes: ByteArray): String {
+    fun sendTransaction(transactionBytes: ByteArray, optional: Map<String, Any>  = mapOf("encoding" to "base64")): String {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         return rpcCall(
             "sendTransaction",
             listOf(
                 Json.encodeToJsonElement(encodedTransaction),
-                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             )
         )
     }
 
-    fun sendTransaction(transaction: Transaction): String {
-        return sendTransaction(transaction.serialize())
+    fun sendTransaction(transaction: Transaction, optional: Map<String, Any> = mapOf("encoding" to "base64")): String {
+        return sendTransaction(transaction.serialize(), optional)
     }
 
-    fun sendTransaction(transaction: VersionedTransaction): String {
-        return sendTransaction(transaction.serialize())
-    }
-
-    fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
+    fun simulateTransaction(transactionBytes: ByteArray, optional: Map<String, Any>  = mapOf("encoding" to "base64")): TransactionSimulation {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
         val result: SimulateTransactionResponse = rpcCall(
             "simulateTransaction",
             listOf(
                 Json.encodeToJsonElement(encodedTransaction),
-                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+                Json.encodeToJsonElement(mapToJsonElement(optional))
             )
         )
         val (err, logs) = result.value
@@ -215,14 +247,27 @@ class Connection @JvmOverloads constructor(
         throw IllegalArgumentException("Unable to parse simulation response")
     }
 
-    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
-        return simulateTransaction(transaction.serialize())
+    fun simulateTransaction(transaction: Transaction, optional: Map<String, Any>  = mapOf("encoding" to "base64")): TransactionSimulation {
+        return simulateTransaction(transaction.serialize(), optional)
     }
 
-    fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation {
-        return simulateTransaction(transaction.serialize())
+    private fun mapToJsonElement(map: Map<String, Any>): JsonElement {
+        return buildJsonObject {
+            for ((key, value) in map) {
+                when (value) {
+                    is String -> put(key, value)
+                    is Number -> put(key, value)
+                    is Boolean -> put(key, value)
+                    is Map<*, *> -> {
+                        @Suppress("UNCHECKED_CAST")
+                        put(key, mapToJsonElement(value as Map<String, Any>))
+                    }
+                    else -> put(key, Json.encodeToJsonElement(value))
+                }
+            }
+        }
     }
-
+    
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
         val connection = URL(rpcUrl).openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
@@ -249,3 +294,4 @@ class Connection @JvmOverloads constructor(
         }
     }
 }
+
