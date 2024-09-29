@@ -254,12 +254,6 @@ val signature = connection.sendTransaction(transaction)
 
 You can find more examples [in the project tests](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt).
 
-## Notes
-
-This project is actively developed. If you would like to
-contribute, please check the open issues or submit
-a pull request.
-
 ## Development setup
 
 In order to build and run sol4k locally, perform the next steps:
@@ -301,3 +295,12 @@ println("Public Key: ${keypair.publicKey}")
 If no environment variables are set, end-to-end tests would use `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`
 to interact with the blockchain. Its secret key is publicly available in the source code, that's why make sure
 it has Devnet USDC and SOL if you want to rely on it.
+
+## Help
+
+If you like sol4k and want the project to keep going consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly on the wallet address:
+
+```shell
+...
+```
