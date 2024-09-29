@@ -301,7 +301,3 @@ println("Public Key: ${keypair.publicKey}")
 If no environment variables are set, end-to-end tests would use `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`
 to interact with the blockchain. Its secret key is publicly available in the source code, that's why make sure
 it has Devnet USDC and SOL if you want to rely on it.
-
-## Contacts
-
-If you have any questions reach out to email `contact@sol4k.org`.
