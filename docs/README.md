@@ -1,6 +1,6 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-English | <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어</a>
+English │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어</a>
 
 Sol4k is a Kotlin client for Solana that can be used with Java or any other JVM
 language, as well as on Android. It enables communication with an RPC node,
@@ -254,12 +254,6 @@ val signature = connection.sendTransaction(transaction)
 
 You can find more examples [in the project tests](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt).
 
-## Notes
-
-This project is actively developed. If you would like to
-contribute, please check the open issues or submit
-a pull request.
-
 ## Development setup
 
 In order to build and run sol4k locally, perform the next steps:
@@ -302,6 +296,11 @@ If no environment variables are set, end-to-end tests would use `EwtJVgZQGHe9MXm
 to interact with the blockchain. Its secret key is publicly available in the source code, that's why make sure
 it has Devnet USDC and SOL if you want to rely on it.
 
-## Contacts
+## Support
 
-If you have any questions reach out to email `contact@sol4k.org`.
+If you like sol4k and want the project to keep going, consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly to the wallet address:
+
+```shell
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
+```

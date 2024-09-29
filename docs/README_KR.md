@@ -1,6 +1,6 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> | 한국어
+<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> │ 한국어
 
 Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용할 수 있는 Solana용 Kotlin 클라이언트입니다. 이 클라이언트를 사용하여 RPC 노드와 통신하고 블록체인에서 정보를 쿼리하며, 계정을 생성하고 데이터를 읽고, 다양한 유형의 트랜잭션을 전송하고, 키 쌍 및 공개 키와 작업할 수 있습니다. 또한 개발자가 매끄럽고 간편하게 작업할 수 있도록 편리한 API도 제공합니다.
 
@@ -234,10 +234,6 @@ val signature = connection.sendTransaction(transaction)
 
 [프로젝트 테스트](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)에서 더 많은 예제를 찾을 수 있습니다.
 
-## 참고 사항
-
-이 프로젝트는 활발히 개발 중입니다. 기여하고 싶다면 열린 Issue를 확인하거나 Pull Request를 제출하십시오.
-
 ## 개발 설정
 
 sol4k를 로컬에서 빌드하고 실행하려면 다음 단계를 수행하십시오:
@@ -276,6 +272,11 @@ println("Public Key: ${keypair.publicKey}")
 
 환경 변수가 설정되지 않은 경우 종단 간 테스트는 `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`를 사용하여 블록체인과 상호작용합니다. 이 비밀 키는 소스 코드에 공개되어 있으므로 이를 사용하려면 Devnet USDC와 SOL이 있는지 확인하십시오.
 
-## 연락처
+## Support
 
-질문이 있으면 `contact@sol4k.org`로 문의하십시오.
+If you like sol4k and want the project to keep going, consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly to the wallet address:
+
+```shell
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
+```
