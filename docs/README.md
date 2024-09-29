@@ -296,11 +296,11 @@ If no environment variables are set, end-to-end tests would use `EwtJVgZQGHe9MXm
 to interact with the blockchain. Its secret key is publicly available in the source code, that's why make sure
 it has Devnet USDC and SOL if you want to rely on it.
 
-## Help
+## Support
 
-If you like sol4k and want the project to keep going consider sponsoring it
-[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly on the wallet address:
+If you like sol4k and want the project to keep going, consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly to the wallet address:
 
 ```shell
-...
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
 ```

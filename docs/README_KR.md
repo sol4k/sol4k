@@ -272,11 +272,11 @@ println("Public Key: ${keypair.publicKey}")
 
 환경 변수가 설정되지 않은 경우 종단 간 테스트는 `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`를 사용하여 블록체인과 상호작용합니다. 이 비밀 키는 소스 코드에 공개되어 있으므로 이를 사용하려면 Devnet USDC와 SOL이 있는지 확인하십시오.
 
-## Help
+## Support
 
-If you like sol4k and want the project to keep going consider sponsoring it
-[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly on the wallet address:
+If you like sol4k and want the project to keep going, consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly to the wallet address:
 
 ```shell
-...
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
 ```
