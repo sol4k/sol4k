@@ -1,5 +1,6 @@
 <footer class="site-footer h-card">
-    <data class="u-url" href="{{ "/" | relative_url }}"></data>
+    <data class="u-url" href="{{ "
+    /" | relative_url }}"></data>
 
     <div class="wrapper">
 
@@ -12,8 +13,19 @@
             </div>
 
             <div class="footer-col footer-col-2">
-                {%- include social.html -%}
-                <li><a class="u-email" href="mailto:contact@sol4k.org">contact@sol4k.org</a></li>
+                <ul class="social-media-list">
+                    <li><a href="https://github.com/sol4k">
+                        <svg class="svg-icon">
+                            <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+                        </svg>
+                        <span class="username">sol4k</span></a></li>
+                    <li><a href="https://www.twitter.com/_sol4k">
+                        <svg class="svg-icon">
+                            <use xlink:href="/assets/minima-social-icons.svg#twitter"></use>
+                        </svg>
+                        <span class="username">_sol4k</span></a></li>
+                    <li><a class="u-email" href="mailto:contact@sol4k.org">contact@sol4k.org</a></li>
+                </ul>
             </div>
 
             <div class="footer-col footer-col-3">
