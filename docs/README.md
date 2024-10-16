@@ -188,7 +188,7 @@ Legacy transaction:
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
 
-`Instaruction` is an interface that requires having the following data:
+`Instruction` is an interface that requires having the following data:
 ```kotlin
 interface Instruction {
     val data: ByteArray
@@ -196,7 +196,7 @@ interface Instruction {
     val programId: PublicKey
 }
 ```
-The `Instaruction` interface has several implementations such as `TransferInstruction`,
+The `Instruction` interface has several implementations such as `TransferInstruction`,
 `SplTransferInstruction`, `CreateAssociatedTokenAccountInstruction`, and `BaseInstruction`
 (the one used for sending arbitrary transactions).
 
