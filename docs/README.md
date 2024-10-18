@@ -281,7 +281,7 @@ Execute the tests:
 ```
 
 The account needs to have some Devnet SOL as well as Devnet USDC in order to run the tests.
-You can aridrop them both using [this faucet](https://spl-token-faucet.com/?token-name=USDC-Dev).
+You can airdrop them both using [this faucet](https://spl-token-faucet.com/?token-name=USDC-Dev).
 
 If you want to generate a new account for testing, you can do it like this:
 
