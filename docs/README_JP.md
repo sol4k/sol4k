@@ -8,7 +8,7 @@ Sol4kは、Javaや他のJVM言語、Androidでも使用できるSolana用のKotl
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.4.2'
+implementation 'org.sol4k:sol4k:0.5.4'
 ```
 
 Maven:
@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.4</version>
 </dependency>
 ```
 
@@ -29,7 +29,8 @@ val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 val instruction = TransferInstruction(sender.publicKey, receiver, lamports = 1000)
-val transaction = Transaction(blockhash, instruction, feePayer = sender.publicKey)
+val message = TransactionMessage.newMessage(sender.publicKey, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 transaction.sign(sender)
 val signature = connection.sendTransaction(transaction)
 ```
@@ -142,7 +143,9 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
+- `getMinimumBalanceForRentExemption`
 - `getTokenAccountBalance`
+- `getTokenSupply`
 - `getTransactionCount`
 - `isBlockhashValid`
 - `requestAirdrop`
@@ -151,14 +154,21 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 
 ### トランザクション
 
-sol4kトランザクションは、Solanaトランザクションを構築、署名、シリアル化、および送信するために使用できるクラスです。最新のブロックハッシュ、1つ以上の命令、および手数料支払者を指定してトランザクションを作成できます。
+sol4kは、`VersionedTransaction`および`Transaction`クラスを使用して、バージョン化されたトランザクションとレガシートランザクションをサポートします。両方のクラスは類似したAPIをサポートしており、Solanaトランザクションの構築、署名、シリアル化、逆シリアル化、および送信に使用できます。新しいコードでは`VersionedTransaction`を使用することをお勧めします。トランザクションは、最新のブロックハッシュ、1つ以上の命令、および手数料支払者を指定して作成できます。
 
 ```kotlin
-val transaction = Transaction(blockhash, instruction, feePayer)
+val message = TransactionMessage.newMessage(feePayer, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 ```
 
-複数の命令を持つトランザクション:
+複数の命令を持つバージョン化されたトランザクション:
 
+```kotlin
+val message = TransactionMessage.newMessage(feePayer, blockhash, instructions)
+val transaction = VersionedTransaction(message)
+```
+
+レガシートランザクション:
 ```kotlin
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
@@ -196,11 +206,8 @@ val accounts = listOf(
 )
 val joinGameInstruction = BaseInstruction(instructionData, accounts, programId)
 val blockhash = connection.getLatestBlockhash()
-val joinGameTransaction = Transaction(
-    blockhash,
-    instruction = joinGameInstruction,
-    feePayer = playerPublicKey,
-)
+val joinGameMessage = TransactionMessage.newMessage(playerPublicKey, blockhash, joinGameInstruction)
+val joinGameTransaction = VersionedTransaction(joinGameMessage)
 joinGameTransaction.sign(playerKeypair)
 val signature = connection.sendTransaction(joinGameTransaction)
 ```
@@ -219,20 +226,13 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     owner = destinationWallet,
     mint = usdcMintAddress,
 )
-val transaction = Transaction(
-    blockhash,
-    instruction,
-    feePayer = payerWallet.publicKey,
-)
+val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
+val transaction = Transaction(message)
 transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```
 
 [プロジェクトテスト](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)でさらに多くの例を見つけることができます。
-
-## 注意事項
-
-このプロジェクトは積極的に開発されています。貢献したい場合は、オープンなIssueを確認するか、Pull Requestを提出してください。
 
 ## 開発環境の設定
 
@@ -269,6 +269,10 @@ println("Public Key: ${keypair.publicKey}")
 
 環境変数が設定されていない場合、エンドツーエンドテストは`EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`を使用してブロックチェーンと対話します。この秘密鍵はソースコードで公開されているため、これを使用する場合はDevnet USDCとSOLがあることを確認してください。
 
-## 連絡先
+## サポート
 
-質問がある場合は、`contact@sol4k.org`までお問い合わせください。
+sol4kが気に入ってプロジェクトを継続してほしい場合は、[GitHub Sponsors](https://github.com/sponsors/Shpota)を通じてスポンサーになるか、次のウォレットアドレスに直接寄付を検討してください:
+
+```shell
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
+```
