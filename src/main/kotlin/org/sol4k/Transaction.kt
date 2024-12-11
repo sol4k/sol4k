@@ -158,7 +158,8 @@ class Transaction(
                 byteArray = instructionAccountDecodedLength.bytes
 
                 val accountIndices =
-                    byteArray.slice(0 until instructionAccountDecodedLength.length).toByteArray().toList().map(Byte::toInt)
+                    byteArray.slice(0 until instructionAccountDecodedLength.length).toByteArray().toList()
+                        .map(Byte::toInt)
                 byteArray = byteArray.drop(instructionAccountDecodedLength.length).toByteArray()
 
                 val dataDecodedLength = Binary.decodeLength(byteArray)

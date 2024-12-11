@@ -1,6 +1,6 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> | 한국어 | <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_JP.md#sol4k----">日本語</a>
+<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> │ 한국어 │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_ZH.md#sol4k----">中文</a> | <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_JP.md#sol4k----">日本語</a>
 
 Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용할 수 있는 Solana용 Kotlin 클라이언트입니다. 이 클라이언트를 사용하여 RPC 노드와 통신하고 블록체인에서 정보를 쿼리하며, 계정을 생성하고 데이터를 읽고, 다양한 유형의 트랜잭션을 전송하고, 키 쌍 및 공개 키와 작업할 수 있습니다. 또한 개발자가 매끄럽고 간편하게 작업할 수 있도록 편리한 API도 제공합니다.
 
@@ -8,7 +8,7 @@ Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용�
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.4.2'
+implementation 'org.sol4k:sol4k:0.5.4'
 ```
 
 Maven:
@@ -16,12 +16,11 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.4</version>
 </dependency>
 ```
 
 ## 사용 방법
-
 
 연결을 생성하고 최신 블록 해시를 요청한 후, 한 계정에서 다른 계정으로 SOL 전송 트랜잭션을 제출합니다.
 ```kotlin
@@ -30,7 +29,8 @@ val blockhash = connection.getLatestBlockhash()
 val sender = Keypair.fromSecretKey(secretKeyBytes)
 val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
 val instruction = TransferInstruction(sender.publicKey, receiver, lamports = 1000)
-val transaction = Transaction(blockhash, instruction, feePayer = sender.publicKey)
+val message = TransactionMessage.newMessage(sender.publicKey, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 transaction.sign(sender)
 val signature = connection.sendTransaction(transaction)
 ```
@@ -144,7 +144,9 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
+- `getMinimumBalanceForRentExemption`
 - `getTokenAccountBalance`
+- `getTokenSupply`
 - `getTransactionCount`
 - `isBlockhashValid`
 - `requestAirdrop`
@@ -153,14 +155,21 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 
 ### 트랜잭션
 
-sol4k 트랜잭션은 Solana 트랜잭션을 빌드, 서명, 직렬화 및 전송하는 데 사용할 수 있는 클래스입니다. 최신 블록 해시, 하나 이상의 명령어 및 수수료 지불자를 지정하여 트랜잭션을 생성할 수 있습니다.
+Sol4k는 `VersionedTransaction` 및 `Transaction` 클래스를 통해 버전화된 트랜잭션과 레거시 트랜잭션을 지원합니다. 두 클래스는 유사한 API를 지원하며 Solana 트랜잭션을 생성, 서명, 직렬화, 역직렬화 및 전송하는 데 사용할 수 있습니다. 새로운 코드에서는 `VersionedTransaction` 을 사용하는 것이 권장됩니다. 트랜잭션은 최신 블록해시, 하나 이상의 명령어 및 수수료 지불자를 지정하여 생성할 수 있습니다.
 
 ```kotlin
-val transaction = Transaction(blockhash, instruction, feePayer)
+val message = TransactionMessage.newMessage(feePayer, blockhash, instruction)
+val transaction = VersionedTransaction(message)
 ```
 
-여러 명령어가 있는 트랜잭션:
+다중 명령어 버전화된 트랜잭션:
 
+```kotlin
+val message = TransactionMessage.newMessage(feePayer, blockhash, instructions)
+val transaction = VersionedTransaction(message)
+```
+
+레거시 트랜잭션:
 ```kotlin
 val transaction = Transaction(blockhash, instructions, feePayer)
 ```
@@ -198,11 +207,8 @@ val accounts = listOf(
 )
 val joinGameInstruction = BaseInstruction(instructionData, accounts, programId)
 val blockhash = connection.getLatestBlockhash()
-val joinGameTransaction = Transaction(
-    blockhash,
-    instruction = joinGameInstruction,
-    feePayer = playerPublicKey,
-)
+val joinGameMessage = TransactionMessage.newMessage(playerPublicKey, blockhash, joinGameInstruction)
+val joinGameTransaction = VersionedTransaction(joinGameMessage)
 joinGameTransaction.sign(playerKeypair)
 val signature = connection.sendTransaction(joinGameTransaction)
 ```
@@ -221,21 +227,12 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     owner = destinationWallet,
     mint = usdcMintAddress,
 )
-val transaction = Transaction(
-    blockhash,
-    instruction,
-    feePayer = payerWallet.publicKey,
-)
-transaction.sign(payerWallet)
+val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
+val transaction = Transaction(message)
 val signature = connection.sendTransaction(transaction)
 ```
 
 [프로젝트 테스트](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)에서 더 많은 예제를 찾을 수 있습니다.
-
-
-## 참고 사항
-
-이 프로젝트는 활발히 개발 중입니다. 기여하고 싶다면 열린 Issue를 확인하거나 Pull Request를 제출하십시오.
 
 ## 개발 설정
 
@@ -257,7 +254,6 @@ export E2E_SECRET_KEY="base-58-encode-secret-key..."
 
 테스트를 실행합니다:
 
-
 ```shell
 ./gradlew integrationTest
 ```
@@ -276,6 +272,11 @@ println("Public Key: ${keypair.publicKey}")
 
 환경 변수가 설정되지 않은 경우 종단 간 테스트는 `EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF`를 사용하여 블록체인과 상호작용합니다. 이 비밀 키는 소스 코드에 공개되어 있으므로 이를 사용하려면 Devnet USDC와 SOL이 있는지 확인하십시오.
 
-## 연락처
+## Support
 
-질문이 있으면 `contact@sol4k.org`로 문의하십시오.
+If you like sol4k and want the project to keep going, consider sponsoring it
+[via GitHub Sponsors](https://github.com/sponsors/Shpota) or directly to the wallet address:
+
+```shell
+HNFoca4s9e9XG6KBpaQurVj4Yr6k3GQKhnubRxAGwAZs
+```

@@ -15,7 +15,8 @@ data class TransactionMessage internal constructor(
 ) {
 
     internal enum class MessageVersion {
-        Legacy, V0
+        Legacy,
+        V0,
     }
 
     fun withNewBlockhash(blockhash: String): TransactionMessage {
@@ -121,7 +122,7 @@ data class TransactionMessage internal constructor(
                         programIdIndex = programIdIndex,
                         data = dataSlice,
                         accounts = accountIndices,
-                    )
+                    ),
                 )
             }
 
@@ -148,7 +149,7 @@ data class TransactionMessage internal constructor(
                             publicKey = PublicKey(account),
                             writableIndexes = writableAccountIdx,
                             readonlyIndexes = readOnlyAccountIdx,
-                        )
+                        ),
                     )
                 }
             }
@@ -181,7 +182,7 @@ data class TransactionMessage internal constructor(
             feePayer: PublicKey,
             recentBlockhash: String,
             instructions: List<Instruction>,
-            addressLookupTableAccounts: List<AddressLookupTableAccount> = emptyList(), // v0 transaction
+            addressLookupTableAccounts: List<AddressLookupTableAccount> = emptyList(),
         ): TransactionMessage {
             val addressLookupTableMaps = mutableListOf<Map<PublicKey, Int>>()
             addressLookupTableAccounts.forEach { addressLookupTableAccount ->
@@ -279,7 +280,7 @@ data class TransactionMessage internal constructor(
                             addressLookupTableAccounts[i].key,
                             addressLookupTableWritableIdx[i].toByteArray(),
                             addressLookupTableReadonlyIdx[i].toByteArray(),
-                        )
+                        ),
                     )
                 }
             }
@@ -299,7 +300,7 @@ data class TransactionMessage internal constructor(
                         data = instruction.data,
                         accounts = accountIndex.toList(),
                         programIdIndex = requireNotNull(publicKeyToIdx[instruction.programId]),
-                    )
+                    ),
                 )
             }
 
