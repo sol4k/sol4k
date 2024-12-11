@@ -1,6 +1,6 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어 </a> │ 中文
+<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어 </a> │ 中文 │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_JP.md#sol4k----">日本語</a>
 
 Sol4k 是 Solana 的 Kotlin 客户端，可与 Java 或任何其他 JVM 语言以及 Android 一起使用。它支持与 RPC 节点通信，允许用户从区块链查询信息、创建帐户、从帐户读取数据、发送不同类型的交易以及使用密钥对和公钥。客户端还公开了方便的 API，使开发人员的体验顺畅而直接。
 
