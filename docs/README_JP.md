@@ -1,6 +1,6 @@
 # sol4k [![Maven Central](https://img.shields.io/maven-central/v/org.sol4k/sol4k?color=green)](https://central.sonatype.com/artifact/org.sol4k/sol4k) [![Build](https://github.com/sol4k/sol4k/actions/workflows/build.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/build.yml) [![Style](https://github.com/sol4k/sol4k/actions/workflows/lint.yml/badge.svg)](https://github.com/sol4k/sol4k/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://github.com/sol4k/sol4k/blob/main/LICENSE)
 
-<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> | <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어</a> | 日本語
+<a href="https://github.com/sol4k/sol4k?tab=readme-ov-file#sol4k----">English</a> | <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_KR.md#sol4k----">한국어</a> │ <a href="https://github.com/sol4k/sol4k/blob/main/docs/README_ZH.md#sol4k----">中文</a> | 日本語
 
 Sol4kは、Javaや他のJVM言語、Androidでも使用できるSolana用のKotlinクライアントです。このクライアントを使用すると、RPCノードと通信し、ブロックチェーンから情報をクエリし、アカウントを作成し、データを読み取り、さまざまな種類のトランザクションを送信し、キーペアや公開鍵を操作できます。また、開発者がスムーズかつ簡単に作業できるように便利なAPIも提供しています。
 
