@@ -1,9 +1,9 @@
 package org.sol4k.instruction
 
-import org.sol4k.Constants.TOKEN_PROGRAM_ID
+import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.PublicKey
 
-class SplTransferInstruction(
+class Token2022TransferInstruction @JvmOverloads constructor(
     from: PublicKey,
     to: PublicKey,
     mint: PublicKey,
@@ -12,5 +12,5 @@ class SplTransferInstruction(
     decimals: Int,
     signers: List<PublicKey> = emptyList(),
 ) : TokenTransferInstruction(from, to, mint, owner, amount, decimals, signers) {
-    override val programId: PublicKey = TOKEN_PROGRAM_ID
+    override val programId: PublicKey = TOKEN_2022_PROGRAM_ID
 }
