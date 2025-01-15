@@ -1,8 +1,10 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.instruction.CreateAssociatedToken2022AccountInstruction
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
@@ -161,6 +163,31 @@ internal class ConnectionTest {
             associatedToken = associatedAccount,
             owner = destinationWallet,
             mint = usdcMintAddress,
+        )
+        val transaction = Transaction(
+            blockhash,
+            instruction,
+            feePayer = payerWallet.publicKey,
+        )
+        transaction.sign(payerWallet)
+        val signature = connection.sendTransaction(transaction)
+
+        Logger.info("signature: $signature")
+    }
+
+    @Test
+    fun shouldSendCreateAssociatedTokenTransactionGivenToken2022() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val payerWallet = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val tokenMint = PublicKey("mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So")
+        val destinationWallet = Keypair.generate().publicKey
+        val (associatedAccount) = PublicKey.findProgramDerivedAddress(destinationWallet, tokenMint, TOKEN_2022_PROGRAM_ID)
+        val instruction = CreateAssociatedToken2022AccountInstruction(
+            payer = payerWallet.publicKey,
+            associatedToken = associatedAccount,
+            owner = destinationWallet,
+            mint = tokenMint,
         )
         val transaction = Transaction(
             blockhash,
