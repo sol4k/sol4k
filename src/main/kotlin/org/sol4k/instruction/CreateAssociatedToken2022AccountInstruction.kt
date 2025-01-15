@@ -7,7 +7,7 @@ import org.sol4k.Constants.SYSVAR_RENT_ADDRESS
 import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.PublicKey
 
-class CreateAssociatedToken2022AccountInstruction (
+class CreateAssociatedToken2022AccountInstruction(
     payer: PublicKey,
     associatedToken: PublicKey,
     owner: PublicKey,
