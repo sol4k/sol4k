@@ -3,7 +3,7 @@ package org.sol4k.instruction
 import org.sol4k.Constants.TOKEN_PROGRAM_ID
 import org.sol4k.PublicKey
 
-class SplTransferInstruction(
+class SplTransferInstruction @JvmOverloads constructor(
     from: PublicKey,
     to: PublicKey,
     mint: PublicKey,

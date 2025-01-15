@@ -4,10 +4,10 @@ import org.sol4k.AccountMeta
 import org.sol4k.Constants.ASSOCIATED_TOKEN_PROGRAM_ID
 import org.sol4k.Constants.SYSTEM_PROGRAM
 import org.sol4k.Constants.SYSVAR_RENT_ADDRESS
-import org.sol4k.Constants.TOKEN_PROGRAM_ID
+import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.PublicKey
 
-class CreateAssociatedTokenAccountInstruction(
+class CreateAssociatedToken2022AccountInstruction (
     payer: PublicKey,
     associatedToken: PublicKey,
     owner: PublicKey,
@@ -22,7 +22,7 @@ class CreateAssociatedTokenAccountInstruction(
         AccountMeta(owner),
         AccountMeta(mint),
         AccountMeta(SYSTEM_PROGRAM),
-        AccountMeta(TOKEN_PROGRAM_ID),
+        AccountMeta(TOKEN_2022_PROGRAM_ID),
         AccountMeta(SYSVAR_RENT_ADDRESS),
     )
 
