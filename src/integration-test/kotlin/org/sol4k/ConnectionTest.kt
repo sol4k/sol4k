@@ -174,7 +174,7 @@ internal class ConnectionTest {
     }
 
     @Test
-    fun shouldSendCreateAssociatedTokenTransactionGivenToken2022() {
+    fun shouldCreateAssociatedToken2022Account() {
         val connection = Connection(rpcUrl)
         val blockhash = connection.getLatestBlockhash()
         val payerWallet = Keypair.fromSecretKey(Base58.decode(secretKey))
