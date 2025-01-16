@@ -1,8 +1,10 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.instruction.CreateAssociatedToken2022AccountInstruction
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
@@ -162,12 +164,33 @@ internal class ConnectionTest {
             owner = destinationWallet,
             mint = usdcMintAddress,
         )
-        val transaction = Transaction(
-            blockhash,
-            instruction,
-            feePayer = payerWallet.publicKey,
-        )
+        val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, listOf(instruction))
+        val transaction = VersionedTransaction(message)
         transaction.sign(payerWallet)
+
+        val signature = connection.sendTransaction(transaction)
+
+        Logger.info("signature: $signature")
+    }
+
+    @Test
+    fun shouldSendCreateAssociatedTokenTransactionGivenToken2022() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val payerWallet = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val token2022Mint = PublicKey("2M8uRtM7rHVtEgY8bAW6tg7o8S1PQPLPcxJ1ug9PF11g")
+        val destinationWallet = Keypair.generate().publicKey
+        val (associatedAccount) = PublicKey.findProgramDerivedAddress(destinationWallet, token2022Mint, TOKEN_2022_PROGRAM_ID)
+        val instruction = CreateAssociatedToken2022AccountInstruction(
+            payer = payerWallet.publicKey,
+            associatedToken = associatedAccount,
+            owner = destinationWallet,
+            mint = token2022Mint,
+        )
+        val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, listOf(instruction))
+        val transaction = VersionedTransaction(message)
+        transaction.sign(payerWallet)
+
         val signature = connection.sendTransaction(transaction)
 
         Logger.info("signature: $signature")
