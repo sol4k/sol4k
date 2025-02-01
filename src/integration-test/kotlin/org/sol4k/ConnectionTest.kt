@@ -11,6 +11,8 @@ import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class ConnectionTest {
@@ -204,6 +206,33 @@ internal class ConnectionTest {
         val accountInfo = connection.getAccountInfo(usdc)
 
         Logger.info("accountInfo: $accountInfo")
+    }
+
+    @Test
+    fun shouldGetMultipleAccounts() {
+        val connection = Connection(rpcUrl)
+        val usdcMint = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val nonExistentAccount = Keypair.generate().publicKey
+        val tokenAccount = PublicKey("73d3sqQPLsiwKvdJt2XnnLEzNiEjfn2nreqLujM7zXiT")
+        val accounts = connection.getMultipleAccounts(listOf(usdcMint, nonExistentAccount, tokenAccount))
+
+        assertEquals(3, accounts.size)
+
+        assertNotNull(accounts[0])
+        assertNull(accounts[1])
+        assertNotNull(accounts[2])
+
+        Logger.info("USDC Mint Account Info: ${accounts[0]}")
+        Logger.info("Non-existent Account Info: ${accounts[1]}")
+        Logger.info("Token Account Info: ${accounts[2]}")
+
+        val usdcAccount = accounts[0]!!
+        assertFalse(usdcAccount.executable)
+        assertTrue(usdcAccount.data.isNotEmpty())
+
+        val tokenAccountInfo = accounts[2]!!
+        assertFalse(tokenAccountInfo.executable)
+        assertTrue(tokenAccountInfo.data.isNotEmpty())
     }
 
     @Test
