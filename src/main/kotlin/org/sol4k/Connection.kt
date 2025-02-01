@@ -158,8 +158,8 @@ class Connection @JvmOverloads constructor(
             "getMultipleAccounts",
             listOf(
                 Json.encodeToJsonElement(encodedAddresses),
-                Json.encodeToJsonElement(mapOf("encoding" to "base64"))
-            )
+                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+            ),
         )
 
         return value.map { accountValue ->
@@ -171,7 +171,7 @@ class Connection @JvmOverloads constructor(
                     lamports = it.lamports,
                     owner = PublicKey(it.owner),
                     rentEpoch = it.rentEpoch,
-                    space = it.space ?: data.size
+                    space = it.space ?: data.size,
                 )
             }
         }
