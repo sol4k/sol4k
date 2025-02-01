@@ -1,7 +1,6 @@
 package org.sol4k
 
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -22,6 +21,7 @@ import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
 import org.sol4k.rpc.GetAccountInfoResponse
+import org.sol4k.rpc.GetMultipleAccountsResponse
 import org.sol4k.rpc.GetTokenApplyResponse
 import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
@@ -148,6 +148,32 @@ class Connection @JvmOverloads constructor(
                 rentEpoch = value.rentEpoch,
                 space = value.space ?: data.size,
             )
+        }
+    }
+
+    fun getMultipleAccounts(accountAddresses: List<PublicKey>): List<AccountInfo?> {
+        val encodedAddresses = accountAddresses.map { it.toBase58() }
+
+        val (value) = rpcCall<GetMultipleAccountsResponse, JsonElement>(
+            "getMultipleAccounts",
+            listOf(
+                Json.encodeToJsonElement(encodedAddresses),
+                Json.encodeToJsonElement(mapOf("encoding" to "base64"))
+            )
+        )
+
+        return value.map { accountValue ->
+            accountValue?.let {
+                val data = Base64.getDecoder().decode(it.data[0])
+                AccountInfo(
+                    data,
+                    executable = it.executable,
+                    lamports = it.lamports,
+                    owner = PublicKey(it.owner),
+                    rentEpoch = it.rentEpoch,
+                    space = it.space ?: data.size
+                )
+            }
         }
     }
 
