@@ -17,12 +17,12 @@ class VersionedTransactionTest {
         val accounts = listOf(
             AccountMeta.signerAndWritable(signer1.publicKey),
             AccountMeta.signerAndWritable(signer2.publicKey),
-            AccountMeta.writable(Keypair.generate().publicKey)
+            AccountMeta.writable(Keypair.generate().publicKey),
         )
         val instruction = BaseInstruction(
             ByteBuffer.allocate(8).array(),
             accounts,
-            Keypair.generate().publicKey
+            Keypair.generate().publicKey,
         )
         val message = TransactionMessage.newMessage(signer1.publicKey, blockhash, instruction)
         val transaction = VersionedTransaction(message)
