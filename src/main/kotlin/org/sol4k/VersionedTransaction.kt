@@ -10,12 +10,12 @@ import kotlin.math.max
 
 class VersionedTransaction private constructor(
     val message: TransactionMessage,
-    private val signatures: MutableList<String>,
+    internal val signatures: MutableList<String?>,
 ) {
 
     constructor(
         message: TransactionMessage,
-    ) : this(message, mutableListOf())
+    ) : this(message, MutableList(message.header.numRequireSignatures) { null })
 
     fun sign(keypair: Keypair) {
         val data = message.serialize()
@@ -23,18 +23,14 @@ class VersionedTransaction private constructor(
         for (i in 0 until message.header.numRequireSignatures) {
             val a = message.accounts[i]
             if (a.verify(signature, data)) {
-                if (signatures.isEmpty()) {
-                    signatures.add(Base58.encode(signature))
-                } else {
-                    signatures[i] = Base58.encode(signature)
-                }
+                signatures[i] = Base58.encode(signature)
                 break
             }
         }
     }
 
     fun serialize(): ByteArray {
-        if (signatures.isEmpty() || signatures.size != message.header.numRequireSignatures) {
+        if (signatures.isEmpty() || signatures.filterNotNull().size != message.header.numRequireSignatures) {
             throw SerializationException("Signature verification failed")
         }
 
@@ -42,7 +38,7 @@ class VersionedTransaction private constructor(
 
         val b = ByteArrayOutputStream()
         b.write(Binary.encodeLength(signatures.size))
-        for (s in signatures) {
+        for (s in signatures.filterNotNull()) {
             b.write(Base58.decode(s))
         }
         b.write(messageData)
@@ -79,7 +75,7 @@ class VersionedTransaction private constructor(
             if (signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
                 throw SerializationException("numRequireSignatures is not equal to signatureCount")
             }
-            return VersionedTransaction(message, signatures)
+            return VersionedTransaction(message, signatures.toMutableList())
         }
     }
 }
