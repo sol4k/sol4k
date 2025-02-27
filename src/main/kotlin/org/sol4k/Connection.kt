@@ -231,9 +231,9 @@ class Connection @JvmOverloads constructor(
         )
         val (err, logs) = result.value
         if (err != null) {
-            when (err) {
-                is JsonPrimitive -> return TransactionSimulationError(err.content)
-                else -> throw IllegalArgumentException("Failed to parse the error")
+            return when (err) {
+                is JsonPrimitive -> TransactionSimulationError(err.content)
+                else -> TransactionSimulationError(err.toString())
             }
         } else if (logs != null) {
             return TransactionSimulationSuccess(logs)
