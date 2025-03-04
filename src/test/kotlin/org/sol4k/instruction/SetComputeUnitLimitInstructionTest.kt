@@ -1,8 +1,8 @@
 package org.sol4k.instruction
 
-import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.sol4k.Constants.COMPUTE_BUDGET_PROGRAM_ID
+import kotlin.test.assertEquals
 
 class SetComputeUnitLimitInstructionTest {
 
