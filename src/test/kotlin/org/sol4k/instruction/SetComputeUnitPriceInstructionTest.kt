@@ -1,8 +1,7 @@
 package org.sol4k.instruction
 
-
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import org.junit.jupiter.api.Test
 import org.sol4k.Constants.COMPUTE_BUDGET_PROGRAM_ID
 
 class SetComputeUnitPriceInstructionTest {
