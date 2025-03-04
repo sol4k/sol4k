@@ -209,7 +209,7 @@ internal class ConnectionTest {
         val (associatedAccount) = PublicKey.findProgramDerivedAddress(
             destinationWallet,
             token2022Mint,
-            TOKEN_2022_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID,
         )
         val instruction = CreateAssociatedToken2022AccountInstruction(
             payer = payerWallet.publicKey,
