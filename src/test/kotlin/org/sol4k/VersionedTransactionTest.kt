@@ -107,8 +107,8 @@ class VersionedTransactionTest {
         val sig1 = signer1.sign(data)
         val sig2 = signer2.sign(data)
 
-        transaction1.sign(sig1)
-        transaction1.sign(sig2)
+        transaction1.addSignature(sig1)
+        transaction1.addSignature(sig2)
 
         val signatures = transaction1.signatures
         assertEquals(2, signatures.size)
