@@ -26,7 +26,7 @@ class Transaction(
         signatures.add(Base58.encode(signature))
     }
 
-    private fun addSignature(signature: String) {
+    fun addSignature(signature: String) {
         signatures.add(signature)
     }
 
