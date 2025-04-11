@@ -20,6 +20,12 @@ class VersionedTransaction private constructor(
     fun sign(keypair: Keypair) {
         val data = message.serialize()
         val signature = keypair.sign(data)
+        sign(signature, data)
+    }
+
+    fun sign(signature: ByteArray, serializedMessage: ByteArray? = null) {
+        val data = serializedMessage ?: message.serialize()
+
         for (i in 0 until message.header.numRequireSignatures) {
             val a = message.accounts[i]
             if (a.verify(signature, data)) {

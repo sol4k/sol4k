@@ -82,4 +82,44 @@ class VersionedTransactionTest {
         val fee = tx.calculateFee(5000)
         assertEquals(BigDecimal("0.000005000"), fee)
     }
+
+    @Test
+    fun shouldSignTransactionFromKeypairOrSignature() {
+        val signer1 = Keypair.generate()
+        val signer2 = Keypair.generate()
+        val blockhash = "GYQReb5N3KWsM7x7aboAGTb6kQSxDGRZ1S42N6RTNkgS"
+        val accounts = listOf(
+            AccountMeta.signerAndWritable(signer1.publicKey),
+            AccountMeta.signerAndWritable(signer2.publicKey),
+            AccountMeta.writable(Keypair.generate().publicKey),
+        )
+        val instruction = BaseInstruction(
+            ByteBuffer.allocate(8).array(),
+            accounts,
+            Keypair.generate().publicKey,
+        )
+        val message = TransactionMessage.newMessage(signer1.publicKey, blockhash, instruction)
+        val transaction1 = VersionedTransaction(message)
+        val transaction2 = VersionedTransaction(message)
+
+        // assume no private key is exposed, only the final signature is provided
+        val data = message.serialize()
+        val sig1 = signer1.sign(data)
+        val sig2 = signer2.sign(data)
+
+        transaction1.sign(sig1)
+        transaction1.sign(sig2)
+
+        val signatures = transaction1.signatures
+        assertEquals(2, signatures.size)
+        assertEquals(2, signatures.filterNotNull().size)
+        assertTrue(signer1.publicKey.verify(Base58.decode(signatures[0]!!), message.serialize()))
+        assertTrue(signer2.publicKey.verify(Base58.decode(signatures[1]!!), message.serialize()))
+
+        // regular keypair-based signing
+        transaction2.sign(signer1)
+        transaction2.sign(signer2)
+
+        assertEquals(transaction1, transaction2)
+    }
 }
