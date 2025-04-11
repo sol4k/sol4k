@@ -104,8 +104,8 @@ class VersionedTransactionTest {
 
         // assume no private key is exposed, only the final signature is provided
         val data = message.serialize()
-        val sig1 = signer1.sign(data)
-        val sig2 = signer2.sign(data)
+        val sig1 = Base58.encode(signer1.sign(data))
+        val sig2 = Base58.encode(signer2.sign(data))
 
         transaction1.addSignature(sig1)
         transaction1.addSignature(sig2)
