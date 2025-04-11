@@ -120,6 +120,6 @@ class VersionedTransactionTest {
         transaction2.sign(signer1)
         transaction2.sign(signer2)
 
-        assertEquals(transaction1, transaction2)
+        assertTrue(transaction1.serialize().contentEquals(transaction2.serialize()))
     }
 }
