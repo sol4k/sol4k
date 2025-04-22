@@ -44,6 +44,50 @@ class TransactionMessageTest {
     }
 
     @Test
+    fun shouldCreateNewMessageWithNonParticipatingFeePayer() {
+        val expectedMessage = TransactionMessage(
+            version = V0,
+            header = MessageHeader(
+                numRequireSignatures = 2,
+                numReadonlySignedAccounts = 0,
+                numReadonlyUnsignedAccounts = 1,
+            ),
+            accounts = listOf(
+                feePayerPublicKey(),
+                PublicKey("87jPsvNeMH1RcZvwM9Y5z5Ffo3QDsuKUWzAcmzzFG1oa"),
+                PublicKey("A4iUVr5KjmsLymUcv4eSKPedUtoaBceiPeGipKMYc69b"),
+                SYSTEM_PROGRAM,
+            ),
+            recentBlockhash = "FwRYtTPRk5N4wUeP87rTw9kQVSwigB6kbikGzzeCMrW5",
+            instructions = listOf(
+                CompiledInstruction(
+                    programIdIndex = 3,
+                    accounts = listOf(1, 2),
+                    data = data(),
+                ),
+            ),
+            addressLookupTables = emptyList(),
+        )
+
+        val message = TransactionMessage.newMessage(
+            feePayer = feePayerPublicKey(),
+            recentBlockhash = "FwRYtTPRk5N4wUeP87rTw9kQVSwigB6kbikGzzeCMrW5",
+            instructions = listOf(
+                BaseInstruction(
+                    programId = SYSTEM_PROGRAM,
+                    keys = listOf(
+                        AccountMeta.signerAndWritable(PublicKey("87jPsvNeMH1RcZvwM9Y5z5Ffo3QDsuKUWzAcmzzFG1oa")),
+                        AccountMeta.writable(PublicKey("A4iUVr5KjmsLymUcv4eSKPedUtoaBceiPeGipKMYc69b")),
+                    ),
+                    data = data(),
+                ),
+            ),
+        )
+
+        assertEquals(message, expectedMessage)
+    }
+
+    @Test
     fun shouldCreateNewMessageGivenEmptyAddressesInAddressLookupTables() {
         val expectedMessage = TransactionMessage(
             version = V0,

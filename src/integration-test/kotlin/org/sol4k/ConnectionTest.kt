@@ -20,6 +20,7 @@ import kotlin.test.assertTrue
 internal class ConnectionTest {
     private val rpcUrl = getRpcUrl()
     private val secretKey = getSecretKey()
+    private val feePayerSecretKey = getFeePayerSecretKey()
 
     @Test
     fun shouldGetBalance() {
@@ -104,6 +105,29 @@ internal class ConnectionTest {
         )
         val transaction = VersionedTransaction(message)
         transaction.sign(sender)
+
+        val signature = connection.sendTransaction(transaction)
+
+        Logger.info("signature: $signature")
+    }
+
+    @Test
+    fun shouldSendVersionedTransactionWithNonParticipatingFeePayer() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val feePayer = Keypair.fromSecretKey(Base58.decode(feePayerSecretKey))
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+
+        val message = TransactionMessage.newMessage(
+            feePayer = feePayer.publicKey,
+            blockhash,
+            listOf(instruction),
+        )
+        val transaction = VersionedTransaction(message)
+        transaction.sign(sender)
+        transaction.sign(feePayer)
 
         val signature = connection.sendTransaction(transaction)
 
@@ -411,6 +435,16 @@ internal class ConnectionTest {
             // Public Key: EwtJVgZQGHe9MXmrNWmujwcc6JoVESU2pmq7wTDBvReF
             // Make sure it has Devnet SOL & Devnet USDC if you rely on it
             "28bMpVHJQjuxo3fWw4cBa6Gz7QELgYkx4cjMxU87aPx9Hn6amZZQwH2J5UNCzSYM1jDjcj7TndiK4gpGSiYyLcPy"
+        } else {
+            secretKey
+        }
+    }
+
+    private fun getFeePayerSecretKey(): String {
+        val secretKey = System.getProperty("E2E_FEE_PAYER_SECRET_KEY")
+        return if (secretKey.isNullOrEmpty()) {
+            // Public Key: 2sUfPsijZsqXyD2mT8n4BAQAoNd6JjWw1iRxTHvpy2xT
+            "3RYyJDTY5cuMoeUD9twHK5dswvScP9r2aps5rQpADfJNunMxUETcGAV1Aw4Qcib1zbnYAK9BJFjrCqgb9DtAKfNj"
         } else {
             secretKey
         }
