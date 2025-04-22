@@ -322,7 +322,10 @@ data class TransactionMessage internal constructor(
             feePayer: PublicKey,
             instructions: List<Instruction>,
         ): CompileKeys {
-            val m = mutableMapOf<PublicKey, CompileKeyMeta>()
+            val m = mutableMapOf<PublicKey, CompileKeyMeta>(
+                feePayer to CompileKeyMeta(signer = true, writable = true, invoked = false)
+            )
+
             instructions.forEach { instruction ->
                 // compile program
                 var v = m[instruction.programId]
