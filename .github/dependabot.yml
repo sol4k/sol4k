@@ -4,13 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "automerge"
     commit-message:
       prefix: "deps"
-      prefix-development: "deps(dev)"
+      prefix-development: "deps:"
       include: "scope"
     reviewers:
       - "Shpota"
