@@ -9,7 +9,7 @@ Sol4k 是 Solana 的 Kotlin 客户端，可与 Java 或任何其他 JVM 语言�
 Gradle:
 
 ```groovy
-implementation 'org.sol4k:sol4k:0.5.14'
+implementation 'org.sol4k:sol4k:0.5.15'
 ```
 
 Maven:
@@ -18,7 +18,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.5.14</version>
+    <version>0.5.15</version>
 </dependency>
 ```
 
@@ -155,6 +155,7 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getIdentity`：获取节点的身份信息，通常包含节点的公钥和一些其他的元数据。
 - `getLatestBlockhash`：获取当前网络最新区块的哈希，用于提交交易时指定区块哈希。
 - `getMinimumBalanceForRentExemption`：获取不需要支付租金的账户余额的最小值，即账户需要持有的最低余额，以避免被清除。
+- `getMultipleAccounts`：批量获取多个账户的信息，比单独获取每个账户信息更高效。
 - `getTokenAccountBalance`：获取指定代币账户的余额，通常用于获取SPL代币（Solana的代币标准）的余额。
 - `getTokenSupply`：获取指定代币的总供应量，显示该代币的发行量。
 - `getTransactionCount`：获取指定账户的交易计数（nonce），该计数用于确保交易顺序和避免重放攻击。
