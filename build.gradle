@@ -68,7 +68,7 @@ task integrationTest(type: Test) {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(true)
     if (!project.gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }) {
         signAllPublications()
     }
