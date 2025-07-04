@@ -68,7 +68,7 @@ task integrationTest(type: Test) {
 }
 
 mavenPublishing {
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, true)
+    publishToMavenCentral()
     if (!project.gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }) {
         signAllPublications()
     }
