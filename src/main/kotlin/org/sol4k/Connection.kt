@@ -262,22 +262,22 @@ class Connection @JvmOverloads constructor(
         until: String? = null,
     ): List<TransactionSignature> {
         require(limit in 1..1000) { "Limit must be between 1 and 1000" }
-        
+
         val params = buildJsonObject {
             put("limit", limit)
             before?.let { put("before", it) }
             until?.let { put("until", it) }
             put("commitment", commitment.toString().lowercase())
         }
-        
+
         val result: List<RpcTransactionSignature> = rpcCall(
             "getSignaturesForAddress",
             listOf(
                 Json.encodeToJsonElement(address.toBase58()),
-                params
-            )
+                params,
+            ),
         )
-        
+
         return result.map { rpcSig ->
             TransactionSignature(
                 signature = rpcSig.signature,
@@ -285,7 +285,7 @@ class Connection @JvmOverloads constructor(
                 isError = rpcSig.err != null,
                 memo = rpcSig.memo,
                 blockTime = rpcSig.blockTime,
-                confirmationStatus = rpcSig.confirmationStatus
+                confirmationStatus = rpcSig.confirmationStatus,
             )
         }
     }
