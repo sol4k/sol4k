@@ -257,6 +257,7 @@ class Connection @JvmOverloads constructor(
     fun getSignaturesForAddress(
         address: PublicKey,
         limit: Int = 1000,
+        commitment: Commitment = this.commitment,
         before: String? = null,
         until: String? = null,
     ): List<TransactionSignature> {
@@ -266,6 +267,7 @@ class Connection @JvmOverloads constructor(
             put("limit", limit)
             before?.let { put("before", it) }
             until?.let { put("until", it) }
+            put("commitment", commitment.toString().lowercase())
         }
         
         val result: List<RpcTransactionSignature> = rpcCall(
