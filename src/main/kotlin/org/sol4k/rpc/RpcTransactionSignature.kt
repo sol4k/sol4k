@@ -1,6 +1,5 @@
 package org.sol4k.rpc
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
@@ -10,7 +9,6 @@ internal data class RpcTransactionSignature(
     val slot: Long,
     val err: JsonElement? = null,
     val memo: String? = null,
-    @SerialName("blockTime")
     val blockTime: Long? = null,
     val confirmationStatus: String? = null,
 )
