@@ -4,7 +4,9 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
 import org.sol4k.api.Commitment
@@ -13,6 +15,7 @@ import org.sol4k.api.EpochInfo
 import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
 import org.sol4k.api.TokenAccountBalance
+import org.sol4k.api.TransactionSignature
 import org.sol4k.api.TransactionSimulation
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
@@ -27,6 +30,7 @@ import org.sol4k.rpc.Identity
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
+import org.sol4k.rpc.RpcTransactionSignature
 import org.sol4k.rpc.SimulateTransactionResponse
 import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
@@ -247,6 +251,41 @@ class Connection @JvmOverloads constructor(
 
     fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation {
         return simulateTransaction(transaction.serialize())
+    }
+
+    @JvmOverloads
+    fun getSignaturesForAddress(
+        address: PublicKey,
+        limit: Int = 1000,
+        before: String? = null,
+        until: String? = null,
+    ): List<TransactionSignature> {
+        require(limit in 1..1000) { "Limit must be between 1 and 1000" }
+        
+        val params = buildJsonObject {
+            put("limit", limit)
+            before?.let { put("before", it) }
+            until?.let { put("until", it) }
+        }
+        
+        val result: List<RpcTransactionSignature> = rpcCall(
+            "getSignaturesForAddress",
+            listOf(
+                Json.encodeToJsonElement(address.toBase58()),
+                params
+            )
+        )
+        
+        return result.map { rpcSig ->
+            TransactionSignature(
+                signature = rpcSig.signature,
+                slot = rpcSig.slot,
+                isError = rpcSig.err != null,
+                memo = rpcSig.memo,
+                blockTime = rpcSig.blockTime,
+                confirmationStatus = rpcSig.confirmationStatus
+            )
+        }
     }
 
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
