@@ -440,6 +440,16 @@ internal class ConnectionTest {
         }
     }
 
+    @Test
+    fun shouldGetSignaturesForAddress() {
+        val connection = Connection(rpcUrl)
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+
+        val signatures = connection.getSignaturesForAddress(usdc, limit = 10)
+
+        assertEquals(10, signatures.size)
+    }
+
     private fun getFeePayerSecretKey(): String {
         val secretKey = System.getProperty("E2E_FEE_PAYER_SECRET_KEY")
         return if (secretKey.isNullOrEmpty()) {
