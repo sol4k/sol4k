@@ -60,7 +60,7 @@ class VersionedTransaction private constructor(
         val sigFee = Convert.lamportToSol(BigDecimal(lamportsPerSignature * max(signatures.size, 1)))
         val accounts = message.accounts
         val data = message.instructions
-            .filter { accounts[it.programIdIndex] != Constants.COMPUTE_BUDGET_PROGRAM_ID }
+            .filter { accounts[it.programIdIndex] == Constants.COMPUTE_BUDGET_PROGRAM_ID }
             .map { it.data }
         val msgFee = computeBudget(data)
         return sigFee.add(msgFee).setScale(9, RoundingMode.CEILING)
