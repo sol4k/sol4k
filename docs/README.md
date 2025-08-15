@@ -13,7 +13,7 @@ experience smooth and straightforward.
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.5.16'
+implementation 'org.sol4k:sol4k:0.5.17'
 ```
 
 Maven:
@@ -21,7 +21,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.5.16</version>
+    <version>0.5.17</version>
 </dependency>
 ```
 
