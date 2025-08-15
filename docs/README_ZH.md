@@ -9,7 +9,7 @@ Sol4k 是 Solana 的 Kotlin 客户端，可与 Java 或任何其他 JVM 语言�
 Gradle:
 
 ```groovy
-implementation 'org.sol4k:sol4k:0.5.16'
+implementation 'org.sol4k:sol4k:0.5.17'
 ```
 
 Maven:
@@ -18,7 +18,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.5.16</version>
+    <version>0.5.17</version>
 </dependency>
 ```
 
