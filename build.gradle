@@ -2,7 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '2.2.10'
     id 'org.jetbrains.dokka' version '2.0.0'
     id 'com.vanniktech.maven.publish' version '0.34.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.21'
     id 'org.jlleitschuh.gradle.ktlint' version '12.3.0'
 }
 
