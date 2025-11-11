@@ -450,6 +450,91 @@ internal class ConnectionTest {
         assertEquals(10, signatures.size)
     }
 
+    @Test
+    fun shouldGetVersion() {
+        val connection = Connection(rpcUrl)
+
+        val version = connection.getVersion()
+
+        Logger.info("version: $version")
+        assertNotNull(version.solanaCore)
+        assertTrue(version.solanaCore.isNotEmpty())
+        assertTrue(version.featureSet > 0)
+    }
+
+    @Test
+    fun shouldGetFeeForMessage() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val message = TransactionMessage.newMessage(
+            sender.publicKey,
+            blockhash,
+            listOf(instruction),
+        )
+
+        val fee = connection.getFeeForMessage(message)
+
+        Logger.info("fee: $fee")
+        assertNotNull(fee)
+        assertTrue(fee > 0)
+    }
+
+    @Test
+    fun shouldGetFeeForMessageFromBytes() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+        val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
+        val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
+        val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        val message = TransactionMessage.newMessage(
+            sender.publicKey,
+            blockhash,
+            listOf(instruction),
+        )
+        val messageBytes = message.serialize()
+
+        val fee = connection.getFeeForMessage(messageBytes)
+
+        Logger.info("fee from bytes: $fee")
+        assertNotNull(fee)
+        assertTrue(fee > 0)
+    }
+
+    @Test
+    fun shouldGetRecentPrioritizationFees() {
+        val connection = Connection(rpcUrl)
+
+        val fees = connection.getRecentPrioritizationFees()
+
+        Logger.info("recent prioritization fees: $fees")
+        assertNotNull(fees)
+        assertTrue(fees.isNotEmpty())
+        fees.forEach { fee ->
+            assertTrue(fee.slot > 0)
+            assertTrue(fee.prioritizationFee >= 0) // Most fees are 0 on devnet (no congestion)
+        }
+    }
+
+    @Test
+    fun shouldGetRecentPrioritizationFeesForAccounts() {
+        val connection = Connection(rpcUrl)
+        val usdc = PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
+        val accounts = listOf(usdc)
+
+        val fees = connection.getRecentPrioritizationFees(accounts)
+
+        Logger.info("recent prioritization fees for accounts: $fees")
+        assertNotNull(fees)
+        assertTrue(fees.isNotEmpty())
+        fees.forEach { fee ->
+            assertTrue(fee.slot > 0)
+            assertTrue(fee.prioritizationFee >= 0) // Most fees are 0 on devnet (no congestion)
+        }
+    }
+
     private fun getFeePayerSecretKey(): String {
         val secretKey = System.getProperty("E2E_FEE_PAYER_SECRET_KEY")
         return if (secretKey.isNullOrEmpty()) {
