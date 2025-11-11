@@ -19,9 +19,7 @@ data class TransactionMessage internal constructor(
         V0,
     }
 
-    fun withNewBlockhash(blockhash: String): TransactionMessage {
-        return TransactionMessage(version, header, accounts, blockhash, instructions, addressLookupTables)
-    }
+    fun withNewBlockhash(blockhash: String): TransactionMessage = TransactionMessage(version, header, accounts, blockhash, instructions, addressLookupTables)
 
     fun serialize(): ByteArray {
         ByteArrayOutputStream().use { b ->

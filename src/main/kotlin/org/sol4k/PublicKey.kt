@@ -22,8 +22,7 @@ class PublicKey {
 
     fun toBase58(): String = Base58.encode(this.bytes)
 
-    fun verify(signature: ByteArray, message: ByteArray): Boolean =
-        Signature(bytes, ByteArray(0)).detached_verify(message, signature)
+    fun verify(signature: ByteArray, message: ByteArray): Boolean = Signature(bytes, ByteArray(0)).detached_verify(message, signature)
 
     override fun toString(): String = toBase58()
 
@@ -38,9 +37,7 @@ class PublicKey {
         return true
     }
 
-    override fun hashCode(): Int {
-        return bytes.contentHashCode()
-    }
+    override fun hashCode(): Int = bytes.contentHashCode()
 
     companion object {
         private fun createProgramAddress(seeds: List<ByteArray>, programId: PublicKey): PublicKey {
@@ -67,12 +64,14 @@ class PublicKey {
             programId: PublicKey,
         ): ProgramDerivedAddress {
             val seedsBinary = seeds.map { it.bytes }
-            for (nonce in 255 downTo 1) try {
-                val newSeeds = seedsBinary + byteArrayOf(nonce.toByte())
-                val address = createProgramAddress(newSeeds, programId)
-                return ProgramDerivedAddress(address, nonce)
-            } catch (e: Exception) {
-                /* ignore */
+            for (nonce in 255 downTo 1) {
+                try {
+                    val newSeeds = seedsBinary + byteArrayOf(nonce.toByte())
+                    val address = createProgramAddress(newSeeds, programId)
+                    return ProgramDerivedAddress(address, nonce)
+                } catch (e: Exception) {
+                    /* ignore */
+                }
             }
             throw RuntimeException("Unable to find program address")
         }
