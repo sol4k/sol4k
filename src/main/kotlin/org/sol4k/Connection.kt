@@ -14,19 +14,23 @@ import org.sol4k.api.Commitment.FINALIZED
 import org.sol4k.api.EpochInfo
 import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
+import org.sol4k.api.PrioritizationFee
 import org.sol4k.api.TokenAccountBalance
 import org.sol4k.api.TransactionSignature
 import org.sol4k.api.TransactionSimulation
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.api.Version
 import org.sol4k.exception.RpcException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
+import org.sol4k.rpc.FeeForMessageResponse
 import org.sol4k.rpc.GetAccountInfoResponse
 import org.sol4k.rpc.GetMultipleAccountsResponse
 import org.sol4k.rpc.GetTokenApplyResponse
 import org.sol4k.rpc.Identity
+import org.sol4k.rpc.PrioritizationFeeResult
 import org.sol4k.rpc.RpcErrorResponse
 import org.sol4k.rpc.RpcRequest
 import org.sol4k.rpc.RpcResponse
@@ -34,6 +38,7 @@ import org.sol4k.rpc.RpcTransactionSignature
 import org.sol4k.rpc.SimulateTransactionResponse
 import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
+import org.sol4k.rpc.VersionResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.math.BigInteger
@@ -129,6 +134,14 @@ class Connection @JvmOverloads constructor(
     fun getIdentity(): PublicKey {
         val (identity) = rpcCall<Identity, String>("getIdentity", listOf())
         return PublicKey(identity)
+    }
+
+    fun getVersion(): Version {
+        val result: VersionResult = rpcCall("getVersion", listOf<String>())
+        return Version(
+            solanaCore = result.solanaCore,
+            featureSet = result.featureSet,
+        )
     }
 
     fun getTransactionCount(): Long = rpcCall<Long, String>("getTransactionCount", listOf())
@@ -237,6 +250,32 @@ class Connection @JvmOverloads constructor(
     fun simulateTransaction(transaction: Transaction): TransactionSimulation = simulateTransaction(transaction.serialize())
 
     fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation = simulateTransaction(transaction.serialize())
+
+    fun getFeeForMessage(messageBytes: ByteArray): Long? {
+        val encodedMessage = Base64.getEncoder().encodeToString(messageBytes)
+        val result: FeeForMessageResponse = rpcCall(
+            "getFeeForMessage",
+            listOf(Json.encodeToJsonElement(encodedMessage)),
+        )
+        return result.value
+    }
+
+    fun getFeeForMessage(message: TransactionMessage): Long? = getFeeForMessage(message.serialize())
+
+    @JvmOverloads
+    fun getRecentPrioritizationFees(accountAddresses: List<PublicKey> = emptyList()): List<PrioritizationFee> {
+        val encodedAddresses = accountAddresses.map { it.toBase58() }
+        val result: List<PrioritizationFeeResult> = rpcCall(
+            "getRecentPrioritizationFees",
+            listOf(Json.encodeToJsonElement(encodedAddresses)),
+        )
+        return result.map { fee ->
+            PrioritizationFee(
+                slot = fee.slot,
+                prioritizationFee = fee.prioritizationFee,
+            )
+        }
+    }
 
     @JvmOverloads
     fun getSignaturesForAddress(
