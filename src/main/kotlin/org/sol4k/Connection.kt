@@ -82,8 +82,7 @@ class Connection @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun getLatestBlockhash(commitment: Commitment = this.commitment): String =
-        this.getLatestBlockhashExtended(commitment).blockhash
+    fun getLatestBlockhash(commitment: Commitment = this.commitment): String = this.getLatestBlockhashExtended(commitment).blockhash
 
     @JvmOverloads
     fun getLatestBlockhashExtended(commitment: Commitment = this.commitment): Blockhash {
@@ -181,29 +180,23 @@ class Connection @JvmOverloads constructor(
         }
     }
 
-    fun getMinimumBalanceForRentExemption(space: Int): Long {
-        return rpcCall(
-            "getMinimumBalanceForRentExemption",
-            listOf(Json.encodeToJsonElement(space)),
-        )
-    }
+    fun getMinimumBalanceForRentExemption(space: Int): Long = rpcCall(
+        "getMinimumBalanceForRentExemption",
+        listOf(Json.encodeToJsonElement(space)),
+    )
 
-    fun getTokenSupply(tokenPubkey: String): TokenAmount {
-        return rpcCall<GetTokenApplyResponse, JsonElement>(
-            "getTokenSupply",
-            listOf(Json.encodeToJsonElement(tokenPubkey)),
-        ).value
-    }
+    fun getTokenSupply(tokenPubkey: String): TokenAmount = rpcCall<GetTokenApplyResponse, JsonElement>(
+        "getTokenSupply",
+        listOf(Json.encodeToJsonElement(tokenPubkey)),
+    ).value
 
-    fun requestAirdrop(accountAddress: PublicKey, amount: Long): String {
-        return rpcCall(
-            "requestAirdrop",
-            listOf(
-                Json.encodeToJsonElement(accountAddress.toBase58()),
-                Json.encodeToJsonElement(amount),
-            ),
-        )
-    }
+    fun requestAirdrop(accountAddress: PublicKey, amount: Long): String = rpcCall(
+        "requestAirdrop",
+        listOf(
+            Json.encodeToJsonElement(accountAddress.toBase58()),
+            Json.encodeToJsonElement(amount),
+        ),
+    )
 
     fun sendTransaction(transactionBytes: ByteArray): String {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
@@ -216,13 +209,9 @@ class Connection @JvmOverloads constructor(
         )
     }
 
-    fun sendTransaction(transaction: Transaction): String {
-        return sendTransaction(transaction.serialize())
-    }
+    fun sendTransaction(transaction: Transaction): String = sendTransaction(transaction.serialize())
 
-    fun sendTransaction(transaction: VersionedTransaction): String {
-        return sendTransaction(transaction.serialize())
-    }
+    fun sendTransaction(transaction: VersionedTransaction): String = sendTransaction(transaction.serialize())
 
     fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
@@ -245,13 +234,9 @@ class Connection @JvmOverloads constructor(
         throw IllegalArgumentException("Unable to parse simulation response")
     }
 
-    fun simulateTransaction(transaction: Transaction): TransactionSimulation {
-        return simulateTransaction(transaction.serialize())
-    }
+    fun simulateTransaction(transaction: Transaction): TransactionSimulation = simulateTransaction(transaction.serialize())
 
-    fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation {
-        return simulateTransaction(transaction.serialize())
-    }
+    fun simulateTransaction(transaction: VersionedTransaction): TransactionSimulation = simulateTransaction(transaction.serialize())
 
     @JvmOverloads
     fun getSignaturesForAddress(

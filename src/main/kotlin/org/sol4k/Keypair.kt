@@ -12,16 +12,13 @@ class Keypair private constructor(
     val publicKey: PublicKey
         get() = PublicKey(keypair.publicKey)
 
-    fun sign(message: ByteArray): ByteArray =
-        TweetNaclFast.Signature(ByteArray(0), secret).detached(message)
+    fun sign(message: ByteArray): ByteArray = TweetNaclFast.Signature(ByteArray(0), secret).detached(message)
 
     companion object {
         @JvmStatic
         fun generate(): Keypair = Keypair(TweetNaclFast.Signature.keyPair())
 
         @JvmStatic
-        fun fromSecretKey(secret: ByteArray): Keypair {
-            return Keypair(TweetNaclFast.Signature.keyPair_fromSeed(secret))
-        }
+        fun fromSecretKey(secret: ByteArray): Keypair = Keypair(TweetNaclFast.Signature.keyPair_fromSeed(secret))
     }
 }

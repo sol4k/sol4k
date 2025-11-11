@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.dokka' version '2.1.0'
     id 'com.vanniktech.maven.publish' version '0.34.0'
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.21'
-    id 'org.jlleitschuh.gradle.ktlint' version '12.3.0'
+    id 'org.jlleitschuh.gradle.ktlint' version '14.0.1'
 }
 
 group = 'org.sol4k'
