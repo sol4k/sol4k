@@ -9,7 +9,7 @@ Sol4k 是 Solana 的 Kotlin 客户端，可与 Java 或任何其他 JVM 语言�
 Gradle:
 
 ```groovy
-implementation 'org.sol4k:sol4k:0.5.18'
+implementation 'org.sol4k:sol4k:0.6.0'
 ```
 
 Maven:
@@ -18,7 +18,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.5.18</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -151,14 +151,17 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getAccountInfo`：获取账户信息，返回指定账户的详细数据，包括余额、状态等信息。
 - `getBalance`：获取指定账户的余额。
 - `getEpochInfo`：获取当前epoch的相关信息，包括epoch编号、slot范围等。
+- `getFeeForMessage`：获取消息的手续费，计算特定交易消息所需的手续费，无需实际发送交易。
 - `getHealth`：检查节点的健康状态，通常用于了解节点是否正常运行。
 - `getIdentity`：获取节点的身份信息，通常包含节点的公钥和一些其他的元数据。
 - `getLatestBlockhash`：获取当前网络最新区块的哈希，用于提交交易时指定区块哈希。
 - `getMinimumBalanceForRentExemption`：获取不需要支付租金的账户余额的最小值，即账户需要持有的最低余额，以避免被清除。
 - `getMultipleAccounts`：批量获取多个账户的信息，比单独获取每个账户信息更高效。
+- `getRecentPrioritizationFees`：获取最近的优先费用，返回最近slots的优先费用信息，用于确定最优的优先费用设置。
 - `getTokenAccountBalance`：获取指定代币账户的余额，通常用于获取SPL代币（Solana的代币标准）的余额。
 - `getTokenSupply`：获取指定代币的总供应量，显示该代币的发行量。
 - `getTransactionCount`：获取指定账户的交易计数（nonce），该计数用于确保交易顺序和避免重放攻击。
+- `getVersion`：获取节点版本信息，返回Solana节点的软件版本和功能集信息。
 - `isBlockhashValid`：验证一个区块哈希是否有效，通常用来检查某个区块哈希是否可以用于提交交易。
 - `requestAirdrop`：请求空投指定数量的代币（通常是SOL），用于开发测试目的。
 - `sendTransaction`：发送交易，将交易信息提交到网络，通常是进行某些操作（如转账、合约调用等）。

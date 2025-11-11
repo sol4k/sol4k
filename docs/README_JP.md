@@ -8,7 +8,7 @@ Sol4kは、Javaや他のJVM言語、Androidでも使用できるSolana用のKotl
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.5.18'
+implementation 'org.sol4k:sol4k:0.6.0'
 ```
 
 Maven:
@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.5.18</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -140,14 +140,17 @@ val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 - `getAccountInfo`
 - `getBalance`
 - `getEpochInfo`
+- `getFeeForMessage`
 - `getHealth`
 - `getIdentity`
 - `getLatestBlockhash`
 - `getMinimumBalanceForRentExemption`
 - `getMultipleAccounts`
+- `getRecentPrioritizationFees`
 - `getTokenAccountBalance`
 - `getTokenSupply`
 - `getTransactionCount`
+- `getVersion`
 - `isBlockhashValid`
 - `requestAirdrop`
 - `sendTransaction`
