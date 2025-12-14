@@ -6,23 +6,22 @@ import org.sol4k.api.AccountInfo
 import org.sol4k.api.Commitment
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.instruction.BaseInstruction
 import org.sol4k.instruction.CreateAssociatedToken2022AccountInstruction
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
+import org.sol4k.instruction.Instruction
 import org.sol4k.instruction.SetComputeUnitLimitInstruction
 import org.sol4k.instruction.SetComputeUnitPriceInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.sol4k.instruction.BaseInstruction
-import org.sol4k.instruction.Instruction
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 internal class ConnectionTest {
     private val rpcUrl = getRpcUrl()
@@ -552,16 +551,16 @@ internal class ConnectionTest {
         val nonceAccount = Keypair.generate()
         val nonceAuthority = payer.publicKey // Use payer as nonce authority
 
-        val NONCE_ACCOUNT_SIZE = 80L
+        val nonceAccountSize = 80L
 
-        val rentExemptLamports = connection.getMinimumBalanceForRentExemption(NONCE_ACCOUNT_SIZE.toInt())
+        val rentExemptLamports = connection.getMinimumBalanceForRentExemption(nonceAccountSize.toInt())
             ?: error("getMinimumBalanceForRentExemption returned null")
 
         val createAccountIx = createAccountInstruction(
             from = payer.publicKey,
             newAccount = nonceAccount.publicKey,
             lamports = rentExemptLamports.toLong(),
-            space = NONCE_ACCOUNT_SIZE,
+            space = nonceAccountSize,
             programId = SYSTEM_PROGRAM, // owner of nonce account is the system program
         )
 
@@ -629,7 +628,7 @@ internal class ConnectionTest {
 
         private enum class SystemInstruction(val index: Int) {
             CreateAccount(0),
-            InitializeNonceAccount(6)
+            InitializeNonceAccount(6),
         }
 
         /**
