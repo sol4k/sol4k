@@ -95,7 +95,7 @@ class Transaction(
                 .filter { acc -> acc.publicKey != this.feePayer }
                 .filter { acc -> acc.publicKey !in programIds }
                 .distinctBy { it.publicKey }
-                .sortedWith(compareBy({ it.signer }, { it.signer && !it.writable }, { !it.signer && !it.writable }))
+                .sortedWith(compareBy({ !it.signer }, { !it.writable }))
                 .toList()
         val programIdKeys =
             programIds

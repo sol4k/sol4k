@@ -2,15 +2,21 @@ package org.sol4k
 
 import org.junit.jupiter.api.Test
 import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
+import org.sol4k.api.AccountInfo
+import org.sol4k.api.Commitment
 import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
+import org.sol4k.instruction.BaseInstruction
 import org.sol4k.instruction.CreateAssociatedToken2022AccountInstruction
 import org.sol4k.instruction.CreateAssociatedTokenAccountInstruction
+import org.sol4k.instruction.Instruction
 import org.sol4k.instruction.SetComputeUnitLimitInstruction
 import org.sol4k.instruction.SetComputeUnitPriceInstruction
 import org.sol4k.instruction.SplTransferInstruction
 import org.sol4k.instruction.TransferInstruction
 import java.math.BigInteger
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -535,6 +541,76 @@ internal class ConnectionTest {
         }
     }
 
+    @Test
+    fun shouldCreateDurableNonceAccount() {
+        val connection = Connection(rpcUrl)
+        val blockhash = connection.getLatestBlockhash()
+
+        // Use fee payer key for funding (rent exempt + tx fee)
+        val payer = Keypair.fromSecretKey(Base58.decode(feePayerSecretKey))
+        val nonceAccount = Keypair.generate()
+        val nonceAuthority = payer.publicKey // Use payer as nonce authority
+
+        val nonceAccountSize = 80L
+
+        val rentExemptLamports = connection.getMinimumBalanceForRentExemption(nonceAccountSize.toInt())
+            ?: error("getMinimumBalanceForRentExemption returned null")
+
+        val createAccountIx = createAccountInstruction(
+            from = payer.publicKey,
+            newAccount = nonceAccount.publicKey,
+            lamports = rentExemptLamports.toLong(),
+            space = nonceAccountSize,
+            programId = SYSTEM_PROGRAM, // owner of nonce account is the system program
+        )
+
+        val initNonceIx = initializeNonceAccountInstruction(
+            nonceAccount = nonceAccount.publicKey,
+            nonceAuthority = nonceAuthority,
+        )
+
+        val instructions = listOf(createAccountIx, initNonceIx)
+
+        // Legacy Transaction with TWO signers (payer + nonceAccount)
+        val tx = Transaction(
+            recentBlockhash = blockhash,
+            instructions = instructions,
+            feePayer = payer.publicKey,
+        )
+        tx.sign(payer)
+        tx.sign(nonceAccount)
+
+        val sig = connection.sendTransaction(tx)
+        Logger.info("nonce account create tx: $sig")
+
+        awaitConfirmed(connection, payer.publicKey, sig)
+        val info = awaitAccountInfo(connection, nonceAccount.publicKey)
+
+        assertNotNull(info, "Nonce account was not created. tx=$sig nonce=${nonceAccount.publicKey}")
+    }
+
+    private fun awaitConfirmed(connection: Connection, address: PublicKey, signature: String) {
+        repeat(10) {
+            val sigs = connection.getSignaturesForAddress(
+                address = address,
+                limit = 10,
+                commitment = Commitment.CONFIRMED,
+            )
+            if (sigs.any { it.signature == signature }) return
+            Thread.sleep(1000)
+        }
+        error("Transaction did not reach CONFIRMED in time: $signature")
+    }
+
+    private fun awaitAccountInfo(connection: Connection, address: PublicKey): AccountInfo? {
+        repeat(30) {
+            val info = connection.getAccountInfo(address)
+            if (info != null) return info
+            Thread.sleep(1000)
+        }
+        return null
+    }
+
     private fun getFeePayerSecretKey(): String {
         val secretKey = System.getProperty("E2E_FEE_PAYER_SECRET_KEY")
         return if (secretKey.isNullOrEmpty()) {
@@ -542,6 +618,79 @@ internal class ConnectionTest {
             "3RYyJDTY5cuMoeUD9twHK5dswvScP9r2aps5rQpADfJNunMxUETcGAV1Aw4Qcib1zbnYAK9BJFjrCqgb9DtAKfNj"
         } else {
             secretKey
+        }
+    }
+
+    companion object {
+        private val SYSTEM_PROGRAM = PublicKey("11111111111111111111111111111111")
+        private val RENT_SYSVAR = PublicKey("SysvarRent111111111111111111111111111111111")
+        private val RECENT_BLOCKHASHES_SYSVAR = PublicKey("SysvarRecentB1ockHashes11111111111111111111")
+
+        private enum class SystemInstruction(val index: Int) {
+            CreateAccount(0),
+            InitializeNonceAccount(6),
+        }
+
+        /**
+         * SystemProgram::CreateAccount for a nonce account.
+         */
+        private fun createAccountInstruction(
+            from: PublicKey,
+            newAccount: PublicKey,
+            lamports: Long,
+            space: Long,
+            programId: PublicKey, // owner of the new account
+        ): Instruction {
+            // Layout: u32 (instruction enum index) + u64 lamports + u64 space + Pubkey owner (32 bytes)
+            val data = ByteBuffer.allocate(4 + 8 + 8 + 32).apply {
+                order(ByteOrder.LITTLE_ENDIAN)
+                putInt(SystemInstruction.CreateAccount.index)
+                putLong(lamports)
+                putLong(space)
+                put(Base58.decode(programId.toString()))
+            }.array()
+
+            val accounts = listOf(
+                // from: signer + writable (payer / source)
+                AccountMeta.signerAndWritable(from),
+                // newAccount: signer + writable (newly created account)
+                AccountMeta.signerAndWritable(newAccount),
+            )
+
+            return BaseInstruction(
+                data = data,
+                keys = accounts,
+                programId = SYSTEM_PROGRAM, // program we are calling
+            )
+        }
+
+        /**
+         * SystemProgram::InitializeNonceAccount
+         */
+        private fun initializeNonceAccountInstruction(
+            nonceAccount: PublicKey,
+            nonceAuthority: PublicKey,
+        ): Instruction {
+            val data = ByteBuffer.allocate(4 + 32).apply {
+                order(ByteOrder.LITTLE_ENDIAN)
+                putInt(SystemInstruction.InitializeNonceAccount.index) // 6
+                put(Base58.decode(nonceAuthority.toString())) // Pubkey param
+            }.array()
+
+            val accounts = listOf(
+                // Nonce account: writable
+                AccountMeta(nonceAccount, signer = false, writable = true),
+                // Recent blockhashes sysvar: read-only
+                AccountMeta(RECENT_BLOCKHASHES_SYSVAR, signer = false, writable = false),
+                // Rent sysvar: read-only
+                AccountMeta(RENT_SYSVAR, signer = false, writable = false),
+            )
+
+            return BaseInstruction(
+                data = data,
+                keys = accounts,
+                programId = SYSTEM_PROGRAM,
+            )
         }
     }
 }
