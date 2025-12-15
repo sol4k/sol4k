@@ -8,7 +8,7 @@ Sol4k는 Java 또는 다른 JVM 언어뿐만 아니라 Android에서도 사용�
 
 Gradle:
 ```groovy
-implementation 'org.sol4k:sol4k:0.6.0'
+implementation 'org.sol4k:sol4k:0.6.1'
 ```
 
 Maven:
@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>org.sol4k</groupId>
     <artifactId>sol4k</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
 </dependency>
 ```
 
