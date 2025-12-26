@@ -9,7 +9,7 @@ internal data class GetTokenApplyResponse(
 
 @Serializable
 data class TokenAmount(
-    val amount: Long,
+    val amount: String,
     val decimals: Int,
     val uiAmountString: String,
 )
