@@ -49,12 +49,21 @@ import java.util.Base64
 class Connection @JvmOverloads constructor(
     private val rpcUrl: String,
     private val commitment: Commitment = FINALIZED,
+    private val connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT_MS,
+    private val readTimeout: Int = DEFAULT_READ_TIMEOUT_MS,
 ) {
     @JvmOverloads
     constructor(
         rpcUrl: RpcUrl,
         commitment: Commitment = FINALIZED,
-    ) : this(rpcUrl.value, commitment)
+        connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT_MS,
+        readTimeout: Int = DEFAULT_READ_TIMEOUT_MS,
+    ) : this(rpcUrl.value, commitment, connectTimeout, readTimeout)
+
+    init {
+        require(connectTimeout >= 0) { "connectTimeout must not be negative" }
+        require(readTimeout >= 0) { "readTimeout must not be negative" }
+    }
 
     private val jsonParser = Json {
         ignoreUnknownKeys = true
@@ -318,6 +327,8 @@ class Connection @JvmOverloads constructor(
         val connection = URL(rpcUrl).openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json")
+        connection.connectTimeout = connectTimeout
+        connection.readTimeout = readTimeout
         connection.doOutput = true
         connection.outputStream.use {
             val body = Json.encodeToString(
@@ -338,5 +349,10 @@ class Connection @JvmOverloads constructor(
             val (error) = jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
             throw RpcException(error.code, error.message, responseBody)
         }
+    }
+
+    companion object {
+        const val DEFAULT_CONNECT_TIMEOUT_MS = 15_000
+        const val DEFAULT_READ_TIMEOUT_MS = 30_000
     }
 }

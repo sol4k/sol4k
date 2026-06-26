@@ -145,6 +145,19 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+Every RPC call is bounded by connect and read timeouts so a slow or unresponsive
+node cannot block the calling thread indefinitely. They default to 15s (connect)
+and 30s (read) and can be overridden, in milliseconds, when creating a connection.
+
+```kotlin
+val connection = Connection(
+    RpcUrl.DEVNET,
+    Commitment.FINALIZED,
+    connectTimeout = 15000,
+    readTimeout = 30000,
+)
+```
+
 Supported APIs:
 - `getAccountInfo`
 - `getBalance`
