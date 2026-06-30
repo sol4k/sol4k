@@ -1,5 +1,6 @@
 package org.sol4k
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.sol4k.Constants.TOKEN_2022_PROGRAM_ID
 import org.sol4k.api.AccountInfo
@@ -27,6 +28,12 @@ internal class ConnectionTest {
     private val rpcUrl = getRpcUrl()
     private val secretKey = getSecretKey()
     private val feePayerSecretKey = getFeePayerSecretKey()
+
+    // Space out tests to avoid HTTP 429 (rate limiting) from public RPC endpoints.
+    @BeforeEach
+    fun throttle() {
+        Thread.sleep(REQUEST_DELAY_MS)
+    }
 
     @Test
     fun shouldGetBalance() {
@@ -622,6 +629,8 @@ internal class ConnectionTest {
     }
 
     companion object {
+        private const val REQUEST_DELAY_MS = 1000L
+
         private val SYSTEM_PROGRAM = PublicKey("11111111111111111111111111111111")
         private val RENT_SYSVAR = PublicKey("SysvarRent111111111111111111111111111111111")
         private val RECENT_BLOCKHASHES_SYSVAR = PublicKey("SysvarRecentB1ockHashes11111111111111111111")
