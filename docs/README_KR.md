@@ -137,6 +137,19 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+모든 RPC 호출은 연결(connect) 및 읽기(read) 타임아웃으로 제한되므로, 느리거나
+응답하지 않는 노드가 호출 스레드를 무한정 차단할 수 없습니다. 기본값은 연결 15초,
+읽기 30초이며, 연결을 생성할 때 밀리초 단위로 재정의할 수 있습니다.
+
+```kotlin
+val connection = Connection(
+    RpcUrl.DEVNET,
+    Commitment.FINALIZED,
+    connectTimeout = 15000,
+    readTimeout = 30000,
+)
+```
+
 지원되는 API들:
 - `getAccountInfo`
 - `getBalance`

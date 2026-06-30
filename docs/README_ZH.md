@@ -146,6 +146,19 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+每个 RPC 调用都受连接（connect）和读取（read）超时的限制，因此缓慢或无响应的节点
+不会无限期地阻塞调用线程。它们默认为连接 15 秒、读取 30 秒，并且可以在创建连接时
+以毫秒为单位进行覆盖。
+
+```kotlin
+val connection = Connection(
+    RpcUrl.DEVNET,
+    Commitment.FINALIZED,
+    connectTimeout = 15000,
+    readTimeout = 30000,
+)
+```
+
 支持的 API:
 
 - `getAccountInfo`：获取账户信息，返回指定账户的详细数据，包括余额、状态等信息。
