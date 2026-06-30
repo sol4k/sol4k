@@ -39,22 +39,24 @@ import org.sol4k.rpc.SimulateTransactionResponse
 import org.sol4k.rpc.TokenAmount
 import org.sol4k.rpc.TokenBalanceResult
 import org.sol4k.rpc.VersionResult
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.sol4k.transport.HttpUrlConnectionTransport
+import org.sol4k.transport.RpcTransport
 import java.math.BigInteger
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.Base64
 
 class Connection @JvmOverloads constructor(
     private val rpcUrl: String,
     private val commitment: Commitment = FINALIZED,
+    private val transport: RpcTransport = HttpUrlConnectionTransport(),
+    private val headers: Map<String, String> = emptyMap(),
 ) {
     @JvmOverloads
     constructor(
         rpcUrl: RpcUrl,
         commitment: Commitment = FINALIZED,
-    ) : this(rpcUrl.value, commitment)
+        transport: RpcTransport = HttpUrlConnectionTransport(),
+        headers: Map<String, String> = emptyMap(),
+    ) : this(rpcUrl.value, commitment, transport, headers)
 
     private val jsonParser = Json {
         ignoreUnknownKeys = true
@@ -315,22 +317,12 @@ class Connection @JvmOverloads constructor(
     }
 
     private inline fun <reified T, reified I : Any> rpcCall(method: String, params: List<I>): T {
-        val connection = URL(rpcUrl).openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.doOutput = true
-        connection.outputStream.use {
-            val body = Json.encodeToString(
-                RpcRequest(method, params),
-            )
-            it.write(body.toByteArray())
-        }
-        val responseBody = connection.inputStream.use {
-            BufferedReader(InputStreamReader(it)).use { reader ->
-                reader.readText()
-            }
-        }
-        connection.disconnect()
+        val body = Json.encodeToString(
+            RpcRequest(method, params),
+        )
+
+        val responseBody = transport.post(rpcUrl, body, headers)
+
         try {
             val (result) = jsonParser.decodeFromString<RpcResponse<T>>(responseBody)
             return result
