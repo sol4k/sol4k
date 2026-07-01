@@ -7,6 +7,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Test
 import org.sol4k.api.Health
 import org.sol4k.exception.RpcException
+import org.sol4k.exception.RpcResponseParseException
 import org.sol4k.transport.RpcTransport
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -75,14 +76,14 @@ internal class ConnectionTransportTest {
     }
 
     @Test
-    fun shouldThrowRpcExceptionWhenResponseIsNotJsonRpc() {
+    fun shouldThrowParseExceptionWhenResponseIsNotJsonRpc() {
         val htmlBody = "<html><body>502 Bad Gateway</body></html>"
         val connection = Connection(
             "https://example.solana.rpc",
             transport = StubTransport(htmlBody),
         )
 
-        val exception = assertFailsWith<RpcException> {
+        val exception = assertFailsWith<RpcResponseParseException> {
             connection.getHealth()
         }
 

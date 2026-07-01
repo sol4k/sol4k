@@ -22,6 +22,7 @@ import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.api.Version
 import org.sol4k.exception.RpcException
+import org.sol4k.exception.RpcResponseParseException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
@@ -330,13 +331,9 @@ class Connection @JvmOverloads constructor(
             val (error) = try {
                 jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
             } catch (_: SerializationException) {
-                throw RpcException(UNPARSEABLE_RESPONSE_CODE, "Unable to parse the RPC node response", responseBody)
+                throw RpcResponseParseException(responseBody)
             }
             throw RpcException(error.code, error.message, responseBody)
         }
-    }
-
-    private companion object {
-        const val UNPARSEABLE_RESPONSE_CODE = -1
     }
 }
