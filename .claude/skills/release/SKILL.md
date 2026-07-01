@@ -1,6 +1,6 @@
 ---
 name: release
-description: Bump the sol4k library version everywhere and open a release PR. Use when the user wants to release/cut a new version (e.g. "release 0.8.0", "bump version to X"). Updates gradle.properties and all docs/README*.md dependency snippets, then creates a branch and PR.
+description: Bump the sol4k library version everywhere, open a release PR, and draft GitHub release notes. Use when the user wants to release/cut a new version (e.g. "release 0.8.0", "bump version to X"). Updates gradle.properties and all docs/README*.md dependency snippets, creates a branch and PR, and drafts release notes from the commits since the last version.
 ---
 
 # Release a new sol4k version
@@ -28,6 +28,30 @@ version with the new one in each:
 
 Do not touch test data, changelogs, or any other `0.x.y` occurrences — only the
 five files above carry the published version.
+
+## Release notes
+
+After the PR is opened, draft the GitHub release notes so the user can copy them
+when publishing the release (the release is created manually on GitHub, not by
+this skill). Releases are GitHub Releases whose tag is the bare version (e.g.
+`0.8.0`) with a title of `<version> - <short summary>` and a body of bullet
+points — match the style of past releases (`gh release view 0.8.0`).
+
+Build the notes from the commits between the previous version tag and the tip of
+`main` (exclude the version-bump commit itself):
+```shell
+git log <old-version>..origin/main --oneline
+```
+Turn each meaningful commit into a bullet, dropping the `(#NNN)` PR suffix and
+rewording terse commit subjects into user-facing changes. Pick a concise title
+summary from the most significant change (e.g. a Kotlin bump, a new API).
+
+Present the result as a ready-to-copy block, e.g.:
+```
+Title: 0.8.1 - Configurable RPC transport
+
+- Make the RPC transport configurable and add support for custom headers
+```
 
 ## Steps
 
@@ -60,3 +84,6 @@ five files above carry the published version.
      - `docs/README*.md`: Updated version strings in Gradle and Maven dependency examples (English, Japanese, Korean, Chinese variants)
      ```
    - End the body with the standard Claude Code attribution line.
+7. Draft the GitHub release notes (see **Release notes** above) from
+   `git log <old-version>..origin/main --oneline`, and present them to the user
+   as a ready-to-copy title + body block for when they publish the release.
