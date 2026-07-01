@@ -137,6 +137,21 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+기본적으로 RPC 호출은 15초의 연결 타임아웃과 30초의 읽기 타임아웃을 사용합니다.
+설정된 `HttpUrlConnectionTransport`를 연결에 전달하여 조정할 수 있습니다
+(값은 밀리초 단위이며 `0`은 타임아웃 없음을 의미합니다).
+
+```kotlin
+val transport = HttpUrlConnectionTransport(
+    connectTimeoutMillis = 5_000,
+    readTimeoutMillis = 10_000,
+)
+val connection = Connection(RpcUrl.DEVNET, transport = transport)
+```
+
+RPC 노드가 오류로 응답하면 sol4k는 오류 `code`, `message`, 그리고 노드가 반환한
+`rawResponse`를 노출하는 `RpcException`을 발생시킵니다.
+
 지원되는 API들:
 - `getAccountInfo`
 - `getBalance`

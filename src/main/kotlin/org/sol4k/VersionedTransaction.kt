@@ -35,9 +35,10 @@ class VersionedTransaction private constructor(
             val a = message.accounts[i]
             if (a.verify(signature, data)) {
                 signatures[i] = Base58.encode(signature)
-                break
+                return
             }
         }
+        throw IllegalArgumentException("Signature does not match any required signer of the transaction")
     }
 
     fun serialize(): ByteArray {

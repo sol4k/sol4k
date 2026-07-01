@@ -6,8 +6,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Test
 import org.sol4k.api.Health
+import org.sol4k.exception.RpcException
 import org.sol4k.transport.RpcTransport
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 internal class ConnectionTransportTest {
 
@@ -53,6 +55,46 @@ internal class ConnectionTransportTest {
         assertEquals(1, transport.callCount)
         assertEquals(RpcUrl.DEVNET.value, transport.url)
         assertEquals(headers, transport.headers)
+    }
+
+    @Test
+    fun shouldThrowRpcExceptionWhenNodeReturnsError() {
+        val errorBody = """{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}"""
+        val connection = Connection(
+            "https://example.solana.rpc",
+            transport = StubTransport(errorBody),
+        )
+
+        val exception = assertFailsWith<RpcException> {
+            connection.getHealth()
+        }
+
+        assertEquals(-32602, exception.code)
+        assertEquals("Invalid params", exception.message)
+        assertEquals(errorBody, exception.rawResponse)
+    }
+
+    @Test
+    fun shouldThrowRpcExceptionWhenResponseIsNotJsonRpc() {
+        val htmlBody = "<html><body>502 Bad Gateway</body></html>"
+        val connection = Connection(
+            "https://example.solana.rpc",
+            transport = StubTransport(htmlBody),
+        )
+
+        val exception = assertFailsWith<RpcException> {
+            connection.getHealth()
+        }
+
+        assertEquals(htmlBody, exception.rawResponse)
+    }
+
+    private class StubTransport(private val response: String) : RpcTransport {
+        override fun post(
+            url: String,
+            body: String,
+            headers: Map<String, String>,
+        ): String = response
     }
 
     private class CapturingTransport : RpcTransport {

@@ -327,8 +327,16 @@ class Connection @JvmOverloads constructor(
             val (result) = jsonParser.decodeFromString<RpcResponse<T>>(responseBody)
             return result
         } catch (_: SerializationException) {
-            val (error) = jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
+            val (error) = try {
+                jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
+            } catch (_: SerializationException) {
+                throw RpcException(UNPARSEABLE_RESPONSE_CODE, "Unable to parse the RPC node response", responseBody)
+            }
             throw RpcException(error.code, error.message, responseBody)
         }
+    }
+
+    private companion object {
+        const val UNPARSEABLE_RESPONSE_CODE = -1
     }
 }
