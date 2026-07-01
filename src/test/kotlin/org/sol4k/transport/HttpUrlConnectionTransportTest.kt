@@ -2,11 +2,13 @@ package org.sol4k.transport
 
 import com.sun.net.httpserver.HttpServer
 import org.junit.jupiter.api.Test
+import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.SocketTimeoutException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 internal class HttpUrlConnectionTransportTest {
 
@@ -49,6 +51,35 @@ internal class HttpUrlConnectionTransportTest {
             )
 
             assertEquals(errorBody, response)
+        } finally {
+            server.stop(0)
+        }
+    }
+
+    @Test
+    fun shouldReportHttpStatusWhenErrorBodyIsNotJson() {
+        val errorBody = "<html><body>502 Bad Gateway</body></html>"
+        val server = HttpServer.create(InetSocketAddress(0), 0)
+        server.createContext("/") { exchange ->
+            exchange.requestBody.use { it.readBytes() }
+            val bytes = errorBody.toByteArray()
+            exchange.sendResponseHeaders(502, bytes.size.toLong())
+            exchange.responseBody.use { it.write(bytes) }
+        }
+        server.start()
+        try {
+            val transport = HttpUrlConnectionTransport()
+
+            val exception = assertFailsWith<IOException> {
+                transport.post(
+                    "http://localhost:${server.address.port}/",
+                    """{"method":"getHealth"}""",
+                    emptyMap(),
+                )
+            }
+
+            assertTrue(exception.message!!.contains("502"))
+            assertTrue(exception.message!!.contains(errorBody))
         } finally {
             server.stop(0)
         }

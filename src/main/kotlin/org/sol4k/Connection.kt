@@ -330,8 +330,8 @@ class Connection @JvmOverloads constructor(
         } catch (_: SerializationException) {
             val (error) = try {
                 jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
-            } catch (_: SerializationException) {
-                throw RpcResponseParseException(responseBody)
+            } catch (e: SerializationException) {
+                throw RpcResponseParseException(responseBody, e)
             }
             throw RpcException(error.code, error.message, responseBody)
         }

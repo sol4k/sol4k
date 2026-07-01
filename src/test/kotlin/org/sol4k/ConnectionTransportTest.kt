@@ -11,6 +11,7 @@ import org.sol4k.exception.RpcResponseParseException
 import org.sol4k.transport.RpcTransport
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 internal class ConnectionTransportTest {
 
@@ -88,6 +89,7 @@ internal class ConnectionTransportTest {
         }
 
         assertEquals(htmlBody, exception.rawResponse)
+        assertNotNull(exception.cause)
     }
 
     private class StubTransport(private val response: String) : RpcTransport {
