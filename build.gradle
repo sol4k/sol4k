@@ -1,9 +1,9 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.4.0'
-    id 'org.jetbrains.dokka' version '2.1.0'
-    id 'com.vanniktech.maven.publish' version '0.35.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.0'
-    id 'org.jlleitschuh.gradle.ktlint' version '14.0.1'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.10'
+    id 'org.jetbrains.dokka' version '2.2.0'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.10'
+    id 'org.jlleitschuh.gradle.ktlint' version '14.2.0'
 }
 
 group = 'org.sol4k'
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0'
     implementation 'org.sol4k:tweetnacl:0.1.6'
     implementation 'org.sol4k:utilities:0.1.0'
 
