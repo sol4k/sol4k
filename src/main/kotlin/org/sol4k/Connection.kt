@@ -240,8 +240,8 @@ class Connection @JvmOverloads constructor(
         val (err, logs) = result.value
         if (err != null) {
             return when (err) {
-                is JsonPrimitive -> TransactionSimulationError(err.content)
-                else -> TransactionSimulationError(err.toString())
+                is JsonPrimitive -> TransactionSimulationError(err.content, logs)
+                else -> TransactionSimulationError(err.toString(), logs)
             }
         } else if (logs != null) {
             return TransactionSimulationSuccess(logs)
