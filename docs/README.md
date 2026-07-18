@@ -145,6 +145,21 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+By default, RPC calls use a connect timeout of 15 seconds and a read timeout of
+30 seconds. You can adjust them by passing a configured `HttpUrlConnectionTransport`
+to the connection (values are in milliseconds; `0` means no timeout).
+
+```kotlin
+val transport = HttpUrlConnectionTransport(
+    connectTimeoutMillis = 5_000,
+    readTimeoutMillis = 10_000,
+)
+val connection = Connection(RpcUrl.DEVNET, transport = transport)
+```
+
+If an RPC node responds with an error, sol4k throws an `RpcException` that
+exposes the error `code`, `message`, and the `rawResponse` returned by the node.
+
 Supported APIs:
 - `getAccountInfo`
 - `getBalance`

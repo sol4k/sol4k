@@ -146,6 +146,21 @@ val blockhash = connection.getLatestBlockhash()
 val finalizedBlockhash = connection.getLatestBlockhash(Commitment.FINALIZED)
 ```
 
+默认情况下，RPC 调用使用 15 秒的连接超时和 30 秒的读取超时。
+您可以通过向连接传入一个配置好的 `HttpUrlConnectionTransport` 来调整
+（值以毫秒为单位，`0` 表示不设超时）。
+
+```kotlin
+val transport = HttpUrlConnectionTransport(
+    connectTimeoutMillis = 5_000,
+    readTimeoutMillis = 10_000,
+)
+val connection = Connection(RpcUrl.DEVNET, transport = transport)
+```
+
+如果 RPC 节点返回错误，sol4k 会抛出 `RpcException`，
+其中包含错误的 `code`、`message` 以及节点返回的 `rawResponse`。
+
 支持的 API:
 
 - `getAccountInfo`：获取账户信息，返回指定账户的详细数据，包括余额、状态等信息。

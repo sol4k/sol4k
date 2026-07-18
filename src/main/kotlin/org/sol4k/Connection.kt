@@ -22,6 +22,7 @@ import org.sol4k.api.TransactionSimulationError
 import org.sol4k.api.TransactionSimulationSuccess
 import org.sol4k.api.Version
 import org.sol4k.exception.RpcException
+import org.sol4k.exception.RpcResponseParseException
 import org.sol4k.rpc.Balance
 import org.sol4k.rpc.BlockhashResponse
 import org.sol4k.rpc.EpochInfoResult
@@ -327,7 +328,11 @@ class Connection @JvmOverloads constructor(
             val (result) = jsonParser.decodeFromString<RpcResponse<T>>(responseBody)
             return result
         } catch (_: SerializationException) {
-            val (error) = jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
+            val (error) = try {
+                jsonParser.decodeFromString<RpcErrorResponse>(responseBody)
+            } catch (e: SerializationException) {
+                throw RpcResponseParseException(responseBody, e)
+            }
             throw RpcException(error.code, error.message, responseBody)
         }
     }
