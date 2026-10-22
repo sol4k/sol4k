@@ -1,0 +1,73 @@
+<style>
+.ata-widget{border:1px solid #e8e8e8;border-radius:3px;padding:12px 15px;margin:-5px 0 15px;font-size:15px}
+.ata-widget .ata-title{font-size:16px;margin:0 0 10px}
+.ata-widget form{margin:0}
+.ata-widget label,.ata-widget legend{display:block;padding:0;font-size:14px;color:#828282;margin-bottom:2px}
+.ata-widget .ata-field{margin-bottom:10px}
+.ata-widget .ata-row{display:flex;gap:6px}
+.ata-widget input[type=text]{flex:1;min-width:0;width:100%;box-sizing:border-box;font:14px/1.4 Menlo,Consolas,monospace;color:#111;background:#fff;border:1px solid #e8e8e8;border-radius:3px;padding:5px 8px}
+.ata-widget input[type=text]:focus{outline:none;border-color:#2a7ae2}
+.ata-widget input[aria-invalid=true]{border-color:#d14;background:#fdf6f6}
+.ata-widget button{font:inherit;font-size:14px;color:#2a7ae2;background:#fdfdfd;border:1px solid #e8e8e8;border-radius:3px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+.ata-widget button:hover{border-color:#2a7ae2}
+.ata-widget fieldset{border:0;padding:0;margin:0 0 10px}
+.ata-widget .ata-toggle{display:inline-flex;border:1px solid #e8e8e8;border-radius:3px;overflow:hidden}
+.ata-widget .ata-toggle label{margin:0;font-size:14px;color:#111;padding:4px 12px;cursor:pointer}
+.ata-widget .ata-toggle label+label{border-left:1px solid #e8e8e8}
+.ata-widget .ata-toggle input{position:absolute;opacity:0;pointer-events:none}
+.ata-widget .ata-toggle label:has(input:checked){background:#eef;color:#111}
+.ata-widget .ata-toggle label:has(input:focus-visible){outline:2px solid #2a7ae2;outline-offset:-2px}
+.ata-widget .ata-note{font-size:14px;color:#828282;margin:4px 0 0}
+.ata-widget dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;padding:10px 0 0;border-top:1px solid #e8e8e8}
+.ata-widget dt{font-size:14px;color:#828282}
+.ata-widget dd{margin:0;min-width:0}
+.ata-widget dd code{font-size:14px;padding:0 4px}
+.ata-widget .ata-sub{font-size:13px;color:#828282}
+.ata-widget .ata-address{font:15px/1.4 Menlo,Consolas,monospace;word-break:break-all;color:#111}
+.ata-widget .ata-muted{color:#828282;font-family:inherit}
+.ata-widget .highlighter-rouge{margin-bottom:10px}
+.ata-widget .ata-credit{font-size:13px;color:#828282;margin:0}
+</style>
+<template id="ata-widget-template">
+<section class="ata-widget" aria-labelledby="ata-widget-title">
+  <p class="ata-title" id="ata-widget-title">Try it: how the associated token account address is derived</p>
+  <form autocomplete="off">
+    <div class="ata-field">
+      <label for="ata-holder">holderAddress (wallet)</label>
+      <div class="ata-row">
+        <input type="text" id="ata-holder" name="holder" spellcheck="false" value="DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx">
+        <button type="button" data-action="random">Random wallet</button>
+      </div>
+    </div>
+    <div class="ata-field">
+      <label for="ata-mint">tokenMintAddress (USDC by default)</label>
+      <input type="text" id="ata-mint" name="mint" spellcheck="false" value="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v">
+    </div>
+    <fieldset>
+      <legend>Token program that owns the mint</legend>
+      <div class="ata-toggle">
+        <label><input type="radio" name="program" value="token" checked>Token</label>
+        <label><input type="radio" name="program" value="2022">Token-2022</label>
+      </div>
+      <p class="ata-note" data-out="program-note" hidden>sol4k defaults to the classic Token program. For Token-2022 mints pass <code>Constants.TOKEN_2022_PROGRAM_ID</code>: the program ID is one of the seeds, so the same wallet and mint give a different address.</p>
+    </fieldset>
+  </form>
+  <dl aria-live="polite">
+    <dt>seeds</dt>
+    <dd>
+      <code data-out="seed-holder"></code> <span class="ata-sub">holder</span> ·
+      <code data-out="seed-program"></code> <span class="ata-sub" data-out="seed-program-name"></span> ·
+      <code data-out="seed-mint"></code> <span class="ata-sub">mint</span>
+    </dd>
+    <dt>program</dt>
+    <dd><code title="ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">ATok…knL</code> <span class="ata-sub">Associated Token Account program</span></dd>
+    <dt>nonce</dt>
+    <dd><span data-out="bump"></span> <span class="ata-sub">first bump from 255 down whose SHA-256 is off the Ed25519 curve</span></dd>
+    <dt>address</dt>
+    <dd class="ata-address" data-out="address"></dd>
+  </dl>
+  <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code data-out="kotlin"></code></pre></div></div>
+  <p class="ata-credit">Computed in your browser, nothing is sent anywhere. Interactive example based on a <a href="https://plgrnd.io">PLGRND</a> flow.</p>
+</section>
+</template>
+<script src="{{ '/assets/ata-widget.js' | relative_url }}" defer></script>

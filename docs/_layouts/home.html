@@ -5,3 +5,4 @@ layout: default
 <div class="home">
     {{ content }}
 </div>
+{% if page.url == "/" %}{% include ata-widget.html %}{% endif %}
