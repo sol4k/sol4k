@@ -69,6 +69,12 @@ SPLトークンの関連トークンアカウントアドレスを取得。
 val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
+Token-2022のミントの場合は、Token-2022のプログラムIDを渡します。
+
+```kotlin
+val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress, Constants.TOKEN_2022_PROGRAM_ID)
+```
+
 公開鍵を文字列に変換。
 
 ```kotlin
@@ -231,7 +237,7 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     mint = usdcMintAddress,
 )
 val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
-val transaction = Transaction(message)
+val transaction = VersionedTransaction(message)
 transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```
