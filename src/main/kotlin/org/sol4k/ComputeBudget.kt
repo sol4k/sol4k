@@ -26,12 +26,14 @@ internal fun computeBudget(data: List<ByteArray>): BigDecimal {
                     .order(ByteOrder.LITTLE_ENDIAN)
                 unitLimit = buffer.asIntBuffer().get()
             }
+
             INSTRUCTION_SET_COMPUTE_UNIT_PRICE -> {
                 // micro-lamports
                 val buffer = ByteBuffer.wrap(d.take(8).toByteArray())
                     .order(ByteOrder.LITTLE_ENDIAN)
                 unitPrice = buffer.asLongBuffer().get()
             }
+
             else -> {
                 return BigDecimal.ZERO
             }
