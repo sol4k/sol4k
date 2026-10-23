@@ -285,7 +285,7 @@ val signature = connection.sendTransaction(transaction)
 
 ```shell
 export E2E_RPC_URL="https://api.devnet.solana.com"
-export E2E_SECRET_KEY="base-58-encode-secret-key..."
+export E2E_SECRET_KEY="base-58-encoded-secret-key..."
 ```
 
 执行测试：

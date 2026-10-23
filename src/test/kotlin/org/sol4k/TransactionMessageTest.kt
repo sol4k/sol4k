@@ -48,7 +48,7 @@ class TransactionMessageTest {
         val expectedMessage = TransactionMessage(
             version = V0,
             header = MessageHeader(
-                numRequireSignatures = 2,
+                numRequiredSignatures = 2,
                 numReadonlySignedAccounts = 0,
                 numReadonlyUnsignedAccounts = 1,
             ),
@@ -211,7 +211,7 @@ class TransactionMessageTest {
     private fun feePayerPublicKey() = PublicKey("EvN4kgKmCmYzdbd5kL8Q8YgkUW5RoqMTpBczrfLExtx7")
 
     private fun header() = MessageHeader(
-        numRequireSignatures = 1,
+        numRequiredSignatures = 1,
         numReadonlySignedAccounts = 0,
         numReadonlyUnsignedAccounts = 1,
     )

@@ -28,7 +28,7 @@ import org.sol4k.rpc.EpochInfoResult
 import org.sol4k.rpc.FeeForMessageResponse
 import org.sol4k.rpc.GetAccountInfoResponse
 import org.sol4k.rpc.GetMultipleAccountsResponse
-import org.sol4k.rpc.GetTokenApplyResponse
+import org.sol4k.rpc.GetTokenSupplyResponse
 import org.sol4k.rpc.Identity
 import org.sol4k.rpc.PrioritizationFeeResult
 import org.sol4k.rpc.RpcErrorResponse
@@ -200,7 +200,7 @@ class Connection @JvmOverloads constructor(
         listOf(Json.encodeToJsonElement(space)),
     )
 
-    fun getTokenSupply(tokenPubkey: String): TokenAmount = rpcCall<GetTokenApplyResponse, JsonElement>(
+    fun getTokenSupply(tokenPubkey: String): TokenAmount = rpcCall<GetTokenSupplyResponse, JsonElement>(
         "getTokenSupply",
         listOf(Json.encodeToJsonElement(tokenPubkey)),
     ).value

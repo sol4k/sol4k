@@ -27,7 +27,7 @@ data class TransactionMessage internal constructor(
                 b.write(ByteArray(1) { 128.toByte() })
             }
 
-            b.write(header.numRequireSignatures)
+            b.write(header.numRequiredSignatures)
             b.write(header.numReadonlySignedAccounts)
             b.write(header.numReadonlyUnsignedAccounts)
             b.write(Binary.encodeLength(accounts.size))
@@ -154,7 +154,7 @@ data class TransactionMessage internal constructor(
             return TransactionMessage(
                 version = version,
                 header = MessageHeader(
-                    numRequireSignatures = numRequiredSignatures,
+                    numRequiredSignatures = numRequiredSignatures,
                     numReadonlySignedAccounts = numReadonlySignedAccounts,
                     numReadonlyUnsignedAccounts = numReadonlyUnsignedAccounts,
                 ),
@@ -305,7 +305,7 @@ data class TransactionMessage internal constructor(
             return TransactionMessage(
                 version = MessageVersion.V0,
                 header = MessageHeader(
-                    numRequireSignatures = writableSignedAccount.size + readOnlySignedAccount.size,
+                    numRequiredSignatures = writableSignedAccount.size + readOnlySignedAccount.size,
                     numReadonlySignedAccounts = readOnlySignedAccount.size,
                     numReadonlyUnsignedAccounts = readOnlyUnsignedAccount.size,
                 ),
@@ -356,7 +356,7 @@ data class TransactionMessage internal constructor(
 }
 
 internal data class MessageHeader(
-    val numRequireSignatures: Int,
+    val numRequiredSignatures: Int,
     val numReadonlySignedAccounts: Int,
     val numReadonlyUnsignedAccounts: Int,
 )
