@@ -15,7 +15,7 @@ class VersionedTransaction private constructor(
 
     constructor(
         message: TransactionMessage,
-    ) : this(message, MutableList(message.header.numRequireSignatures) { null })
+    ) : this(message, MutableList(message.header.numRequiredSignatures) { null })
 
     fun sign(keypair: Keypair) {
         val data = message.serialize()
@@ -31,7 +31,7 @@ class VersionedTransaction private constructor(
     private fun addSignature(signature: ByteArray, serializedMessage: ByteArray? = null) {
         val data = serializedMessage ?: message.serialize()
 
-        for (i in 0 until message.header.numRequireSignatures) {
+        for (i in 0 until message.header.numRequiredSignatures) {
             val a = message.accounts[i]
             if (a.verify(signature, data)) {
                 signatures[i] = Base58.encode(signature)
@@ -41,7 +41,7 @@ class VersionedTransaction private constructor(
     }
 
     fun serialize(): ByteArray {
-        if (signatures.isEmpty() || signatures.filterNotNull().size != message.header.numRequireSignatures) {
+        if (signatures.isEmpty() || signatures.filterNotNull().size != message.header.numRequiredSignatures) {
             throw SerializationException("Signature verification failed")
         }
 
@@ -83,8 +83,8 @@ class VersionedTransaction private constructor(
 
             val message = TransactionMessage.deserialize(byteArray)
 
-            if (signaturesDecodedLength.length > 0 && message.header.numRequireSignatures != signaturesDecodedLength.length) {
-                throw SerializationException("numRequireSignatures is not equal to signatureCount")
+            if (signaturesDecodedLength.length > 0 && message.header.numRequiredSignatures != signaturesDecodedLength.length) {
+                throw SerializationException("numRequiredSignatures is not equal to signatureCount")
             }
             return VersionedTransaction(message, signatures.toMutableList())
         }
