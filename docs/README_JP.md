@@ -257,7 +257,7 @@ sol4kをローカルでビルドして実行するには、次の手順を実行
 
 ```shell
 export E2E_RPC_URL="https://api.devnet.solana.com"
-export E2E_SECRET_KEY="base-58-encode-secret-key..."
+export E2E_SECRET_KEY="base-58-encoded-secret-key..."
 ```
 
 テストを実行します:

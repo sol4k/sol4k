@@ -62,7 +62,7 @@ class VersionedTransactionTest {
         st = Base64.getEncoder().encodeToString(tx.serialize())
         assertEquals(t, st)
 
-        // tesSolTransfer result
+        // testSolTransfer result
         t = "ARVew6hYoHo5kaSjjZoEOMEGLzRQpLW8JJkxuowUlyUxh14/6/N9+UfAEd7emdBPu/DRN1S8lLnuBb6snp1ooA0BAAEDqOPlXkyTIzkq9/wJeq73vTcF66CM2+M+bT2itX2eHXx5cm2lLZnWCwfq1zsvbwv2CDzIXHepTjTWkdePi8r+yQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXFUebKYgYvgYhDu1MxWJbVizM8Bod2OkxO9ubs/ESZcBAgIAAQwCAAAAZAAAAAAAAAA="
         tx = VersionedTransaction.from(t)
         st = Base64.getEncoder().encodeToString(tx.serialize())
