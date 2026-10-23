@@ -76,6 +76,12 @@ Obtaining an associated token account address for an SPL token.
 val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
+For a Token-2022 mint, pass the Token-2022 program ID.
+
+```kotlin
+val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress, Constants.TOKEN_2022_PROGRAM_ID)
+```
+
 Converting a public key to a string.
 
 ```kotlin
@@ -251,7 +257,7 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     mint = usdcMintAddress,
 )
 val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
-val transaction = Transaction(message)
+val transaction = VersionedTransaction(message)
 transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```

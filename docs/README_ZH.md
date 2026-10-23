@@ -74,6 +74,12 @@ val publicKey = PublicKey(publicKeyByteArray)
 val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress)
 ```
 
+对于Token-2022的铸币，需要传入Token-2022的程序ID。
+
+```kotlin
+val programDerivedAddress = PublicKey.findProgramDerivedAddress(holderAddress, tokenMintAddress, Constants.TOKEN_2022_PROGRAM_ID)
+```
+
 将公钥转换为字符串。
 
 ```kotlin
@@ -252,7 +258,7 @@ val instruction = CreateAssociatedTokenAccountInstruction(
     mint = usdcMintAddress,
 )
 val message = TransactionMessage.newMessage(payerWallet.publicKey, blockhash, instruction)
-val transaction = Transaction(message)
+val transaction = VersionedTransaction(message)
 transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```
