@@ -103,6 +103,7 @@ mavenPublishing {
 }
 
 ktlint {
+    version = '1.8.0'
     additionalEditorconfig = [
             'ktlint_code_style': 'intellij_idea'
     ]
