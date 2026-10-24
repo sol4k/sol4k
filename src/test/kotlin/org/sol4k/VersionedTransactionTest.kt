@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.util.Base64
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class VersionedTransactionTest {
@@ -129,5 +130,34 @@ class VersionedTransactionTest {
         transaction2.sign(signer2)
 
         assertTrue(transaction1.serialize().contentEquals(transaction2.serialize()))
+    }
+
+    @Test
+    fun shouldRejectSignatureThatDoesNotMatchAnySigner() {
+        val signer = Keypair.generate()
+        val nonSigner = Keypair.generate()
+        val blockhash = "GYQReb5N3KWsM7x7aboAGTb6kQSxDGRZ1S42N6RTNkgS"
+        val instruction = BaseInstruction(
+            ByteBuffer.allocate(8).array(),
+            listOf(AccountMeta.writable(Keypair.generate().publicKey)),
+            Keypair.generate().publicKey,
+        )
+        val message = TransactionMessage.newMessage(signer.publicKey, blockhash, instruction)
+        val transaction = VersionedTransaction(message)
+
+        // a keypair that is not a required signer of the transaction
+        assertFailsWith<IllegalArgumentException> {
+            transaction.sign(nonSigner)
+        }
+
+        // a signature produced over different data
+        val signatureOfWrongData = Base58.encode(signer.sign("unrelated data".toByteArray()))
+        assertFailsWith<IllegalArgumentException> {
+            transaction.addSignature(signatureOfWrongData)
+        }
+
+        // a valid signature is still accepted
+        transaction.sign(signer)
+        assertEquals(1, transaction.signatures.filterNotNull().size)
     }
 }
