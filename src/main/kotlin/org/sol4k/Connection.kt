@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import org.sol4k.api.AccountInfo
 import org.sol4k.api.Blockhash
@@ -15,6 +16,7 @@ import org.sol4k.api.EpochInfo
 import org.sol4k.api.Health
 import org.sol4k.api.IsBlockhashValidResult
 import org.sol4k.api.PrioritizationFee
+import org.sol4k.api.SendTransactionParams
 import org.sol4k.api.TokenAccountBalance
 import org.sol4k.api.TransactionSignature
 import org.sol4k.api.TransactionSimulation
@@ -213,20 +215,30 @@ class Connection @JvmOverloads constructor(
         ),
     )
 
-    fun sendTransaction(transactionBytes: ByteArray): String {
+    fun sendTransaction(transactionBytes: ByteArray, params: SendTransactionParams): String {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
+        val options = buildJsonObject {
+            put("encoding", "base64")
+            Json.encodeToJsonElement(params).jsonObject.forEach { (key, value) -> put(key, value) }
+        }
         return rpcCall(
             "sendTransaction",
             listOf(
                 Json.encodeToJsonElement(encodedTransaction),
-                Json.encodeToJsonElement(mapOf("encoding" to "base64")),
+                options,
             ),
         )
     }
 
+    fun sendTransaction(transactionBytes: ByteArray): String = sendTransaction(transactionBytes, SendTransactionParams())
+
     fun sendTransaction(transaction: Transaction): String = sendTransaction(transaction.serialize())
 
+    fun sendTransaction(transaction: Transaction, params: SendTransactionParams): String = sendTransaction(transaction.serialize(), params)
+
     fun sendTransaction(transaction: VersionedTransaction): String = sendTransaction(transaction.serialize())
+
+    fun sendTransaction(transaction: VersionedTransaction, params: SendTransactionParams): String = sendTransaction(transaction.serialize(), params)
 
     fun simulateTransaction(transactionBytes: ByteArray): TransactionSimulation {
         val encodedTransaction = Base64.getEncoder().encodeToString(transactionBytes)
