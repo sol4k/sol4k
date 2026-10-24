@@ -12,7 +12,7 @@ as `org.sol4k:sol4k`.
 
 ## Commands
 
-Build the library:
+Build all modules (compile, unit tests, ktlint and the public API check):
 ```shell
 ./gradlew build
 ```
@@ -22,10 +22,12 @@ Run unit tests:
 ./gradlew test
 ```
 
-Run a single unit test class / method:
+Run a single unit test class / method. Prefix the task with the module: the
+root-level `./gradlew test --tests ...` fails in every module that has no
+matching test.
 ```shell
-./gradlew test --tests "org.sol4k.TransactionTest"
-./gradlew test --tests "org.sol4k.TransactionTest.someMethod"
+./gradlew :sol4k:test --tests "org.sol4k.TransactionTest"
+./gradlew :sol4k:test --tests "org.sol4k.TransactionTest.someMethod"
 ```
 
 Lint (ktlint, code style = IntelliJ IDEA). The lint job is enforced in CI:
@@ -34,18 +36,27 @@ Lint (ktlint, code style = IntelliJ IDEA). The lint job is enforced in CI:
 ./gradlew ktlintFormat    # auto-fix
 ```
 
-Install to the local Maven repo (for importing into other projects; bump
-`currentVersion` in `gradle.properties` first):
+Public API check: `./gradlew build` runs `checkKotlinAbi`, which compares each
+library module's public API with the dump committed in
+`<module>/api/<module>.api`. After an intended public API change, regenerate
+the dump and commit it (never edit `.api` files by hand):
+```shell
+./gradlew :sol4k:updateKotlinAbi
+```
+
+Install every module (`sol4k` and `sol4k-bom`) to the local Maven repo (for
+importing into other projects; bump `currentVersion` in `gradle.properties`
+first):
 ```shell
 ./gradlew publishToMavenLocal
 ```
 
 ### Integration / end-to-end tests
 
-`integrationTest` is a separate source set under `src/integration-test/kotlin`
-that hits a real Solana cluster (Devnet by default). It is configured via two
-environment variables; without them it falls back to a hardcoded shared Devnet
-key in the source.
+`integrationTest` is a separate source set under
+`sol4k/src/integration-test/kotlin` that hits a real Solana cluster (Devnet by
+default). It is configured via two environment variables; without them it
+falls back to a hardcoded shared Devnet key in the source.
 ```shell
 export E2E_RPC_URL="https://api.devnet.solana.com"
 export E2E_SECRET_KEY="base-58-encoded-secret-key..."
@@ -56,12 +67,28 @@ The test account needs Devnet SOL and Devnet USDC.
 ## Toolchain note
 
 The library targets JVM 1.8 (`jvmToolchain(8)`), so a JDK 8 must be installed
-(but not the default). The Gradle build itself should run on JDK 11+. On macOS,
+(but not the default). The Gradle build itself runs on JDK 17+. On macOS,
 `/usr/libexec/java_home -V` lists installed JDKs.
 
 ## Architecture
 
-The public API lives in `org.sol4k` (`src/main/kotlin/org/sol4k`). Three layers:
+The repository is a multi-module Gradle build (Kotlin DSL). All modules share
+one version and are released together:
+
+- `sol4k/` — the `org.sol4k:sol4k` library described below.
+- `sol4k-bom/` — `org.sol4k:sol4k-bom`, a Java platform (BOM) with version
+  constraints for every published sol4k module. Each library module depends on
+  it, so Gradle keeps all sol4k artifacts on the same version.
+- `build-logic/` — an included build with the convention plugins that hold the
+  shared configuration: `sol4k.kotlin-library` (JVM 1.8 toolchain, ABI
+  validation, ktlint, `Automatic-Module-Name`), `sol4k.publishing` (Maven
+  Central coordinates, POM, signing) and `sol4k.integration-test`. Apply
+  third-party plugins in these convention plugins, not in module build files.
+- `gradle/libs.versions.toml` — the version catalog with every dependency and
+  plugin version, shared by the main build and `build-logic`.
+
+The public API of `sol4k` lives in `org.sol4k`
+(`sol4k/src/main/kotlin/org/sol4k`). Three layers:
 
 - **Network layer — `Connection`** is the single entry point for all RPC calls.
   Each public method (e.g. `getBalance`, `getLatestBlockhash`, `sendTransaction`,
@@ -107,4 +134,4 @@ The public API lives in `org.sol4k` (`src/main/kotlin/org/sol4k`). Three layers:
 - The README that ships with the project is `docs/README.md` (the GitHub Pages
   site source), not a root `README.md`. Update it when the public API changes;
   translated copies (`docs/README_*.md`) also exist.
-- `currentVersion` is defined in `gradle.properties`.
+- `currentVersion` in `gradle.properties` is the version of every module.
