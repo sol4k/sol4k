@@ -1,0 +1,19 @@
+[versions]
+kotlin = "2.4.21"
+kotlinx-serialization = "1.12.0"
+dokka = "2.2.0"
+maven-publish = "0.37.0"
+ktlint-gradle = "14.2.0"
+ktlint = "1.8.0"
+
+[libraries]
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+sol4k-tweetnacl = { module = "org.sol4k:tweetnacl", version = "0.1.6" }
+sol4k-utilities = { module = "org.sol4k:utilities", version = "0.1.0" }
+
+# Gradle plugins, consumed by build-logic as regular dependencies
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-serialization-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+maven-publish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
+ktlint-gradle-plugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint-gradle" }
