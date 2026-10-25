@@ -65,6 +65,7 @@ task integrationTest(type: Test) {
     mustRunAfter tasks.test
     systemProperty "E2E_RPC_URL", System.env.E2E_RPC_URL
     systemProperty "E2E_SECRET_KEY", System.env.E2E_SECRET_KEY
+    systemProperty "E2E_FEE_PAYER_SECRET_KEY", System.env.E2E_FEE_PAYER_SECRET_KEY
 }
 
 mavenPublishing {
