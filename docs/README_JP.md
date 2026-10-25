@@ -242,7 +242,7 @@ transaction.sign(payerWallet)
 val signature = connection.sendTransaction(transaction)
 ```
 
-[プロジェクトテスト](https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)でさらに多くの例を見つけることができます。
+[プロジェクトテスト](https://github.com/sol4k/sol4k/blob/main/sol4k/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt)でさらに多くの例を見つけることができます。
 
 ## 開発環境の設定
 

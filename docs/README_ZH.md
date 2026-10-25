@@ -264,7 +264,7 @@ val signature = connection.sendTransaction(transaction)
 ```
 
 你可以在[项目的测试中]找到更多示例。
-(https://github.com/sol4k/sol4k/blob/main/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt).
+(https://github.com/sol4k/sol4k/blob/main/sol4k/src/integration-test/kotlin/org/sol4k/ConnectionTest.kt).
 
 ## 开发环境设置
 
