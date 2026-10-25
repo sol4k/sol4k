@@ -43,12 +43,16 @@ Install to the local Maven repo (for importing into other projects; bump
 ### Integration / end-to-end tests
 
 `integrationTest` is a separate source set under `src/integration-test/kotlin`
-that hits a real Solana cluster (Devnet by default). It is configured via two
-environment variables; without them it falls back to a hardcoded shared Devnet
-key in the source.
+that hits a real Solana cluster (Devnet by default). It is configured via
+environment variables; without them it falls back to hardcoded shared Devnet
+keys in the source. `E2E_FEE_PAYER_SECRET_KEY` is the separate fee payer used by
+the non-participating fee payer test. Each variable must also be forwarded as a
+system property by the `integrationTest` task in `build.gradle` and set in
+`.github/workflows/integration-test.yml`.
 ```shell
 export E2E_RPC_URL="https://api.devnet.solana.com"
 export E2E_SECRET_KEY="base-58-encoded-secret-key..."
+export E2E_FEE_PAYER_SECRET_KEY="base-58-encoded-secret-key..."
 ./gradlew integrationTest
 ```
 The test account needs Devnet SOL and Devnet USDC.

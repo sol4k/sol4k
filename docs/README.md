@@ -277,11 +277,13 @@ Adjust `currentVersion` in `gradle.properties` to be sure you are importing the 
 you have built.
 
 In order to run end-to-end tests, you need to set two environment variables: an RPC URL and a Base-58 encoded
-secret key of an account that you would be using for testing.
+secret key of an account that you would be using for testing. Optionally, you can also set a Base-58 encoded
+secret key of a separate fee payer account, used by the test that sends a transaction with a non-participating fee payer.
 
 ```shell
 export E2E_RPC_URL="https://api.devnet.solana.com"
 export E2E_SECRET_KEY="base-58-encoded-secret-key..."
+export E2E_FEE_PAYER_SECRET_KEY="base-58-encoded-secret-key..." # optional
 ```
 
 Execute the tests:

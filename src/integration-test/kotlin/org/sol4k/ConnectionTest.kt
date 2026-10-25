@@ -132,6 +132,7 @@ internal class ConnectionTest {
         val sender = Keypair.fromSecretKey(Base58.decode(secretKey))
         val receiver = PublicKey("DxPv2QMA5cWR5Xfg7tXr5YtJ1EEStg5Kiag9HhkY1mSx")
         val instruction = TransferInstruction(sender.publicKey, receiver, 1000)
+        Logger.info("fee payer: ${feePayer.publicKey}, sender: ${sender.publicKey}")
 
         val message = TransactionMessage.newMessage(
             feePayer = feePayer.publicKey,

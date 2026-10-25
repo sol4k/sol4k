@@ -19,4 +19,5 @@ jobs:
         env:
           E2E_RPC_URL: ${{ secrets.E2E_RPC_URL }}
           E2E_SECRET_KEY: ${{ secrets.E2E_SECRET_KEY }}
+          E2E_FEE_PAYER_SECRET_KEY: ${{ secrets.E2E_FEE_PAYER_SECRET_KEY }}
         run: ./gradlew integrationTest
