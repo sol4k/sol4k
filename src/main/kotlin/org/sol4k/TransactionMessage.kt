@@ -1,9 +1,12 @@
 package org.sol4k
 
 import org.sol4k.Constants.PUBLIC_KEY_LENGTH
+import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.CompiledInstruction
 import org.sol4k.instruction.Instruction
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 data class TransactionMessage internal constructor(
     internal val version: MessageVersion,
@@ -12,16 +15,21 @@ data class TransactionMessage internal constructor(
     internal val recentBlockhash: String,
     internal val instructions: List<CompiledInstruction>,
     internal val addressLookupTables: List<CompiledAddressLookupTable>,
+    internal val config: TransactionConfig = TransactionConfig(),
 ) {
 
     internal enum class MessageVersion {
         Legacy,
         V0,
+        V1,
     }
 
-    fun withNewBlockhash(blockhash: String): TransactionMessage = TransactionMessage(version, header, accounts, blockhash, instructions, addressLookupTables)
+    fun withNewBlockhash(blockhash: String): TransactionMessage = TransactionMessage(version, header, accounts, blockhash, instructions, addressLookupTables, config)
 
     fun serialize(): ByteArray {
+        if (version == MessageVersion.V1) {
+            return serializeV1()
+        }
         ByteArrayOutputStream().use { b ->
             if (version == MessageVersion.V0) {
                 b.write(ByteArray(1) { 128.toByte() })
@@ -68,10 +76,48 @@ data class TransactionMessage internal constructor(
         }
     }
 
+    // SIMD-0385: header, config mask, lifetime specifier, u8 counts, keys,
+    // config values, fixed-size instruction headers, then instruction payloads.
+    private fun serializeV1(): ByteArray {
+        ByteArrayOutputStream().use { b ->
+            b.write(V1_PREFIX)
+            b.write(header.numRequiredSignatures)
+            b.write(header.numReadonlySignedAccounts)
+            b.write(header.numReadonlyUnsignedAccounts)
+            b.write(Binary.uint32(config.mask().toLong()))
+            b.write(Base58.decode(recentBlockhash))
+            b.write(instructions.size)
+            b.write(accounts.size)
+            for (a in accounts) {
+                b.write(a.bytes())
+            }
+            config.priorityFee?.let { b.write(Binary.int64(it)) }
+            config.computeUnitLimit?.let { b.write(Binary.uint32(it.toLong())) }
+            config.loadedAccountsDataSizeLimit?.let { b.write(Binary.uint32(it.toLong())) }
+            config.heapSize?.let { b.write(Binary.uint32(it.toLong())) }
+            for (i in instructions) {
+                b.write(i.programIdIndex)
+                b.write(i.accounts.size)
+                b.write(Binary.uint16(i.data.size))
+            }
+            for (i in instructions) {
+                for (a in i.accounts) {
+                    b.write(a)
+                }
+                b.write(i.data)
+            }
+            return b.toByteArray()
+        }
+    }
+
     companion object {
+        internal const val V1_PREFIX = 0x81
 
         @JvmStatic
         fun deserialize(d: ByteArray): TransactionMessage {
+            if ((d.first().toInt() and 0xFF) == V1_PREFIX) {
+                return deserializeV1(ByteBuffer.wrap(d))
+            }
             var data = d
             val v = data.first().toInt() and 0xFF
             val version = if (v > 127) {
@@ -162,6 +208,59 @@ data class TransactionMessage internal constructor(
                 recentBlockhash = Base58.encode(recentBlockhash),
                 instructions = instructions,
                 addressLookupTables = addressLookupTables,
+            )
+        }
+
+        // Reads one v1 message and leaves the buffer positioned right after it.
+        internal fun deserializeV1(buffer: ByteBuffer): TransactionMessage {
+            buffer.order(ByteOrder.LITTLE_ENDIAN)
+            if ((buffer.get().toInt() and 0xFF) != V1_PREFIX) {
+                throw SerializationException("Not a v1 message")
+            }
+            val numRequiredSignatures = buffer.get().toInt() and 0xFF
+            val numReadonlySignedAccounts = buffer.get().toInt() and 0xFF
+            val numReadonlyUnsignedAccounts = buffer.get().toInt() and 0xFF
+            val mask = buffer.getInt()
+            val priorityFeeBits = mask and TransactionConfig.PRIORITY_FEE
+            if ((mask and TransactionConfig.KNOWN_BITS.inv()) != 0 ||
+                (priorityFeeBits != 0 && priorityFeeBits != TransactionConfig.PRIORITY_FEE)
+            ) {
+                throw SerializationException("Invalid transaction config mask")
+            }
+            val recentBlockhash = ByteArray(PUBLIC_KEY_LENGTH).also { buffer.get(it) }
+            val numInstructions = buffer.get().toInt() and 0xFF
+            val numAccounts = buffer.get().toInt() and 0xFF
+            val accountKeys = List(numAccounts) {
+                PublicKey(ByteArray(PUBLIC_KEY_LENGTH).also { buffer.get(it) })
+            }
+            val config = TransactionConfig(
+                priorityFee = if (priorityFeeBits != 0) buffer.getLong() else null,
+                computeUnitLimit = if ((mask and TransactionConfig.COMPUTE_UNIT_LIMIT) != 0) buffer.getInt() else null,
+                loadedAccountsDataSizeLimit = if ((mask and TransactionConfig.LOADED_ACCOUNTS_DATA_SIZE) != 0) buffer.getInt() else null,
+                heapSize = if ((mask and TransactionConfig.HEAP_SIZE) != 0) buffer.getInt() else null,
+            )
+            val instructionHeaders = List(numInstructions) {
+                Triple(buffer.get().toInt() and 0xFF, buffer.get().toInt() and 0xFF, buffer.getShort().toInt() and 0xFFFF)
+            }
+            val instructions = instructionHeaders.map { (programIdIndex, accountCount, dataLength) ->
+                CompiledInstruction(
+                    programIdIndex = programIdIndex,
+                    accounts = List(accountCount) { buffer.get().toInt() and 0xFF },
+                    data = ByteArray(dataLength).also { buffer.get(it) },
+                )
+            }
+            return TransactionMessage(
+                version = MessageVersion.V1,
+                header = MessageHeader(
+                    numRequiredSignatures = numRequiredSignatures,
+                    numReadonlySignedAccounts = numReadonlySignedAccounts,
+                    numReadonlyUnsignedAccounts = numReadonlyUnsignedAccounts,
+                ),
+                accounts = accountKeys,
+                recentBlockhash = Base58.encode(recentBlockhash),
+                instructions = instructions,
+                addressLookupTables = emptyList(),
+                config = config,
             )
         }
 
@@ -360,6 +459,31 @@ internal data class MessageHeader(
     val numReadonlySignedAccounts: Int,
     val numReadonlyUnsignedAccounts: Int,
 )
+
+// Compute budget settings carried in a v1 message instead of instructions.
+internal data class TransactionConfig(
+    val priorityFee: Long? = null,
+    val computeUnitLimit: Int? = null,
+    val loadedAccountsDataSizeLimit: Int? = null,
+    val heapSize: Int? = null,
+) {
+    fun mask(): Int {
+        var mask = 0
+        if (priorityFee != null) mask = mask or PRIORITY_FEE
+        if (computeUnitLimit != null) mask = mask or COMPUTE_UNIT_LIMIT
+        if (loadedAccountsDataSizeLimit != null) mask = mask or LOADED_ACCOUNTS_DATA_SIZE
+        if (heapSize != null) mask = mask or HEAP_SIZE
+        return mask
+    }
+
+    companion object {
+        const val PRIORITY_FEE = 0b11
+        const val COMPUTE_UNIT_LIMIT = 0b100
+        const val LOADED_ACCOUNTS_DATA_SIZE = 0b1000
+        const val HEAP_SIZE = 0b10000
+        const val KNOWN_BITS = PRIORITY_FEE or COMPUTE_UNIT_LIMIT or LOADED_ACCOUNTS_DATA_SIZE or HEAP_SIZE
+    }
+}
 
 data class AddressLookupTableAccount(
     val key: PublicKey,

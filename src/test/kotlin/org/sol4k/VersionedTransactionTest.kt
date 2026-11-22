@@ -1,11 +1,13 @@
 package org.sol4k
 
 import org.junit.jupiter.api.Test
+import org.sol4k.exception.SerializationException
 import org.sol4k.instruction.BaseInstruction
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.util.Base64
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class VersionedTransactionTest {
@@ -129,5 +131,49 @@ class VersionedTransactionTest {
         transaction2.sign(signer2)
 
         assertTrue(transaction1.serialize().contentEquals(transaction2.serialize()))
+    }
+
+    @Test
+    fun shouldDecodeV1TransactionFromString() {
+        // mainnet slot 450393816: 1 signer, no instructions, priority fee, CU and loaded data limits
+        var t = "gQEAAA8AAABiq0Gwotg0FHnTqmYkLsNUVdhaqWklinCpz9V56nijXwABDQTq3/TfkvSKmiwAes6z+SHi/yMLeT0G9FMAu0RBJDSihgEAAAAAAAAAAAAAgAAAJRj3pIO/uEv1j1WhsXDhzhCsU3gBEfIhW2Lz1+P3hfBqgcotlwhhuF0OZ10H5wnFj/BjnU7aGyYl9MSex1GcBA=="
+        var tx = VersionedTransaction.from(t)
+        assertEquals(TransactionMessage.MessageVersion.V1, tx.message.version)
+        assertEquals(1, tx.signatures.size)
+        assertEquals(1, tx.message.accounts.size)
+        assertEquals(0, tx.message.instructions.size)
+        assertEquals("7eAR3fvfxykTmVZWenyhqHTGM4VigBWZFLBKUET8Yu4S", tx.message.recentBlockhash)
+        assertEquals(t, Base64.getEncoder().encodeToString(tx.serialize()))
+        assertTrue(tx.message.accounts[0].verify(Base58.decode(tx.signatures[0]!!), tx.message.serialize()))
+
+        // mainnet slot 471106999: 2 signers, 1 instruction
+        t = "gQIAAQ8AAABX3oskRYW4rxhkeJassE6dhF0KYvIxg3tzLiJupHC9EAEDvV80paH03jPaRzVC/Yz4z2vCw6lONgJzuEUw7rZzPQwei4+VosNTKffZM04/j/3EihtONafJn7hLz26T6lOY9gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAXBUAAAAABAICDAABAAIAAADtAMcHAAAAADcZWI+eyXokQ48GcXp169x4tarnXYua9i1h21l/QZ6tskS04GjZ4MbEQhs23npkKOtZuMYNqsIfD9/9rRiFqwCMyfb+8QPFgg1A8RziVq9bCGTfP9ursH0dBqUuWE2lj17KiuuVLqqvthBlflZso5Pw3Nh55vqf3PvbmYvORXkB"
+        tx = VersionedTransaction.from(t)
+        assertEquals(2, tx.signatures.size)
+        assertEquals(3, tx.message.accounts.size)
+        assertEquals(1, tx.message.instructions.size)
+        assertEquals("6v1HivZFMh1ZgMQMMwuE8ySjcUUYh17Tt15qR2WsJZiX", tx.message.recentBlockhash)
+        assertEquals(t, Base64.getEncoder().encodeToString(tx.serialize()))
+        assertTrue(tx.message.accounts[0].verify(Base58.decode(tx.signatures[0]!!), tx.message.serialize()))
+        assertTrue(tx.message.accounts[1].verify(Base58.decode(tx.signatures[1]!!), tx.message.serialize()))
+
+        // mainnet slot 447551999: all four config values
+        t = "gQEAAR8AAADh7m4vguWuRS3hHZSoNsBIrC7HTKIDMr3gsGUPz3uezwEDaKLdQ+LwfDvX9PJ4Uj+1MDLhFU1YcLoOdlBRwcItglvyyHeIvEHlnUg8fuAqXSjUT4UTmj04WFjKgCbdQYPkAgv4/JLU3rMUWgjuC2u6N5eRRt1SZoMgKa8hW58VBcyaMwAAAAAAAACgAAAAMqgCAACAAAACAh0AAAE3ALgvB9w5AAAA/xmtGgAAAAABAwDD7BlNVXdGvqS8gp4wpx/VS79llOV5Dyw1yKL7uauVljhIRAYqg1SEo5Ft20ffTNXjmdplejnS0hOxyxEo2mQkNIShwSc4Ngs="
+        tx = VersionedTransaction.from(t)
+        assertEquals(t, Base64.getEncoder().encodeToString(tx.serialize()))
+    }
+
+    @Test
+    fun shouldRejectV1TransactionWithWrongSignatureCount() {
+        val bytes = Base64.getDecoder().decode(
+            "gQEAAA8AAABiq0Gwotg0FHnTqmYkLsNUVdhaqWklinCpz9V56nijXwABDQTq3/TfkvSKmiwAes6z+SHi/yMLeT0G9FMAu0RBJDSihgEAAAAAAAAAAAAAgAAAJRj3pIO/uEv1j1WhsXDhzhCsU3gBEfIhW2Lz1+P3hfBqgcotlwhhuF0OZ10H5wnFj/BjnU7aGyYl9MSex1GcBA==",
+        )
+        val encoder = Base64.getEncoder()
+        assertFailsWith<SerializationException> {
+            VersionedTransaction.from(encoder.encodeToString(bytes.copyOf(bytes.size - 1)))
+        }
+        assertFailsWith<SerializationException> {
+            VersionedTransaction.from(encoder.encodeToString(bytes + ByteArray(64)))
+        }
     }
 }

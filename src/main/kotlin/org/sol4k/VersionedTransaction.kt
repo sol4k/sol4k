@@ -5,6 +5,7 @@ import org.sol4k.exception.SerializationException
 import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.nio.ByteBuffer
 import java.util.Base64
 import kotlin.math.max
 
@@ -48,6 +49,14 @@ class VersionedTransaction private constructor(
         val messageData = message.serialize()
 
         val b = ByteArrayOutputStream()
+        if (message.version == TransactionMessage.MessageVersion.V1) {
+            // v1 puts the message first, then the signatures with no length prefix.
+            b.write(messageData)
+            for (s in signatures.filterNotNull()) {
+                b.write(Base58.decode(s))
+            }
+            return b.toByteArray()
+        }
         b.write(Binary.encodeLength(signatures.size))
         for (s in signatures.filterNotNull()) {
             b.write(Base58.decode(s))
@@ -71,6 +80,9 @@ class VersionedTransaction private constructor(
         @JvmStatic
         fun from(encodedTransaction: String): VersionedTransaction {
             var byteArray = Base64.getDecoder().decode(encodedTransaction)
+            if (byteArray.isNotEmpty() && (byteArray.first().toInt() and 0xFF) == TransactionMessage.V1_PREFIX) {
+                return fromV1(byteArray)
+            }
             val signaturesDecodedLength = Binary.decodeLength(byteArray)
             byteArray = signaturesDecodedLength.bytes
             val signatures = mutableListOf<String>()
@@ -82,11 +94,27 @@ class VersionedTransaction private constructor(
             }
 
             val message = TransactionMessage.deserialize(byteArray)
+            if (message.version == TransactionMessage.MessageVersion.V1) {
+                throw SerializationException("A v1 message must not be preceded by a signature count")
+            }
 
             if (signaturesDecodedLength.length > 0 && message.header.numRequiredSignatures != signaturesDecodedLength.length) {
                 throw SerializationException("numRequiredSignatures is not equal to signatureCount")
             }
             return VersionedTransaction(message, signatures.toMutableList())
+        }
+
+        private fun fromV1(byteArray: ByteArray): VersionedTransaction {
+            val buffer = ByteBuffer.wrap(byteArray)
+            val message = TransactionMessage.deserializeV1(buffer)
+            val signatureCount = message.header.numRequiredSignatures
+            if (buffer.remaining() != signatureCount * SIGNATURE_LENGTH) {
+                throw SerializationException("Expected $signatureCount signatures after the v1 message")
+            }
+            val signatures = MutableList<String?>(signatureCount) {
+                Base58.encode(ByteArray(SIGNATURE_LENGTH).also { buffer.get(it) })
+            }
+            return VersionedTransaction(message, signatures)
         }
     }
 }
